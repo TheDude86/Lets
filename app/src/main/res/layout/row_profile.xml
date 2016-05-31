@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/placeCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="1dp"
+    android:layout_marginBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="330dp">
+
+            <ImageView
+                android:id="@+id/bgImage"
+                android:layout_width="575dp"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="#00aeff"
+                android:transitionName="tImage" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="290dp"
+                android:id="@+id/img_profile"
+                android:layout_gravity="top|center"
+                android:adjustViewBounds="false"
+                android:scaleType="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Joe Novosel"
+                android:paddingBottom="10dp"
+                android:id="@+id/txt_name"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginTop="15dp"
+                android:textSize="35dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical|center_horizontal" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignEnd="@+id/txt_bio"
+            android:layout_alignBottom="@+id/txt_friends"
+            android:background="#b3b3b3"
+            android:id="@+id/line">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This text is as insignificat as Shallon&apos;s existance"
+                android:id="@+id/ShallonDidNineEleven"
+                android:textSize="0dp"
+                android:textColor="#00ffffff" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_alignStart="@+id/line"
+            android:id="@+id/layout_info">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="1"
+                android:id="@+id/layout_profile_bar"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Events"
+                    android:id="@+id/btn_events"
+                    android:shadowRadius="4"
+                    android:elevation="30dp"
+                    android:layout_weight="0.33"
+                    android:background="#00FFFFFF" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Friends"
+                    android:id="@+id/btn_friends"
+                    android:layout_weight="0.33"
+                    android:background="#00FFFFFF" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn_groups"
+                    android:text="Groups"
+                    android:layout_weight="0.33"
+                    android:background="#00ffffff" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Bio goes here"
+                android:id="@+id/txt_bio"
+                android:layout_marginTop="36dp"
+                android:layout_below="@+id/txt_friends"
+                android:layout_alignStart="@+id/txt_friends" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Friends"
+                android:id="@+id/txt_friends"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Score"
+                android:id="@+id/txt_score"
+                android:layout_alignTop="@+id/txt_friends"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="25dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Interests"
+                android:id="@+id/textView2"
+                android:layout_marginTop="71dp"
+                android:layout_below="@+id/txt_bio"
+                android:layout_alignStart="@+id/txt_bio" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Interests go here"
+                android:id="@+id/txt_interests"
+                android:layout_below="@+id/textView2"
+                android:layout_alignStart="@+id/textView2" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

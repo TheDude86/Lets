@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/btn_attend"
+        style="@style/TextButtonToolBar"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/settings"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Attendance"
+        android:textSize="14dp" />
+
+    <TextView
+        style="@style/TextButtonToolBar"
+        android:id="@+id/btn_comments"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Comments"
+        android:textSize="14dp" />
+
+    <TextView
+        style="@style/TextButtonToolBar"
+        android:id="@+id/btn_actions"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Actions"
+        android:textSize="14dp" />
+
+</LinearLayout>
