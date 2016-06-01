@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
     public GlobalFeed mGlobalFeed;
     HashMap<String, Object> mMap;
 
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.println(Log.ASSERT, "Has Token", mMap.containsKey("token") ? (String) mMap.get("token") : "No");
 
             }
         });
