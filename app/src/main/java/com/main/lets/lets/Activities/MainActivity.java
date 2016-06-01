@@ -2,6 +2,7 @@ package com.main.lets.lets.Activities;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
@@ -31,10 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public GlobalFeed mGlobalFeed;
     HashMap<String, Object> mMap;
 
-    /**
-     *
-     * @param savedInstanceState
-     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,6 +158,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
+
+            }
+        });
+
+        //Set the recycler view to display the user's notifications
+        findViewById(R.id.create_event).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.println(Log.ASSERT, "Clicked", "Create event clicked");
+
+                Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
+                startActivity(i);
 
             }
         });
