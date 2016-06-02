@@ -166,8 +166,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.create_event).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.println(Log.ASSERT, "Clicked", "Create event clicked");
-
                 Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
                 startActivity(i);
 
