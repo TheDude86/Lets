@@ -5,25 +5,26 @@ import org.json.JSONException;
 /**
  * Created by Joe on 5/13/2016.
  */
-public class Group {
+public class Group extends Entity{
     private org.json.JSONObject JSON;
-    private int groupID;
-    private int ownerID;
-    private String mTitle;
-    private String mBio;
-    private String pic_ref;
     private boolean isPublic;
+    private String pic_ref;
     private int mSettings;
+    private String mTitle;
+    private int ownerID;
+    private String mBio;
+    private int groupID;
 
     public Group(org.json.JSONObject j) throws JSONException {
-        JSON = j;
-        groupID = j.getInt("group_id");
-        ownerID = j.getInt("god");
+        super(j.getInt("group_id"), j.getString("group_name"), EntityType.GROUP);
         mTitle = j.getString("group_name");
-        mBio = j.getString("bio");
-        pic_ref = j.getString("pic_ref");
         isPublic = j.getBoolean("public");
         mSettings = j.getInt("settings");
+        pic_ref = j.getString("pic_ref");
+        groupID = j.getInt("group_id");
+        ownerID = j.getInt("god");
+        mBio = j.getString("bio");
+        JSON = j;
 
     }
 

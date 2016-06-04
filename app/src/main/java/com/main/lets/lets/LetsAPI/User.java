@@ -10,7 +10,7 @@ import java.util.LinkedList;
 /**
  * Created by Joe on 5/12/2016.
  */
-public class User implements Serializable {
+public class User extends Entity {
     private static final long serialVersionUID = 1L;
     private int userID;
     private String name;
@@ -27,20 +27,24 @@ public class User implements Serializable {
     private LinkedList<Group> mGroups;
 
     public User(int id, String name, String bio, int events, int score, Timestamp birthday, int friends, boolean active, int ownerList) {
+        super(id, name, EntityType.USER);
+
+        mGroups = new LinkedList<>();
+        this.setOwnerList(ownerList);
+        this.setBirthday(birthday);
+        this.setFriends(friends);
+        this.setEvents(events);
+        this.setActive(active);
+        this.setScore(score);
         this.setUserID(id);
         this.setName(name);
         this.setBio(bio);
-        this.setEvents(events);
-        this.setScore(score);
-        this.setBirthday(birthday);
-        this.setFriends(friends);
-        this.setActive(active);
-        this.setOwnerList(ownerList);
-        mGroups = new LinkedList<>();
 
     }
 
     public User(JSONObject j) throws JSONException {
+        super(j.getInt("User_ID"), j.getString("User_Name"), EntityType.USER);
+
         this.setBirthday(new Timestamp(Long.parseLong(j.getString("Birthday")
                 .substring(6, j.getString("Birthday").length() - 2))));
         this.setGender(j.getInt("Gender") == 1 ? true : false);

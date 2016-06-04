@@ -8,6 +8,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -162,16 +163,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Set the recycler view to display the user's notifications
+        //Start the EventCreateActivity
         findViewById(R.id.create_event).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
+                i.putExtra("token", (String)mMap.get("token"));
                 startActivity(i);
 
             }
         });
 
+        //Start the GroupCreateActivity
+        findViewById(R.id.create_group).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, GroupDetailActivity.class);
+                i.putExtra("token", (String)mMap.get("token"));
+                startActivity(i);
+
+            }
+        });
 
     }
 
@@ -206,6 +218,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+    }
+
+    /**
+     * Need this to make the application multidexed, with all of the libraries, there are more than
+     * 4K functions which is the max for a single dex file in Android
+     *
+     * Why does this have to be done manually and this doesn't come standard in Android?  Who the fuck
+     * knows, Google is just full of lazy bastards.
+     * @param base (for the super method)
+     */
+    @Override
+    public void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
 }

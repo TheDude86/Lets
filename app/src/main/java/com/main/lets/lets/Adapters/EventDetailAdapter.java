@@ -1,6 +1,7 @@
 package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +24,11 @@ import java.util.ArrayList;
 public class EventDetailAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
     public ArrayList<String> mComment;
     public ArrayList<String> mUsers;
-    ViewType type;
     enum ViewType {USERS, COMMENTS}
     ArrayList<String> mEntities;
     MainHolder mMainHolder;
-
     Activity mActivity;
+    ViewType type;
 
     public EventDetailAdapter(Activity a, ArrayList<String> s) {
         super(s);

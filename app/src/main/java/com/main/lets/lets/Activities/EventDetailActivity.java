@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.main.lets.lets.LetsAPI.Event;
@@ -26,6 +27,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
         try {
             JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
+
             EventDetailFeed f = new EventDetailFeed(this, (UltimateRecyclerView)findViewById(R.id.event_detail_list), j);
             Event e = new Event(j);
 

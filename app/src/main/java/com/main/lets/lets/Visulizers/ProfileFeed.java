@@ -14,9 +14,12 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,9 +30,9 @@ import cz.msebera.android.httpclient.Header;
  */
 public class ProfileFeed extends Client {
     public static final String FILENAME = "userInfo";
+    String ShallonCreamerIsATwat = "Bearer ";
     UltimateRecyclerView mRecyclerView;
     HashMap<String, Object> mUserInfo;
-    String ShallonCreamerIsATwat = "Bearer ";
     ProfileAdapter mProfileAdapter;
     LoginAdapter mLoginAdapter;
     Activity mActivity;
@@ -40,18 +43,31 @@ public class ProfileFeed extends Client {
         mRecyclerView = r;
         mActivity = a;
 
-    }
-
-    public ProfileFeed(Activity a, UltimateRecyclerView r, HashMap<String, Object> m) {
-        mRecyclerView = r;
-        mActivity = a;
-        mUserInfo = m;
         try {
 
             mProfileAdapter = new ProfileAdapter(mActivity, new ArrayList<String>());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public ProfileFeed(Activity a, UltimateRecyclerView r, HashMap<String, Object> m) {
+        mRecyclerView = r;
+        mActivity = a;
+        mUserInfo = m;
+
+        if (!loginInitial()) {
+            try {
+
+                mProfileAdapter = new ProfileAdapter(mActivity, new ArrayList<String>());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
 
     }
 
@@ -63,23 +79,23 @@ public class ProfileFeed extends Client {
 
             mLoginAdapter.setOnLoginClick(new LoginAdapter.OnItemClickListener() {
                 @Override
-                public void onItemClick( String email, String password) {
+                public void onItemClick(String email, String password) {
                     login(email, password);
+                    draw(null);
 
                 }
 
             });
 
-
             mRecyclerView.setAdapter(mLoginAdapter);
-        }else{
+        } else {
             try {
                 mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                mProfileAdapter.switchActive(ProfileAdapter.Viewing.FRIENDS);
                 mRecyclerView.setAdapter(mProfileAdapter);
-                mProfileAdapter.removeAll();
-                mProfileAdapter.insert(mUser.toString());
-
                 loadFriends();
+                loadGroups();
+                loadAttend();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -89,17 +105,18 @@ public class ProfileFeed extends Client {
 
     }
 
-    public void loadFriends() throws JSONException {
+    public void loadGroups() throws JSONException {
         RequestParams params = new RequestParams();
+        params.put("user_id", mUser.get("User_ID"));
         client.addHeader("Authorization", ShallonCreamerIsATwat);
-        post("friends/getFriends", params, new JsonHttpResponseHandler() {
+        post("user/getGroups", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+                mProfileAdapter.mGroups = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
 
-                        if (response.getJSONObject(i).getBoolean("status"))
-                            mProfileAdapter.mFriends.add(response.getJSONObject(i).toString());
+                        mProfileAdapter.mGroups.add(response.getJSONObject(i).toString());
 
                     } catch (org.json.JSONException e) {
                         e.printStackTrace();
@@ -117,6 +134,77 @@ public class ProfileFeed extends Client {
 
         });
 
+
+    }
+
+    public void loadAttend()throws JSONException {
+        RequestParams params = new RequestParams();
+        params.put("user_id", mUser.get("User_ID"));
+        client.addHeader("Authorization", ShallonCreamerIsATwat);
+        post("user/getAttended", params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+                mProfileAdapter.mEvents = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+
+                        mProfileAdapter.mEvents.add(response.getJSONObject(i).toString());
+
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                  org.json.JSONArray errorResponse) {
+                Log.e("Aync Test Failure", errorResponse.toString());
+            }
+
+        });
+
+    }
+
+    public void loadFriends() throws JSONException {
+        for(String ignored : mProfileAdapter.mFriends)
+            mProfileAdapter.removeLast();
+
+        RequestParams params = new RequestParams();
+        client.addHeader("Authorization", ShallonCreamerIsATwat);
+        post("friends/getFriends", params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+                mProfileAdapter.mFriends = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+
+                        if (response.getJSONObject(i).getBoolean("status")) {
+                            mProfileAdapter.mFriends.add(response.getJSONObject(i).toString());
+                            mProfileAdapter.insertLast(response.getJSONObject(i).toString());
+
+                        }
+
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                mProfileAdapter.mViewHolder.getFriends().setText(mProfileAdapter.mFriends.size() +
+                        " Friends");
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                  org.json.JSONArray errorResponse) {
+                Log.e("Aync Test Failure", errorResponse.toString());
+            }
+
+        });
 
     }
 
@@ -141,8 +229,6 @@ public class ProfileFeed extends Client {
                     fos.write(string.getBytes());
                     fos.close();
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -153,8 +239,11 @@ public class ProfileFeed extends Client {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                         try {
-                            mUser = response.getJSONObject(0);
-                            draw(null);
+                            mUser  = response.getJSONObject(0);
+                            ArrayList<String> l = new ArrayList<>();
+                            l.add(response.getJSONObject(0).toString());
+                            mProfileAdapter = new ProfileAdapter(mActivity, l);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -180,5 +269,47 @@ public class ProfileFeed extends Client {
 
         });
     }
+
+    public boolean loginInitial() {
+        try {
+
+            try {
+                FileInputStream fis = mActivity.openFileInput(FILENAME);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader bufferedReader = new BufferedReader(isr);
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                String[] cred = {};
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                if (!sb.toString().equals("blank")) {
+                    cred = sb.toString().split(":");
+                    login(cred[0], cred[1]);
+
+                } else
+                    return false;
+
+            } catch (FileNotFoundException e) {
+                FileOutputStream fos = null;
+                String string = "blank";
+                fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos.write(string.getBytes());
+                fos.close();
+
+                return false;
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+
+    }
+
 
 }

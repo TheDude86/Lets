@@ -157,4 +157,5 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_select_location">Map</string>
+    <string name="descriptionText">Tell us why it\'s so cool</string>
 </resources>

@@ -11,7 +11,7 @@ import java.util.HashMap;
 /**
  * Created by Joe on 5/12/2016.
  */
-public class Event implements Comparable<Event> {
+public class Event extends Entity implements Comparable<Event> {
     private HashMap<String, Double> mCords;
     private int mMaxAttendance = 200;
     private boolean mUserAttending;
@@ -33,6 +33,7 @@ public class Event implements Comparable<Event> {
     private Date mEnd;
 
     public Event(org.json.JSONObject j) throws JSONException {
+        super(j.getInt("Event_ID"),j.getString("Event_Name"), EntityType.EVENT);
         mCords = new HashMap<>();
 
         mCords.put("longitude", j.getDouble("Longitude"));
@@ -41,12 +42,13 @@ public class Event implements Comparable<Event> {
         mMaxAttendance = j.getInt("Max_Attendance");
         mMinAttendance = j.getInt("Min_Attendance");
         mDescription = j.getString("Description");
-        mRestrictions = j.getInt("Restrictions");
-        mDistance = j.getDouble("Distance");
         mTitle = j.getString("Event_Name");
         mOwnerID = j.getInt("Creator_ID");
         mCategory = j.getInt("Category");
         mEventID = j.getInt("Event_ID");
+
+        if(j.has("Distance"))
+            mDistance = j.getDouble("Distance");
 
         mStart = new Date((Long.parseLong(j.getString("Start_Time")
                 .substring(6, j.getString("Start_Time").length() - 2))));

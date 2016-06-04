@@ -1,12 +1,12 @@
 package com.main.lets.lets.Activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.google.android.gms.common.api.Status;
@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 public class EventCreateActivity extends AppCompatActivity {
+    String ShallonCreamerIsATwat;
     //HashMap only stores strings because it is used to create the post request and all params
     //must be strings
     private HashMap<String, String> mMap;
@@ -42,10 +43,11 @@ public class EventCreateActivity extends AppCompatActivity {
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
-        Slider duration = (Slider) findViewById(R.id.duration);
+        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         final EditText title = (EditText) findViewById(R.id.title);
         final EditText date = (EditText) findViewById(R.id.date);
         final EditText time = (EditText) findViewById(R.id.time);
+        Slider duration = (Slider) findViewById(R.id.duration);
         mCalendar = Calendar.getInstance();
 
         /*
@@ -247,7 +249,7 @@ public class EventCreateActivity extends AppCompatActivity {
             /**
              * When the category EditText is clicked, create a dialog box containing the potential
              * categories and then update the HashMap and EditText once the dialog box closes.
-             * @param view
+             * @param view (Unused)
              */
             @Override
             public void onClick(View view) {
@@ -267,7 +269,7 @@ public class EventCreateActivity extends AppCompatActivity {
                      *
                      * When they confirm their choice, the HashMap is updated with the category's
                      * number and the EditText is updated with the title
-                     * @param fragment
+                     * @param fragment (Used by super method)
                      */
                     @Override
                     public void onPositiveActionClicked(DialogFragment fragment) {
@@ -314,7 +316,7 @@ public class EventCreateActivity extends AppCompatActivity {
              * then return and tell the user where they went wrong and if all of the information
              * is there and valid, then set the post request to create the event and if it is
              * successful, start an EventDetailActivity to show the user their new event
-             * @param view
+             * @param view (Unused)
              */
             @Override
             public void onClick(View view) {
@@ -322,8 +324,8 @@ public class EventCreateActivity extends AppCompatActivity {
                 end.set(Calendar.HOUR_OF_DAY, end.get(Calendar.HOUR_OF_DAY) + Integer.parseInt(
                         mMap.get("Duration")));
 
-                Log.println(Log.ASSERT, "Start Time", new SimpleDateFormat("HH:mm:ss mm-dd-yyyy").format(mCalendar.getTime()));
-                Log.println(Log.ASSERT, "End Time", new SimpleDateFormat("HH:mm:ss mm-dd-yyyy").format(end.getTime()));
+                Log.println(Log.ASSERT, "Start Time", new SimpleDateFormat("HH:mm:ss MM-dd-yyyy").format(mCalendar.getTime()));
+                Log.println(Log.ASSERT, "End Time", new SimpleDateFormat("HH:mm:ss MM-dd-yyyy").format(end.getTime()));
 
                 //Checks to see if a start time has been selected
                 if (time.getText().toString().equals("Some Time o'clock"))

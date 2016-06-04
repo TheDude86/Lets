@@ -4,13 +4,14 @@
     android:id="@+id/placeCard"
     android:layout_width="match_parent"
     android:layout_height="100dp"
+    android:layout_marginBottom="8dp"
     card_view:cardCornerRadius="0dp"
-    card_view:cardElevation="0dp">
+    card_view:cardElevation="1dp">
 
     <RelativeLayout
         android:id="@+id/layout_info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:orientation="vertical">
 
@@ -30,17 +31,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView5"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:id="@+id/linearLayout"
-            android:background="#e8e8e8"/>
+            android:layout_marginRight="99dp"
+            android:layout_marginEnd="99dp" />
+
+
 
     </RelativeLayout>
 

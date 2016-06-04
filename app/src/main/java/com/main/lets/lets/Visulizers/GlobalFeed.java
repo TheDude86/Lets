@@ -46,7 +46,7 @@ public class GlobalFeed extends Client {
         try {
 
             RequestParams params = new RequestParams();
-            params.put("latitude", (Double)j.get("latitude") + "");
+            params.put("latitude", j.get("latitude") + "");
             params.put("longitude", j.get("longitude") + "");
             params.put("range", 980000 + "");
 

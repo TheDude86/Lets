@@ -31,6 +31,7 @@ public class EventDetailFeed extends Client {
         mActivity = a;
 
         l.add(j.toString());
+        Log.println(Log.ASSERT, "Test", l.get(0));
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         mEventAdapter = new EventDetailAdapter(a, l);
         mRecyclerView.setAdapter(mEventAdapter);

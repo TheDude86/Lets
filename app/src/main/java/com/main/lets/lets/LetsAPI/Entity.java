@@ -1,45 +1,73 @@
 package com.main.lets.lets.LetsAPI;
 
+import android.util.Log;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.Visulizers.Client;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/30/2016.
  */
-public class Entity {
+public class Entity  extends Client{
     enum EntityType {EVENT, USER, GROUP, COMMENT}
 
     public EntityType mType;
     public String mText;
-    int mID;
+    public int mID;
+
+    public Entity(int i, String s, EntityType e){
+        mType = e;
+        mText = s;
+        mID = i;
+
+    }
 
     public Entity(JSONObject j) {
         try {
             if (j.has("Sender")) {
-                mText = j.getString("User_Name");
-                mID = j.getInt("Sender");
                 mType = EntityType.USER;
+                mID = j.getInt("Sender");
+                mText = j.getString("User_Name");
 
             } else if (j.has("user_id")) {
-                mText = j.getString("name");
-                mID = j.getInt("user_id");
                 mType = EntityType.USER;
+                mID = j.getInt("user_id");
+                mText = j.getString("name");
 
             } else if (j.has("event_id")) {
-                mText = j.getString("event_name");
-                mID = j.getInt("event_id");
                 mType = EntityType.EVENT;
+                mID = j.getInt("event_id");
+                mText = j.getString("event_name");
 
             } else if(j.has("Message")){
                 mID = -1;
-                mText = j.getString("name") + ": \n" + j.getString("Message");
                 mType = EntityType.COMMENT;
+                mText = j.getString("name") + ": \n" + j.getString("Message");
 
+            } else if(j.has("group_name")){
+                mType = EntityType.GROUP;
+                mID = j.getInt("group_id");
+                mText = j.getString("group_name");
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    @Override
+    public void draw(JSONObject j) {
+        Log.println(Log.ASSERT, "Asshat", "Don't use this method");
+        int x = 3/0;
+
     }
 
 }
