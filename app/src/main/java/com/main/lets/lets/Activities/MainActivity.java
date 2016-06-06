@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //If they allow permissions then create the same hashmap as in onCreate
                 mMap.put("latitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
+
                 mMap.put("longitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
                 //Draw the GlobalFeed just as if the user perviously accepted the permissions
                 mGlobalFeed.draw(new JSONObject(mMap));

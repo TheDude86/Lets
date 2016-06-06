@@ -41,10 +41,10 @@ public class Entity  extends Client{
                 mID = j.getInt("user_id");
                 mText = j.getString("name");
 
-            } else if (j.has("event_id")) {
+            } else if (j.has("Event_ID")) {
                 mType = EntityType.EVENT;
-                mID = j.getInt("event_id");
-                mText = j.getString("event_name");
+                mID = j.getInt("Event_ID");
+                mText = j.getString("Event_Name");
 
             } else if(j.has("Message")){
                 mID = -1;

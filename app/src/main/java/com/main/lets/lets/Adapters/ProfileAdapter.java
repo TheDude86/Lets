@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.main.lets.lets.Activities.MainActivity;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
+import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.quickAdapter.easyRegularAdapter;
 
@@ -32,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -42,14 +46,11 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 12/13/2015.
  */
 public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
-    public enum Viewing {EVENTS, GROUPS, FRIENDS}
-
-    private Viewing active = Viewing.FRIENDS;
     private static final int DETAIL_CODE = 1;
     public ArrayList<String> mEntities;
     public ArrayList<String> mFriends;
-    public ArrayList<String> mEvents;
     public ArrayList<String> mGroups;
+    public ArrayList<String> mEvents;
     public ViewHolder mViewHolder;
     private Activity mActivity;
     private User mUser;
@@ -60,17 +61,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     public ProfileAdapter(Activity context, ArrayList<String> a) throws JSONException {
         super(a);
-        mEntities = a;
-        mActivity = context;
-        mEvents = new ArrayList<>();
-        mGroups = new ArrayList<>();
-        mFriends = new ArrayList<>();
-
-    }
-
-    public ProfileAdapter(Activity context, ArrayList<String> a, Viewing e) throws JSONException {
-        super(a);
-        active = e;
         mEntities = a;
         mActivity = context;
         mGroups = new ArrayList<>();
@@ -93,7 +83,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     @Override
     protected void withBindHolder(UltimateRecyclerviewViewHolder holder, String data, int position) {
-
     }
 
     @Override
@@ -103,12 +92,13 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     @Override
     public UltimateRecyclerviewViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_profile, parent, false);
+        mViewHolder = new ViewHolder(view);
+
         try {
             mUser = new User(new JSONObject(mEntities.get(0)));
 
             if (viewType == 0) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_profile, parent, false);
-                mViewHolder = new ViewHolder(view);
 
 
                 mViewHolder.name.setText(mUser.getName());
@@ -129,9 +119,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                             interestString += ", " + Categories[i];
 
                         }
-
                     }
-
                 }
 
                 mViewHolder.interests.setText(interestString);
@@ -142,40 +130,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
             e.printStackTrace();
         }
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
-        EntityHolder e = new EntityHolder(view);
-        e.mLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-
-                    switch (active) {
-                        case FRIENDS:
-
-                            break;
-
-                        case EVENTS:
-                            loadEvent(new Entity(new JSONObject(mEntities.get(viewType))).mID);
-
-                            break;
-
-                    }
-
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                }
-
-            }
-
-        });
-
-        try {
-            e.mTitle.setText(new Entity(new JSONObject(mEntities.get(viewType))).mText);
-        } catch (JSONException e1) {
-            e1.printStackTrace();
-        }
-
-        return e;
+        return new ViewHolder(view);
 
     }
 
@@ -212,93 +167,46 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     }
 
-    public void insert(String s) {
-        mEntities.add(s);
-
-    }
-
-    public void switchActive(Viewing e) {
-        if (active == e || !b)
-            return;
-
-        b = false;
-        switch (active) {
-            case FRIENDS:
-                for (String ignored : mFriends)
-                    removeLast();
-
-                break;
-            case EVENTS:
-                for (String ignored : mEvents)
-                    removeLast();
-
-                break;
-
-            case GROUPS:
-                for (String ignored : mGroups)
-                    removeLast();
-
-                break;
-        }
-
-        switch (e) {
-            case FRIENDS:
-                for (String s : mFriends)
-                    insert(s);
-
-                break;
-            case EVENTS:
-                for (String s : mEvents)
-                    insert(s);
-
-                break;
-
-            case GROUPS:
-                for (String s : mGroups)
-                    insert(s);
-
-                break;
-        }
-
-        active = e;
-        b = true;
-
-    }
-
 
     public class ViewHolder extends UltimateRecyclerviewViewHolder {
+        public RecyclerView mRecyclerView;
+        public TextView interests;
         public ImageView mPicture;
+        public TextView friends;
+        public Button bFriends;
+        public TextView score;
+        public Button bGroups;
+        public Button bEvents;
         public TextView name;
         public TextView bio;
-        public TextView friends;
-        public TextView score;
-        public TextView interests;
-        public Button bEvents;
-        public Button bFriends;
-        public Button bGroups;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             if (mEntities.size() > 0) {
-                name = (TextView) itemView.findViewById(R.id.txt_name);
-                bio = (TextView) itemView.findViewById(R.id.txt_bio);
-                setFriends((TextView) itemView.findViewById(R.id.txt_friends));
-                score = (TextView) itemView.findViewById(R.id.txt_score);
                 interests = (TextView) itemView.findViewById(R.id.txt_interests);
-                bEvents = (Button) itemView.findViewById(R.id.btn_events);
+                mPicture = (ImageView) itemView.findViewById(R.id.img_profile);
+                setFriends((TextView) itemView.findViewById(R.id.txt_friends));
                 bFriends = (Button) itemView.findViewById(R.id.btn_friends);
                 bGroups = (Button) itemView.findViewById(R.id.btn_groups);
-                mPicture = (ImageView) itemView.findViewById(R.id.img_profile);
+                bEvents = (Button) itemView.findViewById(R.id.btn_events);
+                score = (TextView) itemView.findViewById(R.id.txt_score);
+                name = (TextView) itemView.findViewById(R.id.txt_name);
+                bio = (TextView) itemView.findViewById(R.id.txt_bio);
 
-                try {
-                    URL url = new URL(mUser.getPropic());
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    mPicture.setImageBitmap(BitmapFactory.decodeStream(connection.getInputStream()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends, EntityAdapter.Viewing.FRIENDS));
+
+
+//                try {
+//                    URL url = new URL(mUser.getPropic());
+//                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                    connection.setDoInput(true);
+//                    connection.connect();
+//                    mPicture.setImageBitmap(BitmapFactory.decodeStream(connection.getInputStream()));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
 
                 mPicture.setOnLongClickListener(new View.OnLongClickListener() {
@@ -339,16 +247,18 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 bEvents.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        switchActive(Viewing.EVENTS);
-
+                        mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mEvents, EntityAdapter.Viewing.EVENTS));
                     }
                 });
 
                 bFriends.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        switchActive(Viewing.FRIENDS);
-
+                        mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends, EntityAdapter.Viewing.FRIENDS));
                     }
                 });
 
@@ -356,8 +266,9 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 bGroups.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        switchActive(Viewing.GROUPS);
-
+                        mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mGroups, EntityAdapter.Viewing.GROUPS));
                     }
                 });
 
@@ -368,23 +279,13 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
             return friends;
         }
 
+        public RecyclerView getEntityList(){
+            return mRecyclerView;
+        }
+
         public void setFriends(TextView friends) {
             this.friends = friends;
         }
     }
-
-    protected class EntityHolder extends UltimateRecyclerviewViewHolder {
-        RelativeLayout mLayout;
-        TextView mTitle;
-        Entity mEntity;
-
-        public EntityHolder(View itemView) {
-            super(itemView);
-            mTitle = (TextView) itemView.findViewById(R.id.txt_entity_title);
-            mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
-
-        }
-    }
-
 
 }

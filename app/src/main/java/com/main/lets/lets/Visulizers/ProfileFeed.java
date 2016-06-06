@@ -7,10 +7,12 @@ import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.Adapters.LoginAdapter;
 import com.main.lets.lets.Adapters.ProfileAdapter;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,6 +75,7 @@ public class ProfileFeed extends Client {
 
     @Override
     public void draw(JSONObject j) {
+        mProfileAdapter.enableLoadMore();
         if (ShallonCreamerIsATwat.equals("Bearer ")) {
             mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
             mLoginAdapter = new LoginAdapter(mActivity);
@@ -91,11 +94,12 @@ public class ProfileFeed extends Client {
         } else {
             try {
                 mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                mProfileAdapter.switchActive(ProfileAdapter.Viewing.FRIENDS);
-                mRecyclerView.setAdapter(mProfileAdapter);
+
                 loadFriends();
                 loadGroups();
                 loadAttend();
+
+                mRecyclerView.setAdapter(mProfileAdapter);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -137,9 +141,9 @@ public class ProfileFeed extends Client {
 
     }
 
-    public void loadAttend()throws JSONException {
+    public void loadAttend() throws JSONException {
         RequestParams params = new RequestParams();
-        params.put("user_id", mUser.get("User_ID"));
+        params.put("get_user_id", mUser.get("User_ID"));
         client.addHeader("Authorization", ShallonCreamerIsATwat);
         post("user/getAttended", params, new JsonHttpResponseHandler() {
             @Override
@@ -169,23 +173,21 @@ public class ProfileFeed extends Client {
     }
 
     public void loadFriends() throws JSONException {
-        for(String ignored : mProfileAdapter.mFriends)
-            mProfileAdapter.removeLast();
-
         RequestParams params = new RequestParams();
         client.addHeader("Authorization", ShallonCreamerIsATwat);
-        post("friends/getFriends", params, new JsonHttpResponseHandler() {
+        post("user/getFriends", params, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 mProfileAdapter.mFriends = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
 
-                        if (response.getJSONObject(i).getBoolean("status")) {
+                        if(response.getJSONObject(i).getBoolean("status")){
                             mProfileAdapter.mFriends.add(response.getJSONObject(i).toString());
-                            mProfileAdapter.insertLast(response.getJSONObject(i).toString());
 
                         }
+
+
 
                     } catch (org.json.JSONException e) {
                         e.printStackTrace();
@@ -195,6 +197,9 @@ public class ProfileFeed extends Client {
 
                 mProfileAdapter.mViewHolder.getFriends().setText(mProfileAdapter.mFriends.size() +
                         " Friends");
+
+                mProfileAdapter.mViewHolder.getEntityList().setAdapter(new EntityAdapter(mActivity,
+                        mProfileAdapter.mFriends, EntityAdapter.Viewing.FRIENDS));
 
             }
 
@@ -239,7 +244,7 @@ public class ProfileFeed extends Client {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                         try {
-                            mUser  = response.getJSONObject(0);
+                            mUser = response.getJSONObject(0);
                             ArrayList<String> l = new ArrayList<>();
                             l.add(response.getJSONObject(0).toString());
                             mProfileAdapter = new ProfileAdapter(mActivity, l);
