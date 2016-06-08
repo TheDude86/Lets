@@ -46,7 +46,6 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 12/13/2015.
  */
 public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
-    private static final int DETAIL_CODE = 1;
     public ArrayList<String> mEntities;
     public ArrayList<String> mFriends;
     public ArrayList<String> mGroups;
@@ -168,7 +167,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     }
 
 
-    public class ViewHolder extends UltimateRecyclerviewViewHolder {
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener{
         public RecyclerView mRecyclerView;
         public TextView interests;
         public ImageView mPicture;
@@ -186,9 +185,9 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 interests = (TextView) itemView.findViewById(R.id.txt_interests);
                 mPicture = (ImageView) itemView.findViewById(R.id.img_profile);
                 setFriends((TextView) itemView.findViewById(R.id.txt_friends));
-                bFriends = (Button) itemView.findViewById(R.id.btn_friends);
-                bGroups = (Button) itemView.findViewById(R.id.btn_groups);
-                bEvents = (Button) itemView.findViewById(R.id.btn_events);
+                bFriends = (Button) itemView.findViewById(R.id.friends);
+                bGroups = (Button) itemView.findViewById(R.id.groups);
+                bEvents = (Button) itemView.findViewById(R.id.events);
                 score = (TextView) itemView.findViewById(R.id.txt_score);
                 name = (TextView) itemView.findViewById(R.id.txt_name);
                 bio = (TextView) itemView.findViewById(R.id.txt_bio);
@@ -243,10 +242,13 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     }
                 });
 
+                bEvents.setOnClickListener(this);
 
                 bEvents.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+
                         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
                         mRecyclerView.setAdapter(new EntityAdapter(mActivity, mEvents, EntityAdapter.Viewing.EVENTS));
@@ -285,6 +287,11 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
         public void setFriends(TextView friends) {
             this.friends = friends;
+        }
+
+        @Override
+        public void onClick(View view) {
+
         }
     }
 

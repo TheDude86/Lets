@@ -13,6 +13,11 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
@@ -20,15 +25,23 @@ import com.rey.material.app.SimpleDialog;
 import com.rey.material.app.TimePickerDialog;
 import com.rey.material.widget.Slider;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import cz.msebera.android.httpclient.Header;
+
 public class EventCreateActivity extends AppCompatActivity {
-    String ShallonCreamerIsATwat;
+    protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+    protected static AsyncHttpClient client = new AsyncHttpClient();
     //HashMap only stores strings because it is used to create the post request and all params
     //must be strings
     private HashMap<String, String> mMap;
+    String ShallonCreamerIsATwat;
     private Calendar mCalendar;
 
     @Override
@@ -39,9 +52,9 @@ public class EventCreateActivity extends AppCompatActivity {
         //Getting all of the views from the XML file
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager()
                 .findFragmentById(R.id.autocomplete_fragment);
-        CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
+        final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
-        EditText description = (EditText) findViewById(R.id.description);
+        final EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         final EditText title = (EditText) findViewById(R.id.title);
@@ -320,33 +333,88 @@ public class EventCreateActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View view) {
+
+                create.setIndeterminateProgressMode(true);
+                create.setProgress(1);
+
+                //Checks to see if a start time has been selected
+                if (time.getText().toString().equals("Some Time o'clock")) {
+                    create.setProgress(0);
+                    return;
+                }
+
+                //Checks to see if a category has been selected
+                if (category.getText().toString().equals("Category")) {
+                    create.setProgress(0);
+                    return;
+                }
+
+                //Checks to see if a date has been selected
+                if (date.getText().toString().equals("Today")) {
+                    create.setProgress(0);
+                    return;
+                }
+
+                //Checks to see if the user has written a title
+                if (title.getText().toString().equals("")) {
+                    create.setProgress(0);
+                    return;
+                }
+
+                //Checks to see if the user has selected a location (Only have to check "Latitude"
+                //because "Latitude" will never be put without "Longitude" and "Map Title"
+                if (!mMap.containsKey("Latitude")) {
+                    create.setProgress(0);
+                    return;
+                }
+
                 Calendar end = (Calendar) mCalendar.clone();
                 end.set(Calendar.HOUR_OF_DAY, end.get(Calendar.HOUR_OF_DAY) + Integer.parseInt(
                         mMap.get("Duration")));
 
-                Log.println(Log.ASSERT, "Start Time", new SimpleDateFormat("HH:mm:ss MM-dd-yyyy").format(mCalendar.getTime()));
-                Log.println(Log.ASSERT, "End Time", new SimpleDateFormat("HH:mm:ss MM-dd-yyyy").format(end.getTime()));
+                RequestParams params = new RequestParams();
+                params.put("category", mMap.get("Category"));
+                params.put("latitude", mMap.get("Latitude"));
+                params.put("longitude", mMap.get("Longitude"));
+                params.put("location_title", mMap.get("Map Title"));
+                params.put("event_name", title.getText().toString());
+                params.put("description", description.getText().toString());
+                params.put("end_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(end.getTime()));
+                params.put("start_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mCalendar.getTime()));
+                client.addHeader("Authorization", ShallonCreamerIsATwat);
 
-                //Checks to see if a start time has been selected
-                if (time.getText().toString().equals("Some Time o'clock"))
-                    return;
 
-                //Checks to see if a category has been selected
-                if (category.getText().toString().equals("Category"))
-                    return;
+                post("event/create", params, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        Log.println(Log.ASSERT, "Success", response.toString());
+                        create.setProgress(100);
 
-                //Checks to see if a date has been selected
-                if (date.getText().toString().equals("Today"))
-                    return;
+                        try {
+                            Thread.sleep(200);
 
-                //Checks to see if the user has written a title
-                if (title.getText().toString().equals(""))
-                    return;
+                            Intent intent = new Intent(EventCreateActivity.this, EventDetailActivity.class);
+                            intent.putExtra("JSON", response.getJSONObject(0)
+                                    .toString());
 
-                //Checks to see if the user has selected a location (Only have to check "Latitude"
-                //because "Latitude" will never be put without "Longitude" and "Map Title"
-                if (!mMap.containsKey("Latitude"))
-                    return;
+                            finish();
+                            startActivity(intent);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                          org.json.JSONArray errorResponse) {
+                        Log.e("Aync Test Failure", errorResponse.toString());
+                    }
+
+                });
 
 
             }
@@ -354,5 +422,14 @@ public class EventCreateActivity extends AppCompatActivity {
 
         });
 
+    }
+
+
+    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.post(getAbsoluteUrl(url), params, responseHandler);
+    }
+
+    private static String getAbsoluteUrl(String relativeUrl) {
+        return BASE_URL + relativeUrl;
     }
 }

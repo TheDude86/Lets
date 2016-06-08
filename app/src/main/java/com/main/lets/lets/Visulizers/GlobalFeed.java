@@ -48,7 +48,7 @@ public class GlobalFeed extends Client {
             RequestParams params = new RequestParams();
             params.put("latitude", j.get("latitude") + "");
             params.put("longitude", j.get("longitude") + "");
-            params.put("range", 980000 + "");
+            params.put("range", 9800000 + "");
 
             final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
                     "Loading. Please wait...", true);
@@ -56,6 +56,7 @@ public class GlobalFeed extends Client {
             post("event/getCloseEvents", params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+                    Log.println(Log.ASSERT, "Test", response.toString());
 
                     for (int i = 0; i < response.length(); i++) {
                         try {

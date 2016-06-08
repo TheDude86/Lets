@@ -195,6 +195,73 @@
                 android:text="Category"
                 android:inputType="none" />
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="More options"
+                android:id="@+id/more_options"
+                android:layout_below="@+id/category"
+                android:background="#00ffffff" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/more_opts"
+                android:layout_below="@id/more_options">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Minimum Attendance:"
+                    android:id="@+id/textView14" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:ems="10"
+                    android:id="@+id/min"
+                    android:layout_alignBottom="@+id/textView14"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@+id/textView14" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Max Attendance:"
+                    android:id="@+id/textView15"
+                    android:layout_marginTop="50dp"
+                    android:layout_below="@+id/min"/>
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:ems="10"
+                    android:id="@+id/max"
+                    android:layout_alignBottom="@+id/textView15"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignStart="@+id/min" />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Private Event"
+                    android:id="@+id/privateE"
+                    android:layout_below="@id/max"
+                    android:layout_marginTop="50dp"
+                    android:checked="false" />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hidden Event"
+                    android:layout_below="@id/privateE"
+                    android:id="@+id/hidden" />
+            </RelativeLayout>
+
             <com.dd.CircularProgressButton
                 android:id="@+id/create"
                 android:layout_width="196dp"
@@ -205,7 +272,7 @@
                 app:cpb_textComplete="Complete"
                 app:cpb_textError="Something went wrong"
                 app:cpb_textIdle="Create Event"
-                android:layout_below="@+id/category"
+                android:layout_below="@+id/more_opts"
                 android:layout_centerHorizontal="true" />
 
 

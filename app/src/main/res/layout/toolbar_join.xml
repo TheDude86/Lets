@@ -12,7 +12,9 @@
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/settings"
         android:layout_weight="1"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textColor="#096800"
+        android:textStyle="bold" />
 
 
 </LinearLayout>

@@ -77,9 +77,9 @@
             android:id="@+id/layout_info">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:weightSum="1"
                 android:id="@+id/layout_profile_bar"
                 android:layout_below="@+id/txt_interests"
@@ -87,38 +87,24 @@
                 android:layout_marginTop="50dp"
                 android:elevation="0dp">
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Events"
-                    android:id="@+id/btn_events"
-                    android:shadowRadius="4"
-                    android:elevation="30dp"
-                    android:layout_weight="0.33"
-                    android:background="#00FFFFFF" />
+                <include layout="@layout/toolbar_profile"/>
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Friends"
-                    android:id="@+id/btn_friends"
-                    android:layout_weight="0.33"
-                    android:background="#00FFFFFF" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/btn_groups"
-                    android:text="Groups"
-                    android:layout_weight="0.33"
-                    android:background="#00ffffff" />
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#b3b3b3"
+                android:layout_below="@+id/layout_profile_bar"
+                android:layout_alignParentStart="true" />
 
             <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/entities"
-                android:layout_below="@+id/layout_profile_bar" />
+                android:layout_below="@+id/layout_profile_bar"
+                android:background="#fefefe" />
 
             <TextView
                 android:layout_width="wrap_content"
