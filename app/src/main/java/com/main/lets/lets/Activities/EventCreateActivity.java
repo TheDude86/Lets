@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dd.CircularProgressButton;
@@ -18,12 +21,14 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EntityAdapter;
+import com.main.lets.lets.Components.ToggleExpandLayout;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.app.TimePickerDialog;
 import com.rey.material.widget.Slider;
+import com.rey.material.widget.Switch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,7 +58,9 @@ public class EventCreateActivity extends AppCompatActivity {
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager()
                 .findFragmentById(R.id.autocomplete_fragment);
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
+        final ToggleExpandLayout layout = (ToggleExpandLayout) findViewById(R.id.toggleLayout);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
+        Switch switchButton = (Switch) findViewById(R.id.switch_button);
         final EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
@@ -62,6 +69,17 @@ public class EventCreateActivity extends AppCompatActivity {
         final EditText time = (EditText) findViewById(R.id.time);
         Slider duration = (Slider) findViewById(R.id.duration);
         mCalendar = Calendar.getInstance();
+
+
+        switchButton.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(Switch view, boolean checked) {
+                if(checked)
+                    layout.open();
+                else
+                    layout.close();
+            }
+        });
 
         /*
          *Initializing the HashMap that contains all of the following information:

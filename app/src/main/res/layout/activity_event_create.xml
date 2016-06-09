@@ -195,72 +195,125 @@
                 android:text="Category"
                 android:inputType="none" />
 
-            <Button
+
+            <com.main.lets.lets.Components.DropDownLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="50dp"
+                android:layout_marginLeft="15dp"
+                android:layout_below="@id/category"
+                android:id="@+id/more_opts">
+
+
+            <com.main.lets.lets.Components.ToggleExpandLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="More options"
-                android:id="@+id/more_options"
-                android:layout_below="@+id/category"
-                android:background="#00ffffff" />
+                android:id="@+id/toggleLayout">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/more_opts"
-                android:layout_below="@id/more_options">
+                <LinearLayout
+                    android:id="@+id/id2"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="2dp"
+                    android:outlineProvider="bounds"
+                    >
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        >
+                        <TextView
+                            android:id="@+id/first_menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:text="Set date"
+                            />
+                        <TextView
+                            android:layout_below="@+id/first_menu"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="23 August 2015"
+                            android:textColor="#cccccc"/>
+                    </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Minimum Attendance:"
-                    android:id="@+id/textView14" />
+                </LinearLayout>
 
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:ems="10"
-                    android:id="@+id/min"
-                    android:layout_alignBottom="@+id/textView14"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toEndOf="@+id/textView14" />
+                <LinearLayout
+                    android:id="@+id/id3"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="3dp"
+                    android:outlineProvider="bounds"
+                    >
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        >
+                        <TextView
+                            android:id="@+id/second_menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:text="Set time"
+                            />
+                        <TextView
+                            android:layout_below="@+id/second_menu"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="15:47"
+                            android:textColor="#cccccc"/>
+                    </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Max Attendance:"
-                    android:id="@+id/textView15"
-                    android:layout_marginTop="50dp"
-                    android:layout_below="@+id/min"/>
+                </LinearLayout>
 
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:ems="10"
-                    android:id="@+id/max"
-                    android:layout_alignBottom="@+id/textView15"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignStart="@+id/min" />
+                <LinearLayout
+                    android:id="@+id/id4"
+                    android:layout_width="300dp"
+                    android:layout_height="80dp"
+                    android:background="#ffffff"
+                    android:elevation="4dp"
+                    android:outlineProvider="bounds"
+                    >
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        >
+                        <TextView
+                            android:id="@+id/menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginLeft="8dp"
+                            android:text="Automatic date and time"
+                            />
+                        <TextView
+                            android:layout_below="@+id/menu"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Use network provide time"
+                            android:textColor="#cccccc"/>
+                        <com.rey.material.widget.Switch
+                            android:id="@+id/switch_button"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp"/>
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.main.lets.lets.Components.ToggleExpandLayout>
 
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Private Event"
-                    android:id="@+id/privateE"
-                    android:layout_below="@id/max"
-                    android:layout_marginTop="50dp"
-                    android:checked="false" />
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hidden Event"
-                    android:layout_below="@id/privateE"
-                    android:id="@+id/hidden" />
-            </RelativeLayout>
+            </com.main.lets.lets.Components.DropDownLayout>
 
             <com.dd.CircularProgressButton
                 android:id="@+id/create"
