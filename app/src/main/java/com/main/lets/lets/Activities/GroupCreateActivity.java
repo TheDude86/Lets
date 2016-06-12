@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.main.lets.lets.R;
 
-public class GroupDetailActivity extends AppCompatActivity {
+public class GroupCreateActivity extends AppCompatActivity {
     String ShallonCreamerIsATwat;
 
     @Override

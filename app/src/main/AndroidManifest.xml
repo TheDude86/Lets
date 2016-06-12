@@ -38,7 +38,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".Activities.GroupDetailActivity"
+        <activity android:name=".Activities.GroupCreateActivity"
             android:theme="@style/CreateTheme"
             android:parentActivityName=".Activities.MainActivity"
             android:label="Create a new Group"/>

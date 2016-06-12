@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.create_group).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, GroupDetailActivity.class);
+                Intent i = new Intent(MainActivity.this, GroupCreateActivity.class);
                 i.putExtra("token", (String)mMap.get("token"));
                 startActivity(i);
 
