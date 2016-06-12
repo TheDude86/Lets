@@ -70,6 +70,14 @@ public class ProfileFeed extends Client {
 
         }
 
+    }
+
+    public ProfileFeed(Activity a, UltimateRecyclerView r, String token, int userID){
+        ShallonCreamerIsATwat = token;
+        mRecyclerView = r;
+        mActivity = a;
+
+        loadUser(userID);
 
     }
 
@@ -107,6 +115,34 @@ public class ProfileFeed extends Client {
 
         }
 
+    }
+
+    public void loadUser(int userID){
+        RequestParams params = new RequestParams();
+        client.addHeader("Authorization", ShallonCreamerIsATwat);
+        params.put("user_id", userID);
+        post("user/getProfileById", params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+                try {
+                    mUser = response.getJSONObject(0);
+                    ArrayList<String> l = new ArrayList<>();
+                    l.add(response.getJSONObject(0).toString());
+                    mProfileAdapter = new ProfileAdapter(mActivity, l);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                  org.json.JSONArray errorResponse) {
+                Log.e("Aync Test Failure", errorResponse.toString());
+            }
+
+        });
     }
 
     public void loadGroups() throws JSONException {

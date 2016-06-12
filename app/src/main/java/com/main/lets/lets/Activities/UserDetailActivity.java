@@ -5,15 +5,13 @@ import android.os.Bundle;
 
 import com.main.lets.lets.R;
 
-public class GroupCreateActivity extends AppCompatActivity {
-    String ShallonCreamerIsATwat;
+public class UserDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_create);
+        setContentView(R.layout.activity_user_detail);
 
-        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
 
 
     }

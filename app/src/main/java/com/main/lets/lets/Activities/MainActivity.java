@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         // reloading events
         mGlobalFeed = new GlobalFeed(this, (UltimateRecyclerView) findViewById(R.id.list), GlobalFeed.Sort.DIST);
 
+        //Creates the User's profile feed if they're logged in, if they're not.  It will load a login
+        //screen
         mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
 
         //Checks to see if the user has granted the app permission to get the device's location
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 //0 = Closest
                 //1 = Soonest
                 //2 = Most newly created event
+                //3 = Most people attending
 
                 switch (position) {
                     case 0:
@@ -100,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case 2:
+
+                        break;
+
+                    case 3:
 
                         break;
 

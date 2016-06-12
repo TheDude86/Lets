@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
+import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
@@ -84,8 +85,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
                     break;
                 case GROUPS:
-                    ((ViewHolder) holder).mTitle.setText(new Entity(new JSONObject(mList.get(position))).mText);
-
+                    bindGroup((ViewHolder) holder, mList.get(position));
 
                     break;
 
@@ -94,6 +94,19 @@ public class EntityAdapter extends RecyclerView.Adapter {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public void bindGroup(ViewHolder holder, String data) throws JSONException{
+        holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
+        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mActivity, GroupDetailActivity.class);
+                mActivity.startActivity(intent);
+
+            }
+        });
 
     }
 
