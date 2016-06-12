@@ -17,11 +17,10 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EntityAdapter;
-import com.main.lets.lets.Components.ToggleExpandLayout;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
@@ -58,9 +57,7 @@ public class EventCreateActivity extends AppCompatActivity {
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager()
                 .findFragmentById(R.id.autocomplete_fragment);
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
-        final ToggleExpandLayout layout = (ToggleExpandLayout) findViewById(R.id.toggleLayout);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
-        Switch switchButton = (Switch) findViewById(R.id.switch_button);
         final EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
@@ -71,15 +68,6 @@ public class EventCreateActivity extends AppCompatActivity {
         mCalendar = Calendar.getInstance();
 
 
-        switchButton.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(Switch view, boolean checked) {
-                if(checked)
-                    layout.open();
-                else
-                    layout.close();
-            }
-        });
 
         /*
          *Initializing the HashMap that contains all of the following information:
