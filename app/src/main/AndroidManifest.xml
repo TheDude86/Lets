@@ -48,7 +48,16 @@
         <activity
             android:name=".Activities.GroupDetailActivity"
             android:theme="@style/GroupTheme" />
-        <activity android:name=".Activities.UserDetailActivity"></activity>
+        <activity android:name=".Activities.UserDetailActivity" />
+        <activity
+            android:name=".Activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/CreateTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.main.lets.lets.Activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
