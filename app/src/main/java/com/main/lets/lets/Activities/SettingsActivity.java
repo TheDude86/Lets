@@ -2,9 +2,13 @@ package com.main.lets.lets.Activities;
 
 
 import android.annotation.TargetApi;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
@@ -19,6 +23,8 @@ import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +33,7 @@ import android.support.v4.app.NavUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -41,9 +48,11 @@ import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -231,7 +240,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class UserPreferenceFragment extends Fragment{
+    public static class UserPreferenceFragment extends Fragment {
         HashMap<String, Object> mUserInfo;
 
         @Override
@@ -256,6 +265,68 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
                     "Loading. Please wait...", true);
 
+            (view.findViewById(R.id.edit_birthday)).setOnClickListener(new View.OnClickListener() {
+                /**
+                 * When tue user confirm's the start date of the event, update the HashMap
+                 * values and the EditText
+                 * @param v (Unused)
+                 */
+                @Override
+                public void onClick(View v) {
+                    DialogFragment newFragment =
+                            new DatePickerFragment((Date) mUserInfo.get("birthday"), mUserInfo,
+                                    (EditText) view.findViewById(R.id.edit_birthday));
+                    newFragment.show(getFragmentManager(), "datePicker");
+
+                }
+
+            });
+
+            view.findViewById(R.id.edit_interests).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final CharSequence[] items = {" Party ", " Eating & Drinking ", " Studying ",
+                            " TV & Movies ", " Video Games ", " Sports ", " Music ", " Relax ", " Other "};
+                    // arraylist to keep the selected items
+                    final ArrayList<Integer> seletedItems = new ArrayList<>();
+
+                    AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                            .setTitle("Select Interests")
+                            .setMultiChoiceItems(items, null, new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
+                                    if (isChecked) {
+                                        // If the user checked the item, add it to the selected items
+                                        seletedItems.add(indexSelected);
+                                    } else if (seletedItems.contains(indexSelected)) {
+                                        // Else, if the item is already in the array, remove it
+                                        seletedItems.remove(Integer.valueOf(indexSelected));
+                                    }
+                                }
+                            }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    String s = "";
+                                    for(Object i: seletedItems.toArray()){
+                                        switch ((int)i){
+                                            case 0:
+
+                                                break;
+                                        }
+
+                                    }
+
+                                }
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //  Your code when user clicked on Cancel
+                                }
+                            }).create();
+                    dialog.show();
+                }
+            });
+
             RequestParams params = new RequestParams();
             client.addHeader("Authorization", ShallonCreamerIsATwat);
             post("user/getMyProfile", params, new JsonHttpResponseHandler() {
@@ -263,89 +334,88 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
                     try {
 
-                        Log.println(Log.ASSERT, "Birthday", response.getJSONObject(0).getString("Birthday").substring(6,response.getJSONObject(0).getString("Birthday").length()-2));
 
                         mUserInfo.put("email", response.getJSONObject(0).getString("Email_Address"));
                         mUserInfo.put("name", response.getJSONObject(0).getString("User_Name"));
                         mUserInfo.put("birthday", new Date(Long.parseLong(response.getJSONObject(0)
-                                .getString("Birthday").substring(6,response.getJSONObject(0)
-                                        .getString("Birthday").length()-2))));
+                                .getString("Birthday").substring(6, response.getJSONObject(0)
+                                        .getString("Birthday").length() - 2))));
                         mUserInfo.put("bio", response.getJSONObject(0).getString("Biography"));
                         mUserInfo.put("interests", response.getJSONObject(0).getInt("Interests"));
                         mUserInfo.put("gender", response.getJSONObject(0).getInt("Gender"));
                         mUserInfo.put("privacy", response.getJSONObject(0).getInt("Privacy"));
                         mUserInfo.put("picRef", response.getJSONObject(0).getString("Profile_Picture"));
 
-                        ((EditText)(view.findViewById(R.id.edit_name))).setText((CharSequence) mUserInfo.get("name"));
-                        ((EditText)(view.findViewById(R.id.edit_birthday))).setText(new SimpleDateFormat("mm-dd-yyyy")
+                        ((EditText) (view.findViewById(R.id.edit_name))).setText((CharSequence) mUserInfo.get("name"));
+                        ((EditText) (view.findViewById(R.id.edit_birthday))).setText(new SimpleDateFormat("MM-dd-yyyy")
                                 .format(mUserInfo.get("birthday")));
 
-                        ((EditText)(view.findViewById(R.id.edit_bio))).setText((CharSequence) mUserInfo.get("bio"));
+                        ((EditText) (view.findViewById(R.id.edit_bio))).setText((CharSequence) mUserInfo.get("bio"));
 
-                        if(mUserInfo.get("gender") == 0)
-                            ((CheckBox)(view.findViewById(R.id.female))).setChecked(true);
+                        if (mUserInfo.get("gender") == 0)
+                            ((CheckBox) (view.findViewById(R.id.female))).setChecked(true);
 
-                        if(mUserInfo.get("gender") == 1)
-                            ((CheckBox)(view.findViewById(R.id.male))).setChecked(true);
+                        if (mUserInfo.get("gender") == 1)
+                            ((CheckBox) (view.findViewById(R.id.male))).setChecked(true);
 
-                        if(mUserInfo.get("gender") == 2)
-                            ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(true);
+                        if (mUserInfo.get("gender") == 2)
+                            ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(true);
 
-                        if(mUserInfo.get("privacy") == 0)
-                            ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(true);
+                        if (mUserInfo.get("privacy") == 0)
+                            ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(true);
 
-                        if(mUserInfo.get("privacy") == 1)
-                            ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(true);
+                        if (mUserInfo.get("privacy") == 1)
+                            ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(true);
 
-                        if(mUserInfo.get("privacy") == 2)
-                            ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(true);
+                        if (mUserInfo.get("privacy") == 2)
+                            ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(true);
 
                         //All of the checkbox listeners, they do basically the same stuff...
                         (view.findViewById(R.id.male)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.female))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
                             }
                         });
 
                         (view.findViewById(R.id.female)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.male))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
                             }
                         });
 
                         (view.findViewById(R.id.tranny)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.female))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.male))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
                             }
                         });
 
                         (view.findViewById(R.id.chk_public)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
                             }
                         });
 
                         (view.findViewById(R.id.chk_restricted)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
                             }
                         });
 
                         (view.findViewById(R.id.chk_pussy)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(false);
-                                ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
+                                ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
                             }
                         });
 
@@ -467,6 +537,44 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+        private Calendar mStart;
+        private HashMap<String, Object> mUserInfo;
+        private EditText mBirthday;
+
+        public DatePickerFragment(Date d, HashMap<String, Object> m, EditText day) {
+            mStart = Calendar.getInstance();
+            mUserInfo = m;
+            mBirthday = day;
+            mStart.setTime(d);
+
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            int year = mStart.get(Calendar.YEAR);
+            int month = mStart.get(Calendar.MONTH);
+            int day = mStart.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.YEAR, year);
+            c.set(Calendar.MONTH, month);
+            c.set(Calendar.DAY_OF_MONTH, day);
+            mUserInfo.put("birthday", c.getTime());
+
+            mBirthday.setText(new SimpleDateFormat("MM-dd-yyyy")
+                    .format(mUserInfo.get("birthday")));
+
         }
     }
 }

@@ -53,6 +53,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/edit_birthday"
             android:layout_alignBottom="@+id/textView15"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:layout_alignStart="@+id/edit_name"
             android:layout_alignEnd="@+id/edit_name" />
 
@@ -131,6 +135,10 @@
             android:ems="10"
             android:id="@+id/edit_interests"
             android:layout_below="@+id/textView18"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:layout_alignParentStart="true" />
 
         <TextView
