@@ -3,12 +3,12 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.main.lets.lets.Activities.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="com.main.lets.lets.Activities.SettingsActivity$UserPreferenceFragment"
         android:icon="@drawable/ic_person_outline_black_24dp"
         android:title="User settings" />
 
     <header
-        android:fragment="com.main.lets.lets.Activities.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="com.main.lets.lets.Activities.SettingsActivity$SearchPreferenceFragment"
         android:icon="@drawable/ic_place_black_24dp"
         android:title="Search settings" />
 

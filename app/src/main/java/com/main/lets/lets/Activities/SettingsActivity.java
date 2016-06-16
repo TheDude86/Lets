@@ -2,6 +2,8 @@ package com.main.lets.lets.Activities;
 
 
 import android.annotation.TargetApi;
+import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -18,12 +20,32 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.Adapters.ProfileAdapter;
 import com.main.lets.lets.R;
 
+import org.json.JSONException;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -37,6 +59,10 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    static String ShallonCreamerIsATwat;
+    protected static AsyncHttpClient client = new AsyncHttpClient();
+    protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -122,7 +148,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         setupActionBar();
+
+
     }
 
     /**
@@ -171,40 +200,188 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
+                || UserPreferenceFragment.class.getName().equals(fragmentName)
                 || AppSettingPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || SearchPreferenceFragment.class.getName().equals(fragmentName);
     }
+
+
+    @Override
+    public void onHeaderClick(Header header, int position) {
+        if (header.fragmentArguments == null) {
+            header.fragmentArguments = new Bundle();
+        }
+
+        header.fragmentArguments.putString("token", ShallonCreamerIsATwat);
+        super.onHeaderClick(header, position);
+
+    }
+
+    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.post(getAbsoluteUrl(url), params, responseHandler);
+    }
+
+    private static String getAbsoluteUrl(String relativeUrl) {
+        return BASE_URL + relativeUrl;
+    }
+
 
     /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class UserPreferenceFragment extends Fragment{
+        HashMap<String, Object> mUserInfo;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_user);
             setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            mUserInfo = new HashMap<>();
+
+            Bundle b = getArguments();
+            if (b != null)
+                ShallonCreamerIsATwat = b.getString("token");
+
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final View view = inflater.inflate(R.layout.fragment_edit_profile,
+                    container, false);
+
+            final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+                    "Loading. Please wait...", true);
+
+            RequestParams params = new RequestParams();
+            client.addHeader("Authorization", ShallonCreamerIsATwat);
+            post("user/getMyProfile", params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
+                    try {
+
+                        Log.println(Log.ASSERT, "Birthday", response.getJSONObject(0).getString("Birthday").substring(6,response.getJSONObject(0).getString("Birthday").length()-2));
+
+                        mUserInfo.put("email", response.getJSONObject(0).getString("Email_Address"));
+                        mUserInfo.put("name", response.getJSONObject(0).getString("User_Name"));
+                        mUserInfo.put("birthday", new Date(Long.parseLong(response.getJSONObject(0)
+                                .getString("Birthday").substring(6,response.getJSONObject(0)
+                                        .getString("Birthday").length()-2))));
+                        mUserInfo.put("bio", response.getJSONObject(0).getString("Biography"));
+                        mUserInfo.put("interests", response.getJSONObject(0).getInt("Interests"));
+                        mUserInfo.put("gender", response.getJSONObject(0).getInt("Gender"));
+                        mUserInfo.put("privacy", response.getJSONObject(0).getInt("Privacy"));
+                        mUserInfo.put("picRef", response.getJSONObject(0).getString("Profile_Picture"));
+
+                        ((EditText)(view.findViewById(R.id.edit_name))).setText((CharSequence) mUserInfo.get("name"));
+                        ((EditText)(view.findViewById(R.id.edit_birthday))).setText(new SimpleDateFormat("mm-dd-yyyy")
+                                .format(mUserInfo.get("birthday")));
+
+                        ((EditText)(view.findViewById(R.id.edit_bio))).setText((CharSequence) mUserInfo.get("bio"));
+
+                        if(mUserInfo.get("gender") == 0)
+                            ((CheckBox)(view.findViewById(R.id.female))).setChecked(true);
+
+                        if(mUserInfo.get("gender") == 1)
+                            ((CheckBox)(view.findViewById(R.id.male))).setChecked(true);
+
+                        if(mUserInfo.get("gender") == 2)
+                            ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(true);
+
+                        if(mUserInfo.get("privacy") == 0)
+                            ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(true);
+
+                        if(mUserInfo.get("privacy") == 1)
+                            ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(true);
+
+                        if(mUserInfo.get("privacy") == 2)
+                            ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(true);
+
+                        //All of the checkbox listeners, they do basically the same stuff...
+                        (view.findViewById(R.id.male)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.female))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(false);
+                            }
+                        });
+
+                        (view.findViewById(R.id.female)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.male))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.tranny))).setChecked(false);
+                            }
+                        });
+
+                        (view.findViewById(R.id.tranny)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.female))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.male))).setChecked(false);
+                            }
+                        });
+
+                        (view.findViewById(R.id.chk_public)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(false);
+                            }
+                        });
+
+                        (view.findViewById(R.id.chk_restricted)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.chk_pussy))).setChecked(false);
+                            }
+                        });
+
+                        (view.findViewById(R.id.chk_pussy)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((CheckBox)(view.findViewById(R.id.chk_restricted))).setChecked(false);
+                                ((CheckBox)(view.findViewById(R.id.chk_public))).setChecked(false);
+                            }
+                        });
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    dialog.hide();
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable,
+                                      org.json.JSONArray errorResponse) {
+                    Log.e("Aync Test Failure", errorResponse.toString());
+                }
+
+            });
+
+            return view;
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                intent.putExtra("token", ShallonCreamerIsATwat);
+                startActivity(intent);
+
                 return true;
             }
             return super.onOptionsItemSelected(item);
         }
+
     }
 
     /**
@@ -212,7 +389,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
+    public static class SearchPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
