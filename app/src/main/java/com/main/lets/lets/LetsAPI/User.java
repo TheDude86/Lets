@@ -11,20 +11,19 @@ import java.util.LinkedList;
  * Created by Joe on 5/12/2016.
  */
 public class User extends Entity {
-    private static final long serialVersionUID = 1L;
-    private int userID;
-    private String name;
-    private String bio;
-    private int interests;
+    private LinkedList<Group> mGroups;
     private Timestamp birthday;
+    private boolean gender;
+    private boolean active;
+    private int ownerList;
+    private String propic;
+    private int interests;
+    private String name;
+    private int friends;
+    private String bio;
+    private int userID;
     private int events;
     private int score;
-    private int friends;
-    private int ownerList;
-    private boolean active;
-    private boolean gender;
-    private String propic;
-    private LinkedList<Group> mGroups;
 
     public User(int id, String name, String bio, int events, int score, Timestamp birthday, int friends, boolean active, int ownerList) {
         super(id, name, EntityType.USER);

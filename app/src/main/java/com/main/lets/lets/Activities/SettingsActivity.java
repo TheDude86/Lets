@@ -37,6 +37,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.dd.CircularProgressButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -265,6 +266,94 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
                     "Loading. Please wait...", true);
 
+            view.findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    RequestParams params = new RequestParams();
+                    params.put("edit_user_id", mUserInfo.get("id"));
+                    params.put("name", mUserInfo.get("name"));
+                    params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
+                    params.put("bio", mUserInfo.get("id"));
+                    params.put("interests", mUserInfo.get("id"));
+                    params.put("gender", mUserInfo.get("id"));
+                    params.put("pic_ref", mUserInfo.get("id"));
+                    params.put("privacy", mUserInfo.get("id"));
+                    client.addHeader("Authorization", ShallonCreamerIsATwat);
+                    post("user/editProfile", params, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
+
+
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable,
+                                              org.json.JSONArray errorResponse) {
+                            Log.e("Aync Test Failure", errorResponse.toString());
+                        }
+
+                    });
+
+                }
+
+            });
+
+            //All of the checkbox listeners, they do basically the same stuff...
+            (view.findViewById(R.id.male)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("gender", 1);
+                    ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
+                }
+            });
+
+            (view.findViewById(R.id.female)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("gender", 0);
+                    ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
+                }
+            });
+
+            (view.findViewById(R.id.tranny)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("gender", 2);
+                    ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
+                }
+            });
+
+            (view.findViewById(R.id.chk_public)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("privacy", 0);
+                    ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
+                }
+            });
+
+            (view.findViewById(R.id.chk_restricted)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("privacy", 1);
+                    ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
+                }
+            });
+
+            (view.findViewById(R.id.chk_pussy)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mUserInfo.put("privacy", 2);
+                    ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
+                    ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
+                }
+            });
+
             (view.findViewById(R.id.edit_birthday)).setOnClickListener(new View.OnClickListener() {
                 /**
                  * When tue user confirm's the start date of the event, update the HashMap
@@ -292,6 +381,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     AlertDialog dialog = new AlertDialog.Builder(getActivity())
                             .setTitle("Select Interests")
+                            .setCancelable(true)
                             .setMultiChoiceItems(items, null, new DialogInterface.OnMultiChoiceClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
@@ -306,15 +396,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
-                                    String s = "";
-                                    for(Object i: seletedItems.toArray()){
-                                        switch ((int)i){
-                                            case 0:
-
-                                                break;
-                                        }
-
-                                    }
+                                    ((EditText) view.findViewById(R.id.edit_interests)).setText(MapListToString(seletedItems));
 
                                 }
                             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -334,7 +416,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
                     try {
 
-
+                        mUserInfo.put("id", response.getJSONObject(0).getInt("User_ID"));
                         mUserInfo.put("email", response.getJSONObject(0).getString("Email_Address"));
                         mUserInfo.put("name", response.getJSONObject(0).getString("User_Name"));
                         mUserInfo.put("birthday", new Date(Long.parseLong(response.getJSONObject(0)
@@ -370,55 +452,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         if (mUserInfo.get("privacy") == 2)
                             ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(true);
 
-                        //All of the checkbox listeners, they do basically the same stuff...
-                        (view.findViewById(R.id.male)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
-                            }
-                        });
-
-                        (view.findViewById(R.id.female)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
-                            }
-                        });
-
-                        (view.findViewById(R.id.tranny)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
-                            }
-                        });
-
-                        (view.findViewById(R.id.chk_public)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
-                            }
-                        });
-
-                        (view.findViewById(R.id.chk_restricted)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
-                            }
-                        });
-
-                        (view.findViewById(R.id.chk_pussy)).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
-                                ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
-                            }
-                        });
-
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -450,6 +483,73 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        public String MapListToString(ArrayList l) {
+            StringBuilder s = new StringBuilder();
+
+            for (Object i : l) {
+                switch ((int) i) {
+                    case 0:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Party");
+
+                        break;
+                    case 1:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Eating & Drinking");
+
+                        break;
+                    case 2:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Studying");
+
+                        break;
+                    case 3:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("TV & Movies");
+
+                        break;
+                    case 4:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Video Games");
+
+                        break;
+                    case 5:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Sports");
+
+                        break;
+                    case 6:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Music");
+
+                        break;
+                    case 7:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Relaxing");
+
+                        break;
+                    case 8:
+                        if (s.length() > 0)
+                            s.append(", ");
+                        s.append("Other");
+
+                        break;
+
+                }
+            }
+
+
+            return s.toString();
         }
 
     }
