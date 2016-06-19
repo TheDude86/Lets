@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
+import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
@@ -36,11 +37,13 @@ public class EntityAdapter extends RecyclerView.Adapter {
     public enum Viewing {EVENTS, GROUPS, FRIENDS}
 
     private static final int DETAIL_CODE = 1;
+    private String ShallonCreamerIsATwat;
     private ArrayList<String> mList;
     private Activity mActivity;
     private Viewing active;
 
-    public EntityAdapter(Activity a, ArrayList<String> list, Viewing v) {
+    public EntityAdapter(Activity a, ArrayList<String> list, Viewing v, String token) {
+        ShallonCreamerIsATwat = token;
         mActivity = a;
         mList = list;
         active = v;
@@ -110,20 +113,22 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindFriend(ViewHolder holder, String json) throws JSONException {
+    public void bindFriend(ViewHolder holder, final String json) throws JSONException {
         holder.mTitle.setText(new Entity(new JSONObject(json)).mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(mActivity, UserDetailActivity.class);
+                intent.putExtra("JSON", json);
+                intent.putExtra("token", ShallonCreamerIsATwat);
+                mActivity.startActivityForResult(intent, DETAIL_CODE);
             }
         });
 
     }
 
     public void bindEvent(final EventHolder holder, final String data) throws JSONException {
-            org.json.JSONObject j = new org.json.JSONObject(data);
-            Event e = new Event(j);
+            Event e = new Event(new org.json.JSONObject(data));
 
             holder.mLocation.setText(e.getmLocationTitle());
             holder.mTime.setText(e.getTimeSpanString());

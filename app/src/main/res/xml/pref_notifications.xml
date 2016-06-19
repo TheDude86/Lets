@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="push"
+        android:title="Receive push notifications" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="push_user"
+        android:dependency="push"
+        android:title="Notify on friend requests"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="push_event"
+        android:dependency="push"
+        android:title="Notify on event invites"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="push_group"
+        android:dependency="push"
+        android:title="Notify on group invites"/>
+
+</PreferenceScreen>

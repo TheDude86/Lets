@@ -1,5 +1,6 @@
 package com.main.lets.lets.Activities;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -8,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
  * to be used with AppCompat.
  */
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
+    private static final int CODE_LOGOUT = 0;
 
     private AppCompatDelegate mDelegate;
 
@@ -94,6 +97,17 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
     protected void onDestroy() {
         super.onDestroy();
         getDelegate().onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.println(Log.ASSERT, "Result 1", requestCode + "");
+        Log.println(Log.ASSERT, "Result 2", resultCode + "");
+        if (requestCode == CODE_LOGOUT) {
+            if (resultCode == RESULT_OK) {
+                Log.println(Log.ASSERT, "Result", "Here");
+            }
+        }
     }
 
     public void invalidateOptionsMenu() {

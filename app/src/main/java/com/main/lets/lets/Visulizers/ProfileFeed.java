@@ -40,19 +40,6 @@ public class ProfileFeed extends Client {
     Activity mActivity;
     JSONObject mUser;
 
-    public ProfileFeed(Activity a, UltimateRecyclerView r, String token) {
-        ShallonCreamerIsATwat = token;
-        mRecyclerView = r;
-        mActivity = a;
-
-        try {
-
-            mProfileAdapter = new ProfileAdapter(mActivity, new ArrayList<String>());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public ProfileFeed(Activity a, UltimateRecyclerView r, HashMap<String, Object> m) {
         mRecyclerView = r;
@@ -62,22 +49,14 @@ public class ProfileFeed extends Client {
         if (!loginInitial()) {
             try {
 
-                mProfileAdapter = new ProfileAdapter(mActivity, new ArrayList<String>());
+                mProfileAdapter =
+                        new ProfileAdapter(mActivity, new ArrayList<String>(), ShallonCreamerIsATwat);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
         }
-
-    }
-
-    public ProfileFeed(Activity a, UltimateRecyclerView r, String token, int userID){
-        ShallonCreamerIsATwat = token;
-        mRecyclerView = r;
-        mActivity = a;
-
-        loadUser(userID);
 
     }
 
@@ -128,7 +107,7 @@ public class ProfileFeed extends Client {
                     mUser = response.getJSONObject(0);
                     ArrayList<String> l = new ArrayList<>();
                     l.add(response.getJSONObject(0).toString());
-                    mProfileAdapter = new ProfileAdapter(mActivity, l);
+                    mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -235,7 +214,7 @@ public class ProfileFeed extends Client {
                         " Friends");
 
                 mProfileAdapter.mViewHolder.getEntityList().setAdapter(new EntityAdapter(mActivity,
-                        mProfileAdapter.mFriends, EntityAdapter.Viewing.FRIENDS));
+                        mProfileAdapter.mFriends, EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
 
             }
 
@@ -283,7 +262,7 @@ public class ProfileFeed extends Client {
                             mUser = response.getJSONObject(0);
                             ArrayList<String> l = new ArrayList<>();
                             l.add(response.getJSONObject(0).toString());
-                            mProfileAdapter = new ProfileAdapter(mActivity, l);
+                            mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat);
 
                         } catch (JSONException e) {
                             e.printStackTrace();

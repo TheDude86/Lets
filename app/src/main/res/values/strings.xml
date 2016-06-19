@@ -129,20 +129,20 @@
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
+        <item>1 Mile</item>
+        <item>10 Miles</item>
+        <item>20 Miles</item>
+        <item>30 Miles</item>
+        <item>40 Miles</item>
+        <item>50 Miles</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
-        <item>15</item>
+        <item>1</item>
+        <item>10</item>
+        <item>20</item>
         <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
+        <item>40</item>
+        <item>50</item>
     </string-array>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>

@@ -24,7 +24,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,13 +34,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.main.lets.lets.Adapters.ProfileAdapter;
+import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 
 import org.json.JSONException;
@@ -52,9 +50,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-
-import cz.msebera.android.httpclient.Header;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -68,6 +63,7 @@ import cz.msebera.android.httpclient.Header;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    private static final int CODE_LOGOUT = 0;
     static String ShallonCreamerIsATwat;
     protected static AsyncHttpClient client = new AsyncHttpClient();
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
@@ -207,11 +203,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
      */
+    @Override
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || UserPreferenceFragment.class.getName().equals(fragmentName)
                 || AppSettingPreferenceFragment.class.getName().equals(fragmentName)
-                || SearchPreferenceFragment.class.getName().equals(fragmentName);
+                || SearchPreferenceFragment.class.getName().equals(fragmentName)
+                || LogoutPreferenceFragment.class.getName().equals(fragmentName);
     }
 
 
@@ -223,6 +221,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         header.fragmentArguments.putString("token", ShallonCreamerIsATwat);
         super.onHeaderClick(header, position);
+
+        if (header.fragment != null) {
+            if (true) {
+                int titleRes = header.breadCrumbTitleRes;
+                int shortTitleRes = header.breadCrumbShortTitleRes;
+                if (titleRes == 0) {
+                    titleRes = header.titleRes;
+                    shortTitleRes = 0;
+                }
+                startWithFragment(header.fragment, header.fragmentArguments, null, 0,
+                        titleRes, shortTitleRes);
+            } else {
+                switchToHeader(header);
+            }
+        } else if (header.intent != null) {
+            startActivityForResult(header.intent, CODE_LOGOUT);
+        }
 
     }
 
@@ -463,14 +478,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
+            addPreferencesFromResource(R.xml.pref_search);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+            bindPreferenceSummaryToValue(findPreference("search_radius"));
+
         }
 
         @Override
@@ -493,14 +509,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
+            addPreferencesFromResource(R.xml.pref_notifications);
             setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
         }
 
         @Override
@@ -519,14 +530,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
+            addPreferencesFromResource(R.xml.pref_notifications);
             setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            getActivity().setResult(RESULT_OK, new Intent(getActivity(), MainActivity.class));
+            getActivity().finish();
+
         }
 
         @Override

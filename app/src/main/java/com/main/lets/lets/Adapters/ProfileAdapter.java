@@ -46,6 +46,7 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 12/13/2015.
  */
 public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
+    private String ShallonCreamerIsATwat;
     public ArrayList<String> mEntities;
     public ArrayList<String> mFriends;
     public ArrayList<String> mGroups;
@@ -58,13 +59,14 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     private ImageView mPicture;
 
 
-    public ProfileAdapter(Activity context, ArrayList<String> a) throws JSONException {
+    public ProfileAdapter(Activity context, ArrayList<String> a, String token) throws JSONException {
         super(a);
         mEntities = a;
         mActivity = context;
         mGroups = new ArrayList<>();
         mEvents = new ArrayList<>();
         mFriends = new ArrayList<>();
+        ShallonCreamerIsATwat = token;
 
     }
 
@@ -194,7 +196,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
                 mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                 mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends, EntityAdapter.Viewing.FRIENDS));
+                mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                        EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
 
 
 //                try {
@@ -251,7 +254,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
                         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mEvents, EntityAdapter.Viewing.EVENTS));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mEvents,
+                                EntityAdapter.Viewing.EVENTS, ShallonCreamerIsATwat));
                     }
                 });
 
@@ -260,7 +264,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     public void onClick(View view) {
                         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends, EntityAdapter.Viewing.FRIENDS));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                                EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
                     }
                 });
 
@@ -270,7 +275,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     public void onClick(View view) {
                         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mGroups, EntityAdapter.Viewing.GROUPS));
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mGroups,
+                                EntityAdapter.Viewing.GROUPS, ShallonCreamerIsATwat));
                     }
                 });
 
