@@ -8,11 +8,6 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.main.lets.lets.Adapters.ProfileAdapter;
-import com.main.lets.lets.Visulizers.Client;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -20,7 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -32,11 +27,13 @@ public class Login {
     protected static AsyncHttpClient client = new AsyncHttpClient();
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
     private String ShallonCreamerIsATwat;
+    private HashMap<String, String> mInfo;
     private Activity mActivity;
 
     public Login(Activity a) {
         super();
         mActivity = a;
+        mInfo = new HashMap<>();
 
         try {
             try {
@@ -53,7 +50,26 @@ public class Login {
 
                 if (!sb.toString().equals("blank")) {
                     cred = sb.toString().split(":");
-                    login(cred[0], cred[1]);
+                    login(cred[0], cred[1], new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
+                            try {
+                                ShallonCreamerIsATwat += response.getString("accessToken");
+                            } catch (org.json.JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                              org.json.JSONArray errorResponse) {
+                            Log.e("Async Test Failure", errorResponse.toString());
+                        }
+
+                    });
+                    mInfo.put("email", cred[0]);
+                    mInfo.put("password", cred[1]);
 
                 }
 
@@ -73,43 +89,19 @@ public class Login {
 
     }
 
-    public void login(final String email, final String password) {
+    public void login(String email, String password, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("email", email);
         params.put("password", password);
-        post("user/loginSecure", params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
-                try {
-                    ShallonCreamerIsATwat += response.getString("accessToken");
-                } catch (org.json.JSONException e) {
-                    e.printStackTrace();
-                }
-
-                String string = email + ":" + password;
-                FileOutputStream fos;
-                try {
-                    fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                    fos.write(string.getBytes());
-                    fos.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                  org.json.JSONArray errorResponse) {
-                Log.e("Async Test Failure", errorResponse.toString());
-            }
-
-        });
+        post("user/loginSecure", params, jsonHttpResponseHandler);
     }
 
     public String getToken() {
         return ShallonCreamerIsATwat;
+    }
+
+    public HashMap<String, String> getInfo() {
+        return mInfo;
     }
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {

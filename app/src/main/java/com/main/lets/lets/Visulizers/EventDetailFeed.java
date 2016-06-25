@@ -7,6 +7,7 @@ import android.util.Log;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONArray;
@@ -42,9 +43,7 @@ public class EventDetailFeed extends Client {
     public void draw(JSONObject j) {
         try {
 
-            RequestParams params = new RequestParams();
-            params.put("event_id", j.getInt("Event_ID"));
-            post("event/getEventById", params, new JsonHttpResponseHandler() {
+            Calls.getEvent(j.getInt("Event_ID"), new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
                     Log.e("Event", response.toString());

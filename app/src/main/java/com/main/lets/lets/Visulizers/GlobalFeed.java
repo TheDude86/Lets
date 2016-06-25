@@ -9,6 +9,7 @@ import android.view.View;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EventAdapter;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.rey.material.app.Dialog;
 import com.rey.material.widget.TextView;
@@ -24,7 +25,7 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/29/2016.
  */
 public class GlobalFeed extends Client {
-    public enum Sort {DIST, TIME, CREATE}
+    public enum Sort {DIST, TIME, CREATE, TREND}
 
     private Activity mActivity;
     private UltimateRecyclerView mRecyclerView;
@@ -45,15 +46,12 @@ public class GlobalFeed extends Client {
 
         try {
 
-            RequestParams params = new RequestParams();
-            params.put("latitude", j.get("latitude") + "");
-            params.put("longitude", j.get("longitude") + "");
-            params.put("range", 9800000 + "");
-
             final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
                     "Loading. Please wait...", true);
 
-            post("event/getCloseEvents", params, new JsonHttpResponseHandler() {
+            int RANGE = 980000;
+
+            Calls.getCloseEvents(j.getInt("latitude"), j.getInt("longitude"), RANGE, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                     Log.println(Log.ASSERT, "Test", response.toString());
@@ -84,12 +82,12 @@ public class GlobalFeed extends Client {
                             .contentView(t)
                             .cancelable(true)
                             .positiveActionClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            errorMsg.hide();
-                        }
-                    })
-                    .show();
+                                @Override
+                                public void onClick(View view) {
+                                    errorMsg.hide();
+                                }
+                            })
+                            .show();
 
 
                 }

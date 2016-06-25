@@ -10,6 +10,7 @@ import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.Adapters.LoginAdapter;
 import com.main.lets.lets.Adapters.ProfileAdapter;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONArray;
@@ -96,11 +97,9 @@ public class ProfileFeed extends Client {
 
     }
 
-    public void loadUser(int userID){
-        RequestParams params = new RequestParams();
-        client.addHeader("Authorization", ShallonCreamerIsATwat);
-        params.put("user_id", userID);
-        post("user/getProfileById", params, new JsonHttpResponseHandler() {
+    public void loadUser(int userID) {
+
+        Calls.getProfileByID(userID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                 try {
@@ -118,17 +117,16 @@ public class ProfileFeed extends Client {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                   org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
+                Log.e("Async Test Failure", errorResponse.toString());
             }
 
         });
+
     }
 
     public void loadGroups() throws JSONException {
-        RequestParams params = new RequestParams();
-        params.put("user_id", mUser.get("User_ID"));
-        client.addHeader("Authorization", ShallonCreamerIsATwat);
-        post("user/getGroups", params, new JsonHttpResponseHandler() {
+
+        Calls.getGroups(mUser.getInt("User_ID"), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                 mProfileAdapter.mGroups = new ArrayList<>();
@@ -148,7 +146,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                   org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
+                Log.e("Async Test Failure", errorResponse.toString());
             }
 
         });
@@ -157,10 +155,8 @@ public class ProfileFeed extends Client {
     }
 
     public void loadAttend() throws JSONException {
-        RequestParams params = new RequestParams();
-        params.put("get_user_id", mUser.get("User_ID"));
-        client.addHeader("Authorization", ShallonCreamerIsATwat);
-        post("user/getAttended", params, new JsonHttpResponseHandler() {
+
+        Calls.getAttended(mUser.getInt("User_ID"), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                 mProfileAdapter.mEvents = new ArrayList<>();
@@ -180,7 +176,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                   org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
+                Log.e("Async Test Failure", errorResponse.toString());
             }
 
         });
@@ -188,20 +184,18 @@ public class ProfileFeed extends Client {
     }
 
     public void loadFriends() throws JSONException {
-        RequestParams params = new RequestParams();
-        client.addHeader("Authorization", ShallonCreamerIsATwat);
-        post("user/getFriends", params, new JsonHttpResponseHandler() {
+
+        Calls.getFriends(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 mProfileAdapter.mFriends = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
 
-                        if(response.getJSONObject(i).getBoolean("status")){
+                        if (response.getJSONObject(i).getBoolean("status")) {
                             mProfileAdapter.mFriends.add(response.getJSONObject(i).toString());
 
                         }
-
 
 
                     } catch (org.json.JSONException e) {
@@ -210,10 +204,10 @@ public class ProfileFeed extends Client {
 
                 }
 
-                mProfileAdapter.mViewHolder.getFriends().setText(mProfileAdapter.mFriends.size() +
-                        " Friends");
+//                mProfileAdapter.mViewHolder.getFriends().setText(mProfileAdapter.mFriends.size() +
+//                        " Friends");
 
-                mProfileAdapter.mViewHolder.getEntityList().setAdapter(new EntityAdapter(mActivity,
+                mProfileAdapter.mDemoHolder.getEntityList().setAdapter(new EntityAdapter(mActivity,
                         mProfileAdapter.mFriends, EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
 
             }
@@ -221,7 +215,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                   org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
+                Log.e("Async Test Failure", errorResponse.toString());
             }
 
         });
@@ -229,6 +223,7 @@ public class ProfileFeed extends Client {
     }
 
     public void login(final String email, final String password) {
+
         RequestParams params = new RequestParams();
         params.put("email", email);
         params.put("password", password);
@@ -236,6 +231,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
                 try {
+                    Log.println(Log.ASSERT, "Token", response.toString());
                     ShallonCreamerIsATwat += response.getString("accessToken");
                     mUserInfo.put("token", ShallonCreamerIsATwat);
                 } catch (org.json.JSONException e) {
@@ -284,7 +280,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                   org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
+                Log.e("Async Test Failure", errorResponse.toString());
             }
 
         });

@@ -52,6 +52,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     public ArrayList<String> mGroups;
     public ArrayList<String> mEvents;
     public ViewHolder mViewHolder;
+    public DemoHolder mDemoHolder;
     private Activity mActivity;
     private User mUser;
     boolean b = true;
@@ -93,6 +94,25 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     @Override
     public UltimateRecyclerviewViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_profile_demo, parent, false);
+        mDemoHolder = new DemoHolder(view);
+
+        try {
+            mUser = new User(new JSONObject(mEntities.get(0)));
+
+            if (viewType == 0) {
+
+                return mDemoHolder;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return new ViewHolder(view);
+    }
+
+
+    public UltimateRecyclerviewViewHolder onCreateViewHolder_Cancelled(ViewGroup parent, final int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_profile, parent, false);
         mViewHolder = new ViewHolder(view);
 
@@ -169,7 +189,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     }
 
 
-    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener{
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         public RecyclerView mRecyclerView;
         public TextView interests;
         public ImageView mPicture;
@@ -287,7 +307,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
             return friends;
         }
 
-        public RecyclerView getEntityList(){
+        public RecyclerView getEntityList() {
             return mRecyclerView;
         }
 
@@ -300,5 +320,87 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
         }
     }
+
+
+
+    public class DemoHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
+        public RecyclerView mRecyclerView;
+        public TextView interests;
+        public ImageView mPicture;
+        public TextView friends;
+        public Button bFriends;
+        public TextView score;
+        public Button bGroups;
+        public Button bEvents;
+        public TextView name;
+        public TextView bio;
+
+        public DemoHolder(final View itemView) {
+            super(itemView);
+
+            mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+            mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+            mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                    EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
+
+            bFriends = (Button) itemView.findViewById(R.id.friends);
+            bGroups = (Button) itemView.findViewById(R.id.groups);
+            bEvents = (Button) itemView.findViewById(R.id.events);
+
+            bEvents.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+
+                    mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                    mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                    mRecyclerView.setAdapter(new EntityAdapter(mActivity, mEvents,
+                            EntityAdapter.Viewing.EVENTS, ShallonCreamerIsATwat));
+                }
+            });
+
+            bFriends.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                    mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                    mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                            EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
+                }
+            });
+
+
+            bGroups.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
+                    mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                    mRecyclerView.setAdapter(new EntityAdapter(mActivity, mGroups,
+                            EntityAdapter.Viewing.GROUPS, ShallonCreamerIsATwat));
+                }
+            });
+
+        }
+
+        public TextView getFriends() {
+            return friends;
+        }
+
+        public RecyclerView getEntityList() {
+            return mRecyclerView;
+        }
+
+        public void setFriends(TextView friends) {
+            this.friends = friends;
+        }
+
+        @Override
+        public void onClick(View view) {
+
+        }
+    }
+
+
+
 
 }

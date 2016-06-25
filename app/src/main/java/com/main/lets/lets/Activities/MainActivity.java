@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visulizers.GlobalFeed;
 import com.main.lets.lets.Visulizers.ProfileFeed;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public LocationManager mLocationManager;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
+    public Login mLogin;
     HashMap<String, Object> mMap;
 
 
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         //Creates the GlobalFeed object which handles the main event feed and adjusts sorting and
         // reloading events
         mGlobalFeed = new GlobalFeed(this, (UltimateRecyclerView) findViewById(R.id.list), GlobalFeed.Sort.DIST);
+
+        mLogin = new Login(this);
+
 
         //Creates the User's profile feed if they're logged in, if they're not.  It will load a login
         //screen

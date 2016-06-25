@@ -283,29 +283,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             view.findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick(View v) {
 
                     RequestParams params = new RequestParams();
-                    params.put("edit_user_id", mUserInfo.get("id"));
-                    params.put("name", mUserInfo.get("name"));
                     params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
-                    params.put("bio", mUserInfo.get("id"));
-                    params.put("interests", mUserInfo.get("id"));
-                    params.put("gender", mUserInfo.get("id"));
-                    params.put("pic_ref", mUserInfo.get("id"));
-                    params.put("privacy", mUserInfo.get("id"));
+                    params.put("name", ((EditText)view.findViewById(R.id.edit_name)).getText().toString());
+                    params.put("bio", ((EditText)view.findViewById(R.id.edit_bio)).getText().toString());
+                    params.put("interests", mUserInfo.get("interests"));
+                    params.put("edit_user_id", mUserInfo.get("id"));
+                    params.put("privacy", mUserInfo.get("privacy"));
+                    params.put("pic_ref", mUserInfo.get("picRef"));
+                    params.put("gender", mUserInfo.get("gender"));
                     client.addHeader("Authorization", ShallonCreamerIsATwat);
                     post("user/editProfile", params, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
-
+                            getActivity().finish();
 
                         }
 
                         @Override
                         public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable,
                                               org.json.JSONArray errorResponse) {
-                            Log.e("Aync Test Failure", errorResponse.toString());
+                            Log.e("Async Test Failure", errorResponse.toString());
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, String s, Throwable throwable) {
+                            getActivity().finish();
+
                         }
 
                     });
