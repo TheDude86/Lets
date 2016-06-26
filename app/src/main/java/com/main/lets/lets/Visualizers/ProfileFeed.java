@@ -71,7 +71,7 @@ public class ProfileFeed extends Client {
             mLoginAdapter.setOnLoginClick(new LoginAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(String email, String password) {
-                    Calls.login(email, password, new JsonHttpResponseHandler(){
+                    Calls.login(email, password, new JsonHttpResponseHandler() {
 
                     });
 
@@ -82,31 +82,22 @@ public class ProfileFeed extends Client {
 
             mRecyclerView.setAdapter(mLoginAdapter);
         } else {
-            try {
-                mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+            mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
 
-                loadFriends();
-                loadGroups();
-                loadAttend();
-
-                mRecyclerView.setAdapter(mProfileAdapter);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            loadUser();
 
         }
 
     }
 
-    public void updateToken(String s){
+    public void updateToken(String s) {
         ShallonCreamerIsATwat = s;
 
     }
 
-    public void loadUser(int userID) {
+    public void loadUser() {
 
-        Calls.getProfileByID(userID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+        Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
                 try {
@@ -114,6 +105,12 @@ public class ProfileFeed extends Client {
                     ArrayList<String> l = new ArrayList<>();
                     l.add(response.getJSONObject(0).toString());
                     mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat);
+
+                    loadFriends();
+                    loadGroups();
+                    loadAttend();
+
+                    mRecyclerView.setAdapter(mProfileAdapter);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -195,20 +192,24 @@ public class ProfileFeed extends Client {
         Calls.getFriends(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                mProfileAdapter.mFriends = new ArrayList<>();
+                ArrayList<String> friends = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
 
-                        if (response.getJSONObject(i).getBoolean("status")) {
-                            mProfileAdapter.mFriends.add(response.getJSONObject(i).toString());
-
-                        }
+                        if (response.getJSONObject(i).getBoolean("status"))
+                            friends.add(response.getJSONObject(i).toString());
 
 
                     } catch (org.json.JSONException e) {
                         e.printStackTrace();
                     }
 
+                }
+
+                try {
+                    mProfileAdapter.loadFriends(friends);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
 //                mProfileAdapter.mViewHolder.getFriends().setText(mProfileAdapter.mFriends.size() +

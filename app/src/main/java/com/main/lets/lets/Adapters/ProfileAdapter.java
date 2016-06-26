@@ -24,6 +24,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.MainActivity;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
@@ -31,6 +32,7 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.quickAdapter.easyRegularAdapter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,6 +49,7 @@ import cz.msebera.android.httpclient.Header;
  */
 public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
     private String ShallonCreamerIsATwat;
+    public ArrayList<String> mFriendTags;
     public ArrayList<String> mEntities;
     public ArrayList<String> mFriends;
     public ArrayList<String> mGroups;
@@ -128,7 +131,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
                 String[] Categories = {"Party", "Eating/ Drinking", "Study", "TV/ Movies",
                         "Video games", "Sports", "Music", "Relax", "Other"};
-                char[] filter = new Integer(mUser.getInterests()).toString().toCharArray();
+                char[] filter = Integer.toString(mUser.getInterests()).toCharArray();
                 String interestString = "";
 
                 for (int i = 0; i < filter.length; i++) {
@@ -152,6 +155,42 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         }
 
         return new ViewHolder(view);
+
+    }
+
+    public void loadFriends(ArrayList<String> friends) throws JSONException {
+        mFriendTags = friends;
+        loadFriendsHelper(friends, 0);
+
+    }
+
+    public void loadFriendsHelper(final ArrayList<String> friends, final int index) throws JSONException {
+        if (friends.size() <= index) {
+            Log.println(Log.ASSERT, "Friends", mFriends.toString());
+            return;
+
+        }
+
+        Calls.getProfileByID(new JSONObject(friends.get(index)).getInt("user_id"),
+                ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        try {
+                            mFriends.add(response.getJSONObject(0).toString());
+                            loadFriendsHelper(friends, index + 1);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                          org.json.JSONArray errorResponse) {
+                        Log.e("Async Test Failure", errorResponse.toString());
+                    }
+
+                });
 
     }
 
@@ -216,7 +255,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
                 mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                 mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriendTags,
                         EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
 
 
@@ -284,7 +323,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     public void onClick(View view) {
                         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                        mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriendTags,
                                 EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
                     }
                 });
@@ -322,7 +361,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     }
 
 
-
     public class DemoHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         public RecyclerView mRecyclerView;
         public TextView interests;
@@ -340,7 +378,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
             mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
             mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-            mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+            mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriendTags,
                     EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
 
             bFriends = (Button) itemView.findViewById(R.id.friends);
@@ -364,7 +402,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 public void onClick(View view) {
                     mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
                     mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                    mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriends,
+                    mRecyclerView.setAdapter(new EntityAdapter(mActivity, mFriendTags,
                             EntityAdapter.Viewing.FRIENDS, ShallonCreamerIsATwat));
                 }
             });
@@ -399,8 +437,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
         }
     }
-
-
 
 
 }

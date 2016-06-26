@@ -102,4 +102,10 @@ public class Calls {
 
     }
 
+    public static void getMyProfile(String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        client.addHeader("Authorization", token);
+        post("user/getMyProfile", params, jsonHttpResponseHandler);
+    }
+
 }
