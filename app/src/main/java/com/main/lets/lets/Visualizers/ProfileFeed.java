@@ -1,4 +1,4 @@
-package com.main.lets.lets.Visulizers;
+package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
 import android.content.Context;
@@ -63,7 +63,7 @@ public class ProfileFeed extends Client {
 
     @Override
     public void draw(JSONObject j) {
-        mProfileAdapter.enableLoadMore();
+//        mProfileAdapter.enableLoadMore();
         if (ShallonCreamerIsATwat.equals("Bearer ")) {
             mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
             mLoginAdapter = new LoginAdapter(mActivity);
@@ -71,8 +71,10 @@ public class ProfileFeed extends Client {
             mLoginAdapter.setOnLoginClick(new LoginAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(String email, String password) {
-                    login(email, password);
-                    draw(null);
+                    Calls.login(email, password, new JsonHttpResponseHandler(){
+
+                    });
+
 
                 }
 
@@ -94,6 +96,11 @@ public class ProfileFeed extends Client {
             }
 
         }
+
+    }
+
+    public void updateToken(String s){
+        ShallonCreamerIsATwat = s;
 
     }
 

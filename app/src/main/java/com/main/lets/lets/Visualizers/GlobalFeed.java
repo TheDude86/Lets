@@ -1,4 +1,4 @@
-package com.main.lets.lets.Visulizers;
+package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EventAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;

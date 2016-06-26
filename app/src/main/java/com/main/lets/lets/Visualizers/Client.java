@@ -1,4 +1,4 @@
-package com.main.lets.lets.Visulizers;
+package com.main.lets.lets.Visualizers;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;

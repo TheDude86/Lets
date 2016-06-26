@@ -2,10 +2,9 @@ package com.main.lets.lets.Activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.main.lets.lets.R;
-import com.main.lets.lets.Visulizers.ProfileDetailFeed;
+import com.main.lets.lets.Visualizers.ProfileDetailFeed;
 
 import org.json.JSONException;
 import org.json.JSONObject;

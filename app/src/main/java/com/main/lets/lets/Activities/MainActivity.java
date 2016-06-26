@@ -17,23 +17,29 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
-import com.main.lets.lets.Visulizers.GlobalFeed;
-import com.main.lets.lets.Visulizers.ProfileFeed;
+import com.main.lets.lets.Visualizers.GlobalFeed;
+import com.main.lets.lets.Visualizers.ProfileFeed;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import cz.msebera.android.httpclient.Header;
+
 public class MainActivity extends AppCompatActivity {
     public static final int SELECT_PICTURE = 2;
     public LocationManager mLocationManager;
+    public static final int SETTINGS = 0;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
-    public Login mLogin;
     HashMap<String, Object> mMap;
+    public String mActive;
+    public Login mLogin;
 
 
     @Override
@@ -50,12 +56,42 @@ public class MainActivity extends AppCompatActivity {
         // reloading events
         mGlobalFeed = new GlobalFeed(this, (UltimateRecyclerView) findViewById(R.id.list), GlobalFeed.Sort.DIST);
 
-        mLogin = new Login(this);
-
-
         //Creates the User's profile feed if they're logged in, if they're not.  It will load a login
         //screen
         mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
+
+        //Login object used for auto login for returning users
+        mLogin = new Login(this, new JsonHttpResponseHandler(){
+
+            /**
+             * The login object will attempt to login automatically if there are saved credentials
+             * on the device already, if it succeeds, it will update the ProfileFeed object and if
+             * it fails, it will clear the saved credentials
+             *
+             * @param statusCode (Unused)
+             * @param headers (Unused)
+             * @param response contains the access token for the user if successfully logged in and
+             *                 returns an error message of login failed
+             */
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response){
+                try {
+                    if(response.has("accessToken")){
+                        mMap.put("token", response.getString("accessToken"));
+                        mProfileFeed.updateToken("Bearer " + response.getString("accessToken"));
+
+                    }else{
+                        Login.clearInfo(MainActivity.this);
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        });
 
         //Checks to see if the user has granted the app permission to get the device's location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
@@ -75,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
             //Draw the local event feed
             mGlobalFeed.draw(new JSONObject(mMap));
+
+            //Saving the active visualizer so the activity knows which feed to draw when
+            //onResume is called
+            mActive = mGlobalFeed.getClass().toString();
 
         }
 
@@ -143,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 intent.putExtra("token", (String)mMap.get("token"));
-                startActivity(intent);
+                startActivityForResult(intent, SETTINGS);
             }
         });
 
@@ -154,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.btn_add).setVisibility(View.VISIBLE);
                 mGlobalFeed.draw(new JSONObject(mMap));
 
+                //Saving the active visualizer so the activity knows which feed to draw when
+                //onResume is called
+                mActive = mGlobalFeed.getClass().toString();
 
             }
         });
@@ -164,6 +207,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
                 mProfileFeed.draw(null);
+
+                //Saving the active visualizer so the activity knows which feed to draw when
+                //onResume is called
+                mActive = mProfileFeed.getClass().toString();
 
             }
         });
@@ -247,6 +294,25 @@ public class MainActivity extends AppCompatActivity {
     public void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                if(data.getBooleanExtra("LoggedOut", false))
+                    mProfileFeed.updateToken("Bearer ");
+
+                if(mActive.equals(mGlobalFeed.getClass().toString())){
+                    mGlobalFeed.draw(new JSONObject(mMap));
+
+                }else if(mActive.equals(mProfileFeed.getClass().toString())){
+                    mProfileFeed.draw(null);
+
+                }
+            }
+        }
     }
 
 }

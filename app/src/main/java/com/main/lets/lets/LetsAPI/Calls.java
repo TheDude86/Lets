@@ -24,6 +24,8 @@ public class Calls {
     protected static final String GetProfileByID = "user/getProfileById";
     protected static final String GetGroups = "user/getGroups";
     protected static final String GetAttended = "user/getAttended";
+    protected static final String GetFriends = "user/getFriends";
+
     protected static AsyncHttpClient client = new AsyncHttpClient();
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
 
@@ -88,7 +90,15 @@ public class Calls {
 
         RequestParams params = new RequestParams();
         client.addHeader("Authorization", token);
-        post("user/getFriends", params, jsonHttpResponseHandler);
+        post(GetFriends, params, jsonHttpResponseHandler);
+
+    }
+
+    public static void login(String email, String password, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("email", email);
+        params.put("password", password);
+        post("user/loginSecure", params, jsonHttpResponseHandler);
 
     }
 

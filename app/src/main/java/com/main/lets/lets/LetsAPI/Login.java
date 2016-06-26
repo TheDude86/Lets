@@ -26,11 +26,10 @@ public class Login {
     public static final String FILENAME = "userInfo";
     protected static AsyncHttpClient client = new AsyncHttpClient();
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
-    private String ShallonCreamerIsATwat;
     private HashMap<String, String> mInfo;
     private Activity mActivity;
 
-    public Login(Activity a) {
+    public Login(Activity a, JsonHttpResponseHandler jsonHttpResponseHandler) {
         super();
         mActivity = a;
         mInfo = new HashMap<>();
@@ -50,26 +49,9 @@ public class Login {
 
                 if (!sb.toString().equals("blank")) {
                     cred = sb.toString().split(":");
-                    login(cred[0], cred[1], new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
-                            try {
-                                ShallonCreamerIsATwat += response.getString("accessToken");
-                            } catch (org.json.JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                              org.json.JSONArray errorResponse) {
-                            Log.e("Async Test Failure", errorResponse.toString());
-                        }
-
-                    });
-                    mInfo.put("email", cred[0]);
+                    Calls.login(cred[0], cred[1], jsonHttpResponseHandler);
                     mInfo.put("password", cred[1]);
+                    mInfo.put("email", cred[0]);
 
                 }
 
@@ -89,15 +71,31 @@ public class Login {
 
     }
 
-    public void login(String email, String password, JsonHttpResponseHandler jsonHttpResponseHandler) {
-        RequestParams params = new RequestParams();
-        params.put("email", email);
-        params.put("password", password);
-        post("user/loginSecure", params, jsonHttpResponseHandler);
+    public void saveInfo(String email, String password) {
+        String string = email + ":" + password;
+        FileOutputStream fos;
+        try {
+            fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(string.getBytes());
+            fos.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public String getToken() {
-        return ShallonCreamerIsATwat;
+    public static void clearInfo(Activity a){
+        String string = "blank";
+        FileOutputStream fos;
+        try {
+            fos = a.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(string.getBytes());
+            fos.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public HashMap<String, String> getInfo() {

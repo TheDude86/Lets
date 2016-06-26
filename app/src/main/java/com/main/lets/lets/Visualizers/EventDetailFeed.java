@@ -1,11 +1,10 @@
-package com.main.lets.lets.Visulizers;
+package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;

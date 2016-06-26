@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 import com.loopj.android.http.AsyncHttpClient;
@@ -68,6 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     static String ShallonCreamerIsATwat;
     protected static AsyncHttpClient client = new AsyncHttpClient();
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+    private static boolean loggedOut = false;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -160,6 +162,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     }
 
+    @Override
+    public void onBackPressed(){
+        Intent data = new Intent();
+        data.putExtra("LoggedOut", loggedOut);
+        setResult(RESULT_OK, data);
+        finish();
+
+    }
+
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
@@ -168,8 +179,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
+
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent data = new Intent();
+                data.putExtra("LoggedOut", loggedOut);
+                setResult(RESULT_OK, data);
+                finish();
+
+                break;
+        }
+        return true;
+    }
+
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -639,6 +666,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_notifications);
             setHasOptionsMenu(true);
 
+            loggedOut = true;
+            Login.clearInfo(getActivity());
             getActivity().setResult(RESULT_OK, new Intent(getActivity(), MainActivity.class));
             getActivity().finish();
 

@@ -2,15 +2,10 @@ package com.main.lets.lets.LetsAPI;
 
 import android.util.Log;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.main.lets.lets.Visulizers.Client;
+import com.main.lets.lets.Visualizers.Client;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/30/2016.
