@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
+import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
@@ -61,11 +62,11 @@ public class EntityAdapter extends RecyclerView.Adapter {
             case FRIENDS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
 
-                return new ViewHolder(view);
+                return new EntityViewHolder(view);
             case GROUPS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
 
-                return new ViewHolder(view);
+                return new EntityViewHolder(view);
 
         }
 
@@ -84,11 +85,11 @@ public class EntityAdapter extends RecyclerView.Adapter {
                     break;
 
                 case FRIENDS:
-                    bindFriend((ViewHolder) holder, mList.get(position));
+                    bindFriend((EntityViewHolder) holder, mList.get(position));
 
                     break;
                 case GROUPS:
-                    bindGroup((ViewHolder) holder, mList.get(position));
+                    bindGroup((EntityViewHolder) holder, mList.get(position));
 
                     break;
 
@@ -100,7 +101,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindGroup(ViewHolder holder, String data) throws JSONException{
+    public void bindGroup(EntityViewHolder holder, String data) throws JSONException{
         holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +114,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindFriend(ViewHolder holder, final String json) throws JSONException {
+    public void bindFriend(EntityViewHolder holder, final String json) throws JSONException {
         holder.mTitle.setText(new Entity(new JSONObject(json)).mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,20 +163,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
         return mList.size();
     }
 
-    protected class ViewHolder extends RecyclerView.ViewHolder {
-        RelativeLayout mLayout;
-        TextView mTitle;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-
-            mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
-            mTitle = (TextView) itemView.findViewById(R.id.txt_entity_title);
-
-        }
-    }
-
-    protected class EventHolder extends RecyclerView.ViewHolder {
+    public class EventHolder extends RecyclerView.ViewHolder {
         LinearLayout mMainViewHolder;
         LinearLayout mTextBackground;
         ImageView mBackground;

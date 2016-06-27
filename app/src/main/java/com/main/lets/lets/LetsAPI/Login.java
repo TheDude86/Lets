@@ -71,11 +71,11 @@ public class Login {
 
     }
 
-    public void saveInfo(String email, String password) {
+    public static void saveInfo(String email, String password, Activity a) {
         String string = email + ":" + password;
         FileOutputStream fos;
         try {
-            fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos = a.openFileOutput(FILENAME, Context.MODE_PRIVATE);
             fos.write(string.getBytes());
             fos.close();
 
