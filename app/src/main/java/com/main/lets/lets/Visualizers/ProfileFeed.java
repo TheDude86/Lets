@@ -288,19 +288,20 @@ public class ProfileFeed extends Client {
                               @Override
                               public void onSuccess(int statusCode, Header[] headers,
                                                     org.json.JSONArray response) {
-                                  mProfileAdapter.mEvents = new ArrayList<>();
-                                  for (int i = 0; i < response.length(); i++) {
-                                      try {
-                                          //Loads the events in the profile adapter
-                                          mProfileAdapter.mEvents
-                                                  .add(response.getJSONObject(i).toString());
+                                  try {
 
-                                      } catch (org.json.JSONException e) {
-                                          e.printStackTrace();
+                                      ArrayList<String> events = new ArrayList<>();
+                                      for (int i = 0; i < response.length(); i++) {
+                                          //Loads the events in the temporary array list
+                                          events.add(response.getJSONObject(i).toString());
+
                                       }
 
-                                  }
+                                      mProfileAdapter.loadEvents(events);
 
+                                  } catch (org.json.JSONException e) {
+                                      e.printStackTrace();
+                                  }
                               }
 
                               /**

@@ -56,9 +56,9 @@ public class EntityAdapter extends RecyclerView.Adapter {
         View view;
         switch (active) {
             case EVENTS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
 
-                return new EventHolder(view);
+                return new EntityViewHolder(view);
             case FRIENDS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
 
@@ -80,7 +80,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
             switch (active) {
                 case EVENTS:
-                    bindEvent((EventHolder) holder, mList.get(position));
+                    bindEvent((EntityViewHolder) holder, mList.get(position));
 
                     break;
 
@@ -128,31 +128,15 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindEvent(final EventHolder holder, final String data) throws JSONException {
-            Event e = new Event(new org.json.JSONObject(data));
-
-            holder.mLocation.setText(e.getmLocationTitle());
-            holder.mTime.setText(e.getTimeSpanString());
-            holder.mTitle.setText(e.getmTitle());
-
-            Bitmap photo = BitmapFactory.decodeResource(mActivity.getResources(), e.getImageResourceId(mActivity));
-            Picasso.with(mActivity).load(e.getImageResourceId(mActivity)).into((holder.mBackground));
-
-            Palette.generateAsync(photo, new Palette.PaletteAsyncListener() {
+    public void bindEvent(final EntityViewHolder holder, final String data) throws JSONException {
+            holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
+            holder.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onGenerated(Palette palette) {
-                    int bgColor = palette.getMutedColor(mActivity.getResources().getColor(android.R.color.black));
-                    holder.mTextBackground.setBackgroundColor(bgColor);
-                }
-            });
-
-            holder.mMainViewHolder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
                     Intent intent = new Intent(mActivity, EventDetailActivity.class);
                     intent.putExtra("JSON", data);
+                    intent.putExtra("token", ShallonCreamerIsATwat);
                     mActivity.startActivityForResult(intent, DETAIL_CODE);
-
                 }
             });
 

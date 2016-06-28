@@ -187,8 +187,96 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
         });
 
+        mDemoHolder.setEventsClicked(new ProfileViewHolder.OnEventsClickListener() {
+            @Override
+            public void onItemClick(RecyclerView r) {
+                mDemoHolder.loadFeed(mEventTags, EntityAdapter.Viewing.EVENTS);
+            }
+        });
+
         return mDemoHolder;
     }
+
+    /**
+     * This takes in the short hand versions of events that are retrieved from the "/getAttended"
+     * call and then gets the full group info recursively here.
+     *
+     * @param events list of group short hands as JSONs, they contain the group title and ID
+     * @throws JSONException
+     */
+    public void loadEvents(ArrayList<String> events) throws JSONException {
+        mEventTags = events;
+        loadEventsHelper(events, 0);
+
+    }
+
+    /**
+     * Helper function for loadEventss, uses the index paramter to iterate through the events
+     * array list
+     *
+     * @param events list of group short hands as JSONs, they contain the group title and ID
+     * @param index  used to get element from events and iterate through the list
+     * @throws JSONException
+     */
+    public void loadEventsHelper(final ArrayList<String> events, final int index)
+            throws JSONException {
+        //Once it goes through the entire list, return
+        if (events.size() <= index)
+            return;
+
+        //Network call made to get an event's information
+        Calls.getEvent(new JSONObject(events.get(index)).getInt("event_id"),
+                           new JsonHttpResponseHandler() {
+
+                               /**
+                                * When the call is finished, a JSON object is returned as the
+                                * response containing all of the information about the group, the
+                                * JSON's string is then placed in an array list and then calls
+                                * itself again
+                                * @param statusCode (unused)
+                                * @param headers    (unused)
+                                * @param response   JSON containing all of a group's information
+                                */
+                               @Override
+                               public void onSuccess(int statusCode, Header[] headers,
+                                                     JSONObject response) {
+
+                                   //TODO add check to make sure a valid event was returned
+
+                                   //Adding the response to the array list, the response contains
+                                   // the group's info, members, and admins
+                                   mEvents.add(response.toString());
+
+                                   try {
+                                       //Recursively calls itself again iterating through the
+                                       // list by one
+                                       loadEventsHelper(events, index + 1);
+                                   } catch (JSONException e) {
+                                       e.printStackTrace();
+                                   }
+
+                               }
+
+                               /**
+                                * Called when there is an error with the server
+                                *
+                                * @param statusCode (unused)
+                                * @param headers (unused)
+                                * @param throwable (unused)
+                                * @param errorResponse (unused)
+                                */
+                               @Override
+                               public void onFailure(int statusCode, Header[] headers,
+                                                     Throwable throwable,
+                                                     org.json.JSONArray errorResponse) {
+                                   Log.e("Async Test Failure", errorResponse.toString());
+                               }
+
+
+                           });
+
+    }
+
 
     /**
      * This takes in the short hand versions of groups that are retrieved from the "/getGroups" call
@@ -304,6 +392,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         Calls.getProfileByID(new JSONObject(friends.get(index)).getInt("user_id"),
                              ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
+                    //TODO add check to make sure a valid friend was returned
+
                     /**
                      * When the call is done, it will return a JSON array object that will
                      * contain all of the user's information and that will be
@@ -372,6 +462,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     /**
      * Sets the user's profile picture in the profile feed
+     *
      * @param b
      */
     public void setmPicture(Bitmap b) {
