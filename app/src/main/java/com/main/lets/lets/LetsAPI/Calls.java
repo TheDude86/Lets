@@ -13,6 +13,9 @@ import com.rey.material.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+
 import cz.msebera.android.httpclient.Header;
 
 /**
@@ -33,9 +36,9 @@ public class Calls {
     protected static final String LoginSecure = "user/loginSecure";
     protected static final String GetGroupInfo = "group/getInfo";
     protected static final String GetFriends = "user/getFriends";
+    protected static final String GetGroups = "user/getGroups";
 
     protected static AsyncHttpClient client = new AsyncHttpClient();
-    protected static final String GetGroups = "user/getGroups";
 
     /**
      * Base method for making network calls.
@@ -197,6 +200,21 @@ public class Calls {
         params.put("group_id", id);
         post(GetGroupInfo, params, jsonHttpResponseHandler);
 
+    }
+
+
+    public static void editProfile(HashMap<String, Object> mUserInfo, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
+        params.put("interests", mUserInfo.get("interests"));
+        params.put("edit_user_id", mUserInfo.get("id"));
+        params.put("privacy", mUserInfo.get("privacy"));
+        params.put("pic_ref", mUserInfo.get("picRef"));
+        params.put("gender", mUserInfo.get("gender"));
+        params.put("name", mUserInfo.get("name"));
+        params.put("bio", mUserInfo.get("bio"));
+        client.addHeader("Authorization", token);
+        post("user/editProfile", params, jsonHttpResponseHandler);
     }
 
 }

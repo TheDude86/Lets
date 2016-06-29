@@ -41,6 +41,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 
@@ -66,10 +67,8 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final int CODE_LOGOUT = 0;
-    static String ShallonCreamerIsATwat;
-    protected static AsyncHttpClient client = new AsyncHttpClient();
-    protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
     private static boolean loggedOut = false;
+    static String ShallonCreamerIsATwat;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -153,18 +152,37 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         .getString(preference.getKey(), ""));
     }
 
+    /**
+     * Retrieves the access token passed through the intent and saves it locally intellectually as
+     * ShallonCreamerIsATwat because that bitch is and every person should know.
+     * FUCK YOU SHALLON!!!
+     * <p/>
+     * Hehe hopefully this app gets big and one day she downloads this app and it'll be like I'm
+     * calling her a twat to her face every time she uses it.  Ah good thoughts... Oh also this is
+     * where we set up the action bar but that code was auto generated.
+     *
+     * @param savedInstanceState for stuff and things, or was it things and stuff?  Fuck it, it goes
+     *                           to the super method, that's all I know
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
+        ShallonCreamerIsATwat = getIntent().getStringExtra("token");  //  <-- Bitch
+        // The promised method to set up the action bar, sorry for the rant but to be honest I'm
+        // not that sorry...      ;)
         setupActionBar();
 
 
     }
 
+    /**
+     * Overriding this method so we can return with a result to let the main activity know the user
+     * logged out and update the feeds
+     */
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Intent data = new Intent();
+        //If the user pressed the log out button, "loggedOut" will be true
         data.putExtra("LoggedOut", loggedOut);
         setResult(RESULT_OK, data);
         finish();
@@ -183,6 +201,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
+    /**
+     * The user can also return to the main activity by pressing the back arrow button on the
+     * action bar so we got to override that again and return with a result for logging purposes
+     * again
+     *
+     * @param item item clicked in the toolbar
+     * @return returns true always because I like to believe... Eh idk, I'm so fucking tired of
+     * writing comments
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -197,7 +224,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return true;
     }
 
-
+    /**
+     * I know I added this code because there are no comments but I have honestly no idea what it's
+     * doing... Oh I see something about the home ID, must be doing something with pressing the
+     * back arrow on the toolbar.
+     *
+     * @param featureId It is used for stuff and things
+     * @param item      item clicked in the toolbar
+     * @return
+     */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
@@ -241,42 +276,40 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
 
+    /**
+     * When a preference is selected, it inflates a fragment and it's XML so we need to pass the
+     * access token from the activity into the edit user fragment so it can load in the user's
+     * current content
+     *
+     * @param header   is used by fragments and used to pass data from activity to fragment
+     * @param position for the super method
+     */
     @Override
     public void onHeaderClick(Header header, int position) {
         if (header.fragmentArguments == null) {
             header.fragmentArguments = new Bundle();
         }
 
+        //Puts the access token into the bundle for the fragment to get
         header.fragmentArguments.putString("token", ShallonCreamerIsATwat);
         super.onHeaderClick(header, position);
 
+        //Idk what this shit does, not mine
         if (header.fragment != null) {
-            if (true) {
-                int titleRes = header.breadCrumbTitleRes;
-                int shortTitleRes = header.breadCrumbShortTitleRes;
-                if (titleRes == 0) {
-                    titleRes = header.titleRes;
-                    shortTitleRes = 0;
-                }
-                startWithFragment(header.fragment, header.fragmentArguments, null, 0,
-                        titleRes, shortTitleRes);
-            } else {
-                switchToHeader(header);
+            int titleRes = header.breadCrumbTitleRes;
+            int shortTitleRes = header.breadCrumbShortTitleRes;
+            if (titleRes == 0) {
+                titleRes = header.titleRes;
+                shortTitleRes = 0;
             }
+            startWithFragment(header.fragment, header.fragmentArguments, null, 0,
+                    titleRes, shortTitleRes);
         } else if (header.intent != null) {
+            //I tried a thing here
             startActivityForResult(header.intent, CODE_LOGOUT);
         }
 
     }
-
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
-    }
-
 
     /**
      * This fragment shows general preferences only. It is used when the
@@ -308,21 +341,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
                     "Loading. Please wait...", true);
 
-            view.findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {
+            view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    RequestParams params = new RequestParams();
-                    params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
-                    params.put("name", ((EditText)view.findViewById(R.id.edit_name)).getText().toString());
-                    params.put("bio", ((EditText)view.findViewById(R.id.edit_bio)).getText().toString());
-                    params.put("interests", mUserInfo.get("interests"));
-                    params.put("edit_user_id", mUserInfo.get("id"));
-                    params.put("privacy", mUserInfo.get("privacy"));
-                    params.put("pic_ref", mUserInfo.get("picRef"));
-                    params.put("gender", mUserInfo.get("gender"));
-                    client.addHeader("Authorization", ShallonCreamerIsATwat);
-                    post("user/editProfile", params, new JsonHttpResponseHandler() {
+                    mUserInfo.put("name", ((EditText) view.findViewById(R.id.edit_name)).getText().toString());
+                    mUserInfo.put("bio", ((EditText) view.findViewById(R.id.edit_bio)).getText().toString());
+
+                    Calls.editProfile(mUserInfo, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
                             getActivity().finish();
@@ -457,9 +483,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             });
 
-            RequestParams params = new RequestParams();
-            client.addHeader("Authorization", ShallonCreamerIsATwat);
-            post("user/getMyProfile", params, new JsonHttpResponseHandler() {
+            Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, org.json.JSONArray response) {
                     try {
@@ -512,7 +536,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 @Override
                 public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable,
                                       org.json.JSONArray errorResponse) {
-                    Log.e("Aync Test Failure", errorResponse.toString());
+                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });

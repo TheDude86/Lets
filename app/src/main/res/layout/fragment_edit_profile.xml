@@ -180,7 +180,7 @@
             android:checked="false" />
 
         <com.dd.CircularProgressButton
-            android:id="@+id/create"
+            android:id="@+id/update"
             android:layout_width="196dp"
             android:layout_height="64dp"
             android:layout_centerHorizontal="true"

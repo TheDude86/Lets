@@ -24,18 +24,24 @@ import cz.msebera.android.httpclient.Header;
  */
 public class Login {
     public static final String FILENAME = "userInfo";
-    protected static AsyncHttpClient client = new AsyncHttpClient();
-    protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
-    private HashMap<String, String> mInfo;
     private Activity mActivity;
 
+    /**
+     * The login class is used to automatically login when the user opens the app and save user
+     * credentials to their phone if they log in successfully.
+     *
+     * @param a                       Activity used for reading and writing to files on the phone
+     * @param jsonHttpResponseHandler code to be executed once the login call is made
+     */
     public Login(Activity a, JsonHttpResponseHandler jsonHttpResponseHandler) {
         super();
+        //Initializing global variable
         mActivity = a;
-        mInfo = new HashMap<>();
 
         try {
             try {
+                //Opening the input stream and looks for the file, if it is not there, it will
+                //throw a FileNotFoundException
                 FileInputStream fis = mActivity.openFileInput(FILENAME);
                 InputStreamReader isr = new InputStreamReader(fis);
                 BufferedReader bufferedReader = new BufferedReader(isr);
@@ -43,19 +49,26 @@ public class Login {
                 String line;
 
                 String[] cred;
+                //Reads each line from the file and sets the line string equal to the line  then and
+                //appends it onto the string builder
                 while ((line = bufferedReader.readLine()) != null) {
                     sb.append(line);
                 }
 
+                //If the file just reads blank, that means the app has previously tried to log in
+                // but failed so it created the new file and wrote "blank"
+
+                //If the file does not read blank, then the user's email and password have been
+                // saved so it will split the string into a string array containing a separate
+                // string for the email and password which then makes the call to log in
                 if (!sb.toString().equals("blank")) {
                     cred = sb.toString().split(":");
                     Calls.login(cred[0], cred[1], jsonHttpResponseHandler);
-                    mInfo.put("password", cred[1]);
-                    mInfo.put("email", cred[0]);
 
                 }
 
             } catch (FileNotFoundException e) {
+                //If no file exists, this code runs creating a new file and writing "blank"
                 FileOutputStream fos;
                 String string = "blank";
                 fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
@@ -71,10 +84,20 @@ public class Login {
 
     }
 
+    /**
+     * Saves user's email and password as a string on the phone so the app can access that data if
+     * the app is closed and auto login.  The string is saved in the format: "email:password"
+     *
+     * @param email    the user's email
+     * @param password the user's password
+     * @param a        activity used to save the user's credentials to the phone
+     */
     public static void saveInfo(String email, String password, Activity a) {
+        //putting the two strings together as one
         String string = email + ":" + password;
         FileOutputStream fos;
         try {
+            //Writing the string to the file
             fos = a.openFileOutput(FILENAME, Context.MODE_PRIVATE);
             fos.write(string.getBytes());
             fos.close();
@@ -85,7 +108,13 @@ public class Login {
 
     }
 
-    public static void clearInfo(Activity a){
+    /**
+     * Clears the user's email and password saved on the phone, used for logging out.
+     * The file is cleared and replaced with the new text "blank"
+     *
+     * @param a activity used to write to the phone's data
+     */
+    public static void clearInfo(Activity a) {
         String string = "blank";
         FileOutputStream fos;
         try {
@@ -96,18 +125,6 @@ public class Login {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public HashMap<String, String> getInfo() {
-        return mInfo;
-    }
-
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
     }
 
 }
