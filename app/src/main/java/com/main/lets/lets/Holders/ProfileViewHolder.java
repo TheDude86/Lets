@@ -2,6 +2,7 @@ package com.main.lets.lets.Holders;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
@@ -27,16 +28,16 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public OnFriendsClickListener mFriendsClicked;
     public OnGroupsClickListener mGroupsClicked;
     public OnEventsClickListener mEventsClicked;
+    public EntityAdapter.Viewing mActive;
     public String ShallonCreamerIsATwat;
     public RecyclerView mRecyclerView;
-    public ArrayList<String> mFriends;
-    public ArrayList<String> mEvents;
-    public ArrayList<String> mGroups;
+    public ArrayList<String> mList;
     public Activity mActivity;
     public TextView interests;
     public ImageView mPicture;
     public TextView friends;
     public Button bFriends;
+    public String mSearch;
     public TextView score;
     public Button bGroups;
     public Button bEvents;
@@ -51,17 +52,15 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
      * friends, events, and groups.
      *
      * @param itemView does stuff and things
-     * @param a also used for other methods for inflating XMLs
-     * @param token access token
+     * @param a        also used for other methods for inflating XMLs
+     * @param token    access token
      */
     public ProfileViewHolder(final View itemView, final Activity a, final String token) {
         super(itemView);
 
-        //initializing global variables, the array lists are filled with the feeds
+        //initializing global variables, the arraylist holds the entity feed
         ShallonCreamerIsATwat = token;
-        mFriends = new ArrayList<>();
-        mEvents = new ArrayList<>();
-        mGroups = new ArrayList<>();
+        mList = new ArrayList<>();
         mActivity = a;
 
         //Filling the recycler view with the friends list (which is empty at this moment)
@@ -71,6 +70,28 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         bFriends = (Button) itemView.findViewById(R.id.friends);
         bGroups = (Button) itemView.findViewById(R.id.groups);
         bEvents = (Button) itemView.findViewById(R.id.events);
+
+        //Initializing the search string and default viewing feed
+        mSearch = "";
+        mActive = EntityAdapter.Viewing.FRIENDS;
+
+        //Set the on text update listener for the search widget, when the user inputs text, the
+        // feed is updated dyanically
+        ((SearchView) itemView.findViewById(R.id.search)).setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        mSearch = newText;
+                        loadFeed(mList, mActive);
+
+                        return false;
+                    }
+                });
 
         //Setting the buttons' click listeners
         bFriends.setOnClickListener(this);
@@ -137,12 +158,12 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
     //Loads the feed into the recycler view
     public void loadFeed(ArrayList<String> list, EntityAdapter.Viewing view) {
-        Log.println(Log.ASSERT, "ProfileViewHolder", list.toString());
         ArrayList<String> searchedList = new ArrayList<>();
+        mList = list;
 
-        for (String l: list){
+        for (String l : list) {
             try {
-                if(new Entity(new JSONObject(l)).mText.contains(""))
+                if (new Entity(new JSONObject(l)).mText.contains(mSearch))
                     searchedList.add(l);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -152,7 +173,8 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
         mRecyclerView.setLayoutManager(
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-        mRecyclerView.setAdapter(new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat));
+        mRecyclerView.setAdapter(
+                new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat));
 
     }
 }
