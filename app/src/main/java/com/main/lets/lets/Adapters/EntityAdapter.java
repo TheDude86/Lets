@@ -35,6 +35,8 @@ import java.util.ArrayList;
  * Created by Joe on 6/6/2016.
  */
 public class EntityAdapter extends RecyclerView.Adapter {
+    private OnEntityClickListener mOnEntityClicked;
+
     public enum Viewing {EVENTS, GROUPS, FRIENDS}
 
     private static final int DETAIL_CODE = 1;
@@ -56,22 +58,24 @@ public class EntityAdapter extends RecyclerView.Adapter {
         View view;
         switch (active) {
             case EVENTS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_entity_with_space, parent, false);
 
                 return new EntityViewHolder(view);
             case FRIENDS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_entity_with_space, parent, false);
 
                 return new EntityViewHolder(view);
             case GROUPS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_entity_with_space, parent, false);
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.row_entity_with_space, parent, false);
 
                 return new EntityViewHolder(view);
 
         }
 
         return null;
-
     }
 
     @Override
@@ -80,16 +84,16 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
             switch (active) {
                 case EVENTS:
-                    bindEvent((EntityViewHolder) holder, mList.get(position));
+                    bindEvent((EntityViewHolder) holder, mList.get(position), position);
 
                     break;
 
                 case FRIENDS:
-                    bindFriend((EntityViewHolder) holder, mList.get(position));
+                    bindFriend((EntityViewHolder) holder, mList.get(position), position);
 
                     break;
                 case GROUPS:
-                    bindGroup((EntityViewHolder) holder, mList.get(position));
+                    bindGroup((EntityViewHolder) holder, mList.get(position), position);
 
                     break;
 
@@ -101,77 +105,58 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindGroup(EntityViewHolder holder, String data) throws JSONException{
+    public void bindGroup(EntityViewHolder holder, String data, final int position)
+            throws JSONException {
         holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mActivity, GroupDetailActivity.class);
-                mActivity.startActivity(intent);
-
+                if (mOnEntityClicked != null)
+                    mOnEntityClicked.onClicked(position);
             }
         });
 
     }
 
-    public void bindFriend(EntityViewHolder holder, final String json) throws JSONException {
+    public void bindFriend(EntityViewHolder holder, final String json, final int position)
+            throws JSONException {
         holder.mTitle.setText(new Entity(new JSONObject(json)).mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mActivity, UserDetailActivity.class);
-                intent.putExtra("JSON", json);
-                intent.putExtra("token", ShallonCreamerIsATwat);
-                mActivity.startActivityForResult(intent, DETAIL_CODE);
+                if (mOnEntityClicked != null)
+                    mOnEntityClicked.onClicked(position);
             }
         });
 
     }
 
-    public void bindEvent(final EntityViewHolder holder, final String data) throws JSONException {
-            holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
-            holder.mLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(mActivity, EventDetailActivity.class);
-                    intent.putExtra("JSON", data);
-                    intent.putExtra("token", ShallonCreamerIsATwat);
-                    mActivity.startActivityForResult(intent, DETAIL_CODE);
-                }
-            });
+    public void bindEvent(final EntityViewHolder holder, final String data, final int position)
+            throws JSONException {
+        holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
+        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mOnEntityClicked != null)
+                    mOnEntityClicked.onClicked(position);
+            }
+        });
+
+    }
+
+
+    public interface OnEntityClickListener {
+        void onClicked(int position);
+    }
+
+    public void setOnEntityClickListener(OnEntityClickListener e) {
+        mOnEntityClicked = e;
 
     }
 
     @Override
     public int getItemCount() {
         return mList.size();
-    }
-
-    public class EventHolder extends RecyclerView.ViewHolder {
-        LinearLayout mMainViewHolder;
-        LinearLayout mTextBackground;
-        ImageView mBackground;
-        TextView mLocation;
-        TextView mTitle;
-        TextView mTime;
-
-        /**
-         * give more control over NORMAL or HEADER view binding
-         *
-         * @param itemView view binding
-         */
-        public EventHolder(View itemView) {
-            super(itemView);
-
-            mTextBackground = (LinearLayout) itemView.findViewById(R.id.eventNameHolder);
-            mMainViewHolder = (LinearLayout) itemView.findViewById(R.id.eventHolder);
-            mBackground = (ImageView) itemView.findViewById(R.id.eventImage);
-            mLocation = (TextView) itemView.findViewById(R.id.eventLocation);
-            mTitle = (TextView) itemView.findViewById(R.id.eventTitle);
-            mTime = (TextView) itemView.findViewById(R.id.eventTime);
-
-        }
-
     }
 
 }

@@ -12,11 +12,16 @@ import org.json.JSONObject;
  */
 public class Entity  extends Client{
     enum EntityType {EVENT, USER, GROUP, COMMENT}
-
     public EntityType mType;
     public String mText;
     public int mID;
 
+    /**
+     *
+     * @param i
+     * @param s
+     * @param e
+     */
     public Entity(int i, String s, EntityType e){
         mType = e;
         mText = s;

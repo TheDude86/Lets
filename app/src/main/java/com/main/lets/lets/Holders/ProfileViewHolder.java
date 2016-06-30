@@ -29,20 +29,16 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public OnGroupsClickListener mGroupsClicked;
     public OnEventsClickListener mEventsClicked;
     public EntityAdapter.Viewing mActive;
+    public ArrayList<String> mDetailList;
     public String ShallonCreamerIsATwat;
     public RecyclerView mRecyclerView;
     public ArrayList<String> mList;
     public Activity mActivity;
-    public TextView interests;
-    public ImageView mPicture;
-    public TextView friends;
     public Button bFriends;
     public String mSearch;
-    public TextView score;
     public Button bGroups;
     public Button bEvents;
     public TextView name;
-    public TextView bio;
 
     /**
      * The profile view holder diplays the profile feed information, the view holder contains a
@@ -59,6 +55,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         super(itemView);
 
         //initializing global variables, the arraylist holds the entity feed
+        mDetailList = new ArrayList<>();
         ShallonCreamerIsATwat = token;
         mList = new ArrayList<>();
         mActivity = a;
@@ -87,7 +84,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         mSearch = newText;
-                        loadFeed(mList, mActive);
+                        loadFeed(mList, mDetailList, mActive);
 
                         return false;
                     }
@@ -157,13 +154,29 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     }
 
     //Loads the feed into the recycler view
-    public void loadFeed(ArrayList<String> list, EntityAdapter.Viewing view) {
+    public void loadFeed(ArrayList<String> list, ArrayList<String> detailedList,
+                         final EntityAdapter.Viewing view) {
+        String jsonSearchString = "";
+        if(view == EntityAdapter.Viewing.FRIENDS)
+            jsonSearchString = "User_Name";
+        else if(view == EntityAdapter.Viewing.EVENTS)
+            jsonSearchString = "Event_Name";
+        else if(view == EntityAdapter.Viewing.GROUPS)
+            jsonSearchString = "group_name";
+
+
+        ArrayList<String> searchedDetailList = new ArrayList<>();
         ArrayList<String> searchedList = new ArrayList<>();
+        //Saves the active feed locally so when the search widget updates, it can reload the feed
+        mDetailList = detailedList;
         mList = list;
 
+        //Searches the list for the text in the search widget and puts the entities with the
+        // user's text into the searched list array list
         for (String l : list) {
             try {
-                if (new Entity(new JSONObject(l)).mText.contains(mSearch))
+                if (new Entity(new JSONObject(l)).mText.toLowerCase()
+                        .contains(mSearch.toLowerCase()))
                     searchedList.add(l);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -171,10 +184,43 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
         }
 
+        for (String l : detailedList) {
+            try {
+                Log.println(Log.ASSERT, "ProfileViewHolder", l);
+                if (new JSONObject(l).getString(jsonSearchString).toLowerCase()
+                        .contains(mSearch.toLowerCase()))
+                    searchedDetailList.add(l);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        //Creating the entity adapter and setting the on click listener
+        EntityAdapter e = new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat);
+        e.setOnEntityClickListener(new EntityAdapter.OnEntityClickListener() {
+            @Override
+            public void onClicked(int position) {
+                switch (view) {
+                    case FRIENDS:
+                        Log.println(Log.ASSERT, "ProfileViewHolder", mDetailList.get(position));
+
+                        break;
+                    case GROUPS:
+
+                        break;
+                    case EVENTS:
+
+                        break;
+                }
+
+            }
+        });
+
+        // Loads the new entity adapter with the searched list added
         mRecyclerView.setLayoutManager(
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-        mRecyclerView.setAdapter(
-                new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat));
+        mRecyclerView.setAdapter(e);
 
     }
 }

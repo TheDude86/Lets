@@ -174,7 +174,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setFriendsClicked(new ProfileViewHolder.OnFriendsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mFriendTags, EntityAdapter.Viewing.FRIENDS);
+                mDemoHolder.loadFeed(mFriendTags, mFriends, EntityAdapter.Viewing.FRIENDS);
             }
 
         });
@@ -182,7 +182,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setGroupsClicked(new ProfileViewHolder.OnGroupsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mGroupTags, EntityAdapter.Viewing.GROUPS);
+                mDemoHolder.loadFeed(mGroupTags, mGroups, EntityAdapter.Viewing.GROUPS);
             }
 
         });
@@ -190,7 +190,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setEventsClicked(new ProfileViewHolder.OnEventsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mEventTags, EntityAdapter.Viewing.EVENTS);
+                mDemoHolder.loadFeed(mEventTags, mEvents, EntityAdapter.Viewing.EVENTS);
             }
         });
 
@@ -428,35 +428,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     }
 
                 });
-
-    }
-
-
-    public void loadEvent(int i) {
-        RequestParams params = new RequestParams();
-        params.put("event_id", i);
-        Entity.post("event/getEventById", params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
-
-                try {
-                    Intent intent = new Intent(mActivity, EventDetailActivity.class);
-                    intent.putExtra("JSON", response.getJSONArray("Event_info").getJSONObject(0)
-                            .toString());
-                    mActivity.startActivity(intent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                  org.json.JSONArray errorResponse) {
-                Log.e("Aync Test Failure", errorResponse.toString());
-            }
-
-        });
 
     }
 
