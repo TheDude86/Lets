@@ -33,7 +33,7 @@ public class Event extends Entity implements Comparable<Event> {
     private Date mEnd;
 
     public Event(org.json.JSONObject j) throws JSONException {
-        super(j.getInt("event_id"),j.getString("event_name"), EntityType.EVENT);
+        super(j.getInt("Event_ID"),j.getString("Event_Name"), EntityType.EVENT);
         mCords = new HashMap<>();
 
         mCords.put("longitude", j.getDouble("Longitude"));

@@ -168,7 +168,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder = new ProfileViewHolder(view, mActivity, ShallonCreamerIsATwat);
 
 
-        //Settting the onClicked listeners for the buttons of the profile feed, the buttons allow
+        //Setting the onClicked listeners for the buttons of the profile feed, the buttons allow
         //the user to choose which feed they want to search through and when clicked, that feed
         //becomes the active feed in the Entity Adapter
         mDemoHolder.setFriendsClicked(new ProfileViewHolder.OnFriendsClickListener() {
@@ -306,7 +306,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
             return;
 
         //Network call made to get a group's information
-        Calls.getGroupInfo(new JSONObject(groups.get(index)).getInt("group_id"),
+        Calls.getGroupInfo(new Entity(new JSONObject(groups.get(index))).mID,
                            new JsonHttpResponseHandler() {
 
                                /**
@@ -385,11 +385,13 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     public void loadFriendsHelper(final ArrayList<String> friends, final int index)
             throws JSONException {
         //Once it goes through the entire list, return
-        if (friends.size() <= index)
+        if (friends.size() <= index) {
+            mDemoHolder.mDetailList = mFriends;
             return;
+        }
 
         //Network call to get a user's full information
-        Calls.getProfileByID(new JSONObject(friends.get(index)).getInt("user_id"),
+        Calls.getProfileByID(new Entity(new JSONObject(friends.get(index))).mID,
                              ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                     //TODO add check to make sure a valid friend was returned

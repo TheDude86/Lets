@@ -84,16 +84,16 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
             switch (active) {
                 case EVENTS:
-                    bindEvent((EntityViewHolder) holder, mList.get(position), position);
+                    bindEvent((EntityViewHolder) holder, mList.get(position));
 
                     break;
 
                 case FRIENDS:
-                    bindFriend((EntityViewHolder) holder, mList.get(position), position);
+                    bindFriend((EntityViewHolder) holder, mList.get(position));
 
                     break;
                 case GROUPS:
-                    bindGroup((EntityViewHolder) holder, mList.get(position), position);
+                    bindGroup((EntityViewHolder) holder, mList.get(position));
 
                     break;
 
@@ -105,40 +105,44 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void bindGroup(EntityViewHolder holder, String data, final int position)
+    public void bindGroup(EntityViewHolder holder, String data)
             throws JSONException {
-        holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
+        final Entity e = new Entity(new JSONObject(data));
+        holder.mTitle.setText(e.mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mOnEntityClicked != null)
-                    mOnEntityClicked.onClicked(position);
+                    mOnEntityClicked.onClicked(e.mID);
+
             }
         });
 
     }
 
-    public void bindFriend(EntityViewHolder holder, final String json, final int position)
+    public void bindFriend(EntityViewHolder holder, final String data)
             throws JSONException {
-        holder.mTitle.setText(new Entity(new JSONObject(json)).mText);
+        final Entity e = new Entity(new JSONObject(data));
+        holder.mTitle.setText(e.mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mOnEntityClicked != null)
-                    mOnEntityClicked.onClicked(position);
+                    mOnEntityClicked.onClicked(e.mID);
             }
         });
 
     }
 
-    public void bindEvent(final EntityViewHolder holder, final String data, final int position)
+    public void bindEvent(final EntityViewHolder holder, final String data)
             throws JSONException {
-        holder.mTitle.setText(new Entity(new JSONObject(data)).mText);
+        final Entity e = new Entity(new JSONObject(data));
+        holder.mTitle.setText(e.mText);
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mOnEntityClicked != null)
-                    mOnEntityClicked.onClicked(position);
+                    mOnEntityClicked.onClicked(e.mID);
             }
         });
 
@@ -146,7 +150,7 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
 
     public interface OnEntityClickListener {
-        void onClicked(int position);
+        void onClicked(int id);
     }
 
     public void setOnEntityClickListener(OnEntityClickListener e) {

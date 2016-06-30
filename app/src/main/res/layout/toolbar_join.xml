@@ -7,11 +7,10 @@
         android:id="@+id/btn_join"
         style="@style/TextButtonToolBar"
         android:text="Join Event"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/settings"
-        android:layout_weight="1"
         android:gravity="center"
         android:textColor="#096800"
         android:textStyle="bold" />

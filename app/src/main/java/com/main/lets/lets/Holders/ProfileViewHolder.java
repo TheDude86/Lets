@@ -1,6 +1,7 @@
 package com.main.lets.lets.Holders;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -10,11 +11,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.Group;
+import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +34,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public OnFriendsClickListener mFriendsClicked;
     public OnGroupsClickListener mGroupsClicked;
     public OnEventsClickListener mEventsClicked;
+    private static final int DETAIL_CODE = 1;
     public EntityAdapter.Viewing mActive;
     public ArrayList<String> mDetailList;
     public String ShallonCreamerIsATwat;
@@ -153,22 +160,23 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         mEventsClicked = itemClickListener;
     }
 
-    //Loads the feed into the recycler view
+    /**
+     * Takes in the feed to load and it's detailed list which is loaded sightly later and also
+     * which view the user selected (friends/events/groups).  The list is first sorted and then
+     * transferred to the entity adapter where the new entity adapter's on click listener is set
+     * which then passes the corresponding Entity string to the detail activity to show the user
+     * the entity's details
+     *
+     * @param list         list of entity short hands
+     * @param detailedList list of entities with their full descriptions
+     * @param view         which type of list the array list (friends/events/groups)
+     */
     public void loadFeed(ArrayList<String> list, ArrayList<String> detailedList,
                          final EntityAdapter.Viewing view) {
-        String jsonSearchString = "";
-        if(view == EntityAdapter.Viewing.FRIENDS)
-            jsonSearchString = "User_Name";
-        else if(view == EntityAdapter.Viewing.EVENTS)
-            jsonSearchString = "Event_Name";
-        else if(view == EntityAdapter.Viewing.GROUPS)
-            jsonSearchString = "group_name";
-
-
-        ArrayList<String> searchedDetailList = new ArrayList<>();
         ArrayList<String> searchedList = new ArrayList<>();
         //Saves the active feed locally so when the search widget updates, it can reload the feed
         mDetailList = detailedList;
+        mActive = view;
         mList = list;
 
         //Searches the list for the text in the search widget and puts the entities with the
@@ -184,34 +192,55 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
         }
 
-        for (String l : detailedList) {
-            try {
-                Log.println(Log.ASSERT, "ProfileViewHolder", l);
-                if (new JSONObject(l).getString(jsonSearchString).toLowerCase()
-                        .contains(mSearch.toLowerCase()))
-                    searchedDetailList.add(l);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
         //Creating the entity adapter and setting the on click listener
         EntityAdapter e = new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat);
         e.setOnEntityClickListener(new EntityAdapter.OnEntityClickListener() {
             @Override
-            public void onClicked(int position) {
-                switch (view) {
-                    case FRIENDS:
-                        Log.println(Log.ASSERT, "ProfileViewHolder", mDetailList.get(position));
+            public void onClicked(int id) {
+                try {
+                    String s = null;
 
-                        break;
-                    case GROUPS:
+                    switch (view) {
 
-                        break;
-                    case EVENTS:
+                        case FRIENDS:
+                            for (String l : mDetailList) {
+                                if (new User(new JSONObject(l)).getUserID() == id) {
+                                    s = l;
 
-                        break;
+                                    break;
+                                }
+
+                            }
+
+
+                            break;
+                        case GROUPS:
+                            for (String l : mDetailList) {
+                                if (new Group(new JSONObject(l).getJSONArray("Group_info")
+                                        .getJSONObject(0)).getGroupID() == id) {
+                                    Log.println(Log.ASSERT, "ProfileViewHolder", l);
+                                }
+                            }
+
+                            break;
+                        case EVENTS:
+                            for (String l : mDetailList) {
+                                if (new Event(new JSONObject(l).getJSONArray("Event_info")
+                                        .getJSONObject(0)).getmEventID() == id) {
+                                    s = l;
+                                }
+                            }
+
+                            Intent intent = new Intent(mActivity, EventDetailActivity.class);
+                            intent.putExtra("JSON", new JSONObject(s).getJSONArray("Event_info")
+                                    .getJSONObject(0).toString());
+                            mActivity.startActivityForResult(intent, DETAIL_CODE);
+
+                            break;
+                    }
+
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
                 }
 
             }
