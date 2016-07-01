@@ -21,6 +21,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Adapters.EntityAdapter;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
@@ -31,6 +32,7 @@ import com.rey.material.widget.Switch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +56,8 @@ public class EventCreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_create);
 
         //Getting all of the views from the XML file
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager()
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager()
                 .findFragmentById(R.id.autocomplete_fragment);
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
@@ -102,7 +105,8 @@ public class EventCreateActivity extends AppCompatActivity {
              */
             @Override
             public void onPositionChanged
-            (Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
+            (Slider view, boolean fromUser, float oldPos, float newPos, int oldValue,
+             int newValue) {
                 durationLabel.setText(newValue > 1 ? newValue + " Hours" : newValue + " Hour");
 
                 //I forget if you need to remove the old key if you're replacing the value with
@@ -123,7 +127,8 @@ public class EventCreateActivity extends AppCompatActivity {
             /**
              * When the user select's a location from the search widget, the HashMap is updated here
              * with new Latitude, Longitude, and Map Title values
-             * @param place the parameter from the widget when it closes containing all of the place's
+             * @param place the parameter from the widget when it closes containing all of the
+             *              place's
              *              important information
              */
             @Override
@@ -160,7 +165,9 @@ public class EventCreateActivity extends AppCompatActivity {
                 //Creates a new dialog with it's initial time set to the current time or the
                 // previous start time selected by the user
                 TimePickerDialog.Builder builder = new TimePickerDialog.Builder(mCalendar
-                        .get(Calendar.HOUR_OF_DAY), mCalendar.get(Calendar.MINUTE)) {
+                                                                                        .get(Calendar.HOUR_OF_DAY),
+                                                                                mCalendar
+                                                                                        .get(Calendar.MINUTE)) {
 
                     /**
                      * When the user confirm's the start time of the event, update the HashMap
@@ -180,7 +187,8 @@ public class EventCreateActivity extends AppCompatActivity {
                             mMap.remove("Start");
 
                         //Value for the start date of the event
-                        mMap.put("Start", dialog.getFormattedTime(new SimpleDateFormat("HH:mm:ss")));
+                        mMap.put("Start",
+                                 dialog.getFormattedTime(new SimpleDateFormat("HH:mm:ss")));
 
                         //Updating the Calendar's information (this is important for creating the
                         //end time for the event
@@ -236,7 +244,8 @@ public class EventCreateActivity extends AppCompatActivity {
                             mMap.remove("Date");
 
                         //Value for the event's start date formatted for post parameters
-                        mMap.put("Date", dialog.getFormattedDate(new SimpleDateFormat("mm-dd-yyyy")));
+                        mMap.put("Date",
+                                 dialog.getFormattedDate(new SimpleDateFormat("mm-dd-yyyy")));
 
                         //Updating the Calendar's information (this is important for creating the
                         //end time for the event
@@ -378,19 +387,20 @@ public class EventCreateActivity extends AppCompatActivity {
                 end.set(Calendar.HOUR_OF_DAY, end.get(Calendar.HOUR_OF_DAY) + Integer.parseInt(
                         mMap.get("Duration")));
 
-                RequestParams params = new RequestParams();
-                params.put("category", mMap.get("Category"));
-                params.put("latitude", mMap.get("Latitude"));
-                params.put("longitude", mMap.get("Longitude"));
-                params.put("location_title", mMap.get("Map Title"));
-                params.put("event_name", title.getText().toString());
-                params.put("description", description.getText().toString());
-                params.put("end_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(end.getTime()));
-                params.put("start_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mCalendar.getTime()));
-                client.addHeader("Authorization", ShallonCreamerIsATwat);
+                mMap.put("Title", title.getText().toString());
+                mMap.put("Description", description.getText().toString());
+                mMap.put("End Time",
+                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(end.getTime()));
+                mMap.put("Start Time",
+                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mCalendar.getTime()));
 
 
-                post("event/create", params, new JsonHttpResponseHandler() {
+                Calls.createEvent(mMap, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.println(Log.ASSERT, "EventCreateActivity", response.toString());
+                    }
+
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                         Log.println(Log.ASSERT, "Success", response.toString());
@@ -399,7 +409,8 @@ public class EventCreateActivity extends AppCompatActivity {
                         try {
                             Thread.sleep(200);
 
-                            Intent intent = new Intent(EventCreateActivity.this, EventDetailActivity.class);
+                            Intent intent = new Intent(EventCreateActivity.this,
+                                                       EventDetailActivity.class);
                             intent.putExtra("JSON", response.getJSONObject(0)
                                     .toString());
 
@@ -422,16 +433,15 @@ public class EventCreateActivity extends AppCompatActivity {
 
                 });
 
-
             }
-
 
         });
 
     }
 
 
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+    public static void post(String url, RequestParams params,
+                            AsyncHttpResponseHandler responseHandler) {
         client.post(getAbsoluteUrl(url), params, responseHandler);
     }
 

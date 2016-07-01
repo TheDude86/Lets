@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
-                i.putExtra("token", (String)mMap.get("token"));
+                i.putExtra("token", "Bearer " + (String)mMap.get("token"));
                 startActivity(i);
 
             }

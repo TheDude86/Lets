@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
+import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         implements View.OnClickListener {
     public OnFriendsClickListener mFriendsClicked;
+    private static final int USER_DETAIL_CODE = 1;
     public OnGroupsClickListener mGroupsClicked;
     public OnEventsClickListener mEventsClicked;
     private static final int DETAIL_CODE = 1;
@@ -198,26 +200,27 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
             @Override
             public void onClicked(int id) {
                 try {
+                    Intent intent;
                     String s = null;
 
                     switch (view) {
-
                         case FRIENDS:
                             for (String l : mDetailList) {
-                                if (new User(new JSONObject(l)).getUserID() == id) {
+                                if (new User(new JSONObject(l)).getUserID() == id)
                                     s = l;
-
-                                    break;
-                                }
 
                             }
 
+                            intent = new Intent(mActivity, UserDetailActivity.class);
+                            intent.putExtra("JSON", s);
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            mActivity.startActivityForResult(intent, USER_DETAIL_CODE);
 
                             break;
                         case GROUPS:
                             for (String l : mDetailList) {
                                 if (new Group(new JSONObject(l).getJSONArray("Group_info")
-                                        .getJSONObject(0)).getGroupID() == id) {
+                                                      .getJSONObject(0)).getGroupID() == id) {
                                     Log.println(Log.ASSERT, "ProfileViewHolder", l);
                                 }
                             }
@@ -226,12 +229,12 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                         case EVENTS:
                             for (String l : mDetailList) {
                                 if (new Event(new JSONObject(l).getJSONArray("Event_info")
-                                        .getJSONObject(0)).getmEventID() == id) {
+                                                      .getJSONObject(0)).getmEventID() == id)
                                     s = l;
-                                }
+
                             }
 
-                            Intent intent = new Intent(mActivity, EventDetailActivity.class);
+                            intent = new Intent(mActivity, EventDetailActivity.class);
                             intent.putExtra("JSON", new JSONObject(s).getJSONArray("Event_info")
                                     .getJSONObject(0).toString());
                             mActivity.startActivityForResult(intent, DETAIL_CODE);

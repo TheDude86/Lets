@@ -203,7 +203,8 @@ public class Calls {
     }
 
 
-    public static void editProfile(HashMap<String, Object> mUserInfo, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void editProfile(HashMap<String, Object> mUserInfo, String token,
+                                   JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
         params.put("interests", mUserInfo.get("interests"));
@@ -217,4 +218,20 @@ public class Calls {
         post("user/editProfile", params, jsonHttpResponseHandler);
     }
 
+    public static void createEvent(HashMap<String, String> mMap, String token,
+                                   JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("category", mMap.get("Category"));
+        params.put("latitude", mMap.get("Latitude"));
+        params.put("longitude", mMap.get("Longitude"));
+        params.put("location_title", mMap.get("Map Title"));
+        params.put("event_name", mMap.get("Title"));
+        params.put("description", mMap.get("Description"));
+        params.put("end_time", mMap.get("End Time"));
+        params.put("start_time", mMap.get("Start Time"));
+        client.addHeader("Authorization", token);
+
+        post("event/create", params, jsonHttpResponseHandler);
+
+    }
 }
