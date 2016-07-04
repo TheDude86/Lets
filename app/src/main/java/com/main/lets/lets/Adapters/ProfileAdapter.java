@@ -58,6 +58,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     public ArrayList<String> mGroups;
     public ArrayList<String> mEvents;
     private Activity mActivity;
+    private int mID;
 
     private ImageView mPicture;
 
@@ -71,9 +72,10 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
      * @param a
      * @param token
      */
-    public ProfileAdapter(Activity context, ArrayList<String> a, String token) {
+    public ProfileAdapter(Activity context, ArrayList<String> a, String token, int id) {
         super(a);
         mActivity = context;
+        mID = id;
 
         //Initializes as empty arrays because the network calls haven't returned yet.
         mGroups = new ArrayList<>();
@@ -165,7 +167,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 .inflate(R.layout.row_profile_demo, parent, false);
 
         //initializing the view holder
-        mDemoHolder = new ProfileViewHolder(view, mActivity, ShallonCreamerIsATwat);
+        mDemoHolder = new ProfileViewHolder(view, mActivity, ShallonCreamerIsATwat, mID);
 
 
         //Setting the onClicked listeners for the buttons of the profile feed, the buttons allow

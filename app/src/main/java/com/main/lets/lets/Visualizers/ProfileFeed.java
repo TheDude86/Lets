@@ -159,7 +159,8 @@ public class ProfileFeed extends Client {
                         ArrayList<String> l = new ArrayList<>();
                         l.add(response.getJSONObject(0).toString());
                         //Passes the user's info to the profile adapter
-                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat);
+                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
+                                (int) mUserInfo.get("userID"));
 
                         //These functions loads the user's friends, groups, and events
                         loadFriends();
@@ -330,7 +331,10 @@ public class ProfileFeed extends Client {
      */
     public void loadFriends() throws JSONException {
         //Call to get the user's friends
-        Calls.getFriends(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+        Log.println(Log.ASSERT, "ProfileFeed", mUserInfo.toString());
+
+        Calls.getFriends((Integer) mUserInfo.get("userID"), new JsonHttpResponseHandler() {
             /**
              * When the call is made, it returns a JSON array object of all of
              * the friends the user attends.  The JSON objects from the array are

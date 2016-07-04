@@ -53,8 +53,6 @@ public class GlobalFeed extends Client {
             Calls.getCloseEvents(j.getInt("latitude"), j.getInt("longitude"), RANGE, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
-                    Log.println(Log.ASSERT, "Test", response.toString());
-
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             mEventAdapter.insertLast(response.getJSONObject(i).toString());

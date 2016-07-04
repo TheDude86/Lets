@@ -31,7 +31,6 @@ public class EventDetailFeed extends Client {
         mActivity = a;
 
         l.add(j.toString());
-        Log.println(Log.ASSERT, "Test", l.get(0));
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         mEventAdapter = new EventDetailAdapter(a, l);
         mRecyclerView.setAdapter(mEventAdapter);
@@ -81,7 +80,7 @@ public class EventDetailFeed extends Client {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                       org.json.JSONArray errorResponse) {
-                    Log.e("Aync Test Failure", errorResponse.toString());
+                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });

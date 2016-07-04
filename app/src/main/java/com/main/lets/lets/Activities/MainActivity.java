@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if(response.has("accessToken")){
                         mMap.put("token", response.getString("accessToken"));
+                        mMap.put("userID", response.getInt("user_id"));
                         mProfileFeed.updateToken("Bearer " + response.getString("accessToken"));
 
                     }else{
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                intent.putExtra("token", "Bearer " + (String)mMap.get("token"));
+                intent.putExtra("token", "Bearer " + mMap.get("token"));
                 startActivityForResult(intent, SETTINGS);
             }
         });
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
-                i.putExtra("token", "Bearer " + (String)mMap.get("token"));
+                i.putExtra("token", "Bearer " + mMap.get("token"));
                 startActivity(i);
 
             }
@@ -267,8 +268,8 @@ public class MainActivity extends AppCompatActivity {
 
                 //If they allow permissions then create the same hashmap as in onCreate
                 mMap.put("latitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
-
                 mMap.put("longitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+
                 //Draw the GlobalFeed just as if the user perviously accepted the permissions
                 mGlobalFeed.draw(new JSONObject(mMap));
 

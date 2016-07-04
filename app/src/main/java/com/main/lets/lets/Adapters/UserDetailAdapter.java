@@ -1,5 +1,6 @@
 package com.main.lets.lets.Adapters;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -8,20 +9,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.main.lets.lets.Holders.ProfileDetailViewHolder;
+import com.main.lets.lets.Holders.EntityViewHolder;
+import com.main.lets.lets.Holders.UserDetailViewHolder;
+import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -30,80 +28,175 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 6/30/2016.
  */
 public class UserDetailAdapter extends RecyclerView.Adapter {
-    ArrayList<String> mTest = new ArrayList<>();
-    public ProfileDetailViewHolder mHolder;
-    JSONObject mJSON;
+    ArrayList<String> mList = new ArrayList<>();
+     OnEntityClickListener mEntityClickListener;
+    OnFriendClickListener mFriendClickListener;
+    OnGroupClickListener mGroupClickListener;
+    OnEventClickListener mEventClickListener;
+    public UserDetailViewHolder mHolder;
+    private Activity mActivity;
 
-    public UserDetailAdapter(JSONObject j) {
-        mTest.add("Hi");
-        mTest.add("Hi");
-        mTest.add("Hi");
+    public UserDetailAdapter(Activity a, JSONObject j) {
+        mList.add(j.toString());
+        mActivity = a;
 
-        mJSON = j;
+    }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == 0)
+            return new UserDetailViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_profile, parent, false));
 
-        return new ProfileDetailViewHolder(LayoutInflater.from(parent.getContext())
-                                                   .inflate(R.layout.row_profile, parent, false));
+        return new EntityViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_entity_with_space, parent, false));
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        mHolder = (ProfileDetailViewHolder) holder;
+        if (position == 0)
+            loadProfile(holder);
+        else
+            loadEntity(holder, position);
+
+
+    }
+
+    private void loadEntity(RecyclerView.ViewHolder holder, final int position) {
+        EntityViewHolder h = (EntityViewHolder) holder;
         try {
-            mHolder.mFriends.setText("Bill fucking fix getFriends");
-            mHolder.mName.setText(mJSON.getString("User_Name"));
-            mHolder.mBio.setText(mJSON.getString("Biography"));
-            mHolder.mScore.setText(mJSON.getInt("Score") + "");
-            mHolder.mInterests.setText("Fix this too");
-
-
-
-            try {
-                URL url = new URL(mJSON.getString("Profile_Picture"));
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-                mHolder.mPic.setImageBitmap(myBitmap);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            h.mTitle.setText(new Entity(new JSONObject(mList.get(position))).mText);
+            h.mLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mEntityClickListener != null)
+                        mEntityClickListener.OnClick(position - 1);
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
 
-        ((ProfileDetailViewHolder) holder).mName.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void loadProfile(RecyclerView.ViewHolder holder) {
+        mHolder = (UserDetailViewHolder) holder;
+        try {
+            JSONObject json = new JSONObject(mList.get(0));
+
+            mHolder.mScore.setText("Score: " + json.getInt("Score"));
+            mHolder.mName.setText(json.getString("User_Name"));
+            mHolder.mBio.setText(json.getString("Biography"));
+            mHolder.mFriendsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mFriendClickListener != null)
+                        mFriendClickListener.OnClick();
+                }
+            });
+            mHolder.mEventsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mEventClickListener != null)
+                        mEventClickListener.OnClick();
+                }
+            });
+
+            mHolder.mGroupsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mGroupClickListener != null)
+                        mGroupClickListener.OnClick();
+                }
+            });
+            mHolder.mInterests.setText("Fix this too");
+
+            Calls.loadImage(json.getString("Profile_Picture"), new FileAsyncHttpResponseHandler(mActivity) {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                    Log.println(Log.ASSERT, "UserDetailAdapter", "Test failed");
+
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, File response) {
+                    Bitmap myBitmap = BitmapFactory.decodeFile(response.getAbsolutePath());
+                    mHolder.mPic.setImageBitmap(myBitmap);
+                }
+            });
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        ((UserDetailViewHolder) holder).mName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addElement("poo");
             }
         });
-
     }
 
     @Override
     public int getItemCount() {
-        return mTest.size();
+        return mList.size();
     }
 
-    public void addElement(String s){
-        mTest.add("test");
-        notifyItemInserted(mTest.size() - 1);
+    public void addElement(String s) {
+        mList.add(s);
+        notifyItemInserted(mList.size() - 1);
         notifyDataSetChanged();
     }
 
-    public void removeElement(int position){
-        mTest.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, mTest.size());
+    public void clearFeed() {
+        int end = mList.size();
+
+        for (int i = 1; i < end; i++) {
+            mList.remove(1);
+            notifyItemRemoved(1);
+            notifyItemRangeChanged(1, mList.size());
+        }
+
     }
+
+    public interface OnEntityClickListener {
+        void OnClick(int position);
+    }
+
+    public interface OnFriendClickListener {
+        void OnClick();
+    }
+
+    public interface OnEventClickListener {
+        void OnClick();
+    }
+
+    public interface OnGroupClickListener {
+        void OnClick();
+    }
+
+    public void setOnEntityClickListener(OnEntityClickListener e){
+        mEntityClickListener = e;
+    }
+
+    public void setOnFriendClickListener(OnFriendClickListener f) {
+        mFriendClickListener = f;
+    }
+
+    public void setOnEventClickListener(OnEventClickListener e){
+        mEventClickListener = e;
+    }
+
+    public void setOnGroupClickListener(OnGroupClickListener g){
+        mGroupClickListener = g;
+    }
+
 }

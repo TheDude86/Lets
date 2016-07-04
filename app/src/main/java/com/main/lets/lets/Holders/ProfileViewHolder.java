@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
+import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.LetsAPI.Entity;
@@ -48,6 +49,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public Button bGroups;
     public Button bEvents;
     public TextView name;
+    public int mID;
 
     /**
      * The profile view holder diplays the profile feed information, the view holder contains a
@@ -60,7 +62,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
      * @param a        also used for other methods for inflating XMLs
      * @param token    access token
      */
-    public ProfileViewHolder(final View itemView, final Activity a, final String token) {
+    public ProfileViewHolder(final View itemView, final Activity a, final String token, int id) {
         super(itemView);
 
         //initializing global variables, the arraylist holds the entity feed
@@ -68,6 +70,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         ShallonCreamerIsATwat = token;
         mList = new ArrayList<>();
         mActivity = a;
+        mID = id;
 
         //Filling the recycler view with the friends list (which is empty at this moment)
         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
@@ -213,6 +216,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
                             intent = new Intent(mActivity, UserDetailActivity.class);
                             intent.putExtra("JSON", s);
+                            intent.putExtra("id", mID);
                             intent.putExtra("token", ShallonCreamerIsATwat);
                             mActivity.startActivityForResult(intent, USER_DETAIL_CODE);
 
@@ -220,10 +224,16 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                         case GROUPS:
                             for (String l : mDetailList) {
                                 if (new Group(new JSONObject(l).getJSONArray("Group_info")
-                                                      .getJSONObject(0)).getGroupID() == id) {
-                                    Log.println(Log.ASSERT, "ProfileViewHolder", l);
-                                }
+                                                      .getJSONObject(0)).getGroupID() == id)
+                                    s = l;
+
                             }
+
+                            intent = new Intent(mActivity, GroupDetailActivity.class);
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            intent.putExtra("id", mID);
+                            intent.putExtra("JSON", s);
+                            mActivity.startActivity(intent);
 
                             break;
                         case EVENTS:

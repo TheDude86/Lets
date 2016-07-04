@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.rey.material.app.Dialog;
@@ -150,19 +151,19 @@ public class Calls {
     /**
      * Get a list of friends short hands that the user is friends with.
      *
-     * @param token                   access token
+     * @param id                      user to get friends of
      * @param jsonHttpResponseHandler code to be executed
      */
-    public static void getFriends(String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void getFriends(int id, JsonHttpResponseHandler jsonHttpResponseHandler) {
 
         RequestParams params = new RequestParams();
-        client.addHeader("Authorization", token);
+        params.put("user_id", id);
         post(GetFriends, params, jsonHttpResponseHandler);
 
     }
 
     /**
-     * Log in to server to recieve an access token.
+     * Log in to server to receive an access token.
      *
      * @param email
      * @param password
@@ -202,7 +203,6 @@ public class Calls {
 
     }
 
-
     public static void editProfile(HashMap<String, Object> mUserInfo, String token,
                                    JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
@@ -234,4 +234,27 @@ public class Calls {
         post("event/create", params, jsonHttpResponseHandler);
 
     }
+
+    public static void getGroupComments(int id, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("group_id", id);
+        client.addHeader("Authorization", token);
+
+        post("group/getComments", params, jsonHttpResponseHandler);
+    }
+
+    public static void addGroupComment(int id, String s, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("group_id", id);
+        params.put("message", s);
+        client.addHeader("Authorization", token);
+
+        post("group/addComment", params, jsonHttpResponseHandler);
+    }
+
+    public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
+        client.get(url, fileAsyncHttpResponseHandler);
+
+    }
+
 }

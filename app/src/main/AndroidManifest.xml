@@ -47,7 +47,7 @@
             android:theme="@style/CreateTheme" />
         <activity
             android:name=".Activities.GroupDetailActivity"
-            android:theme="@style/GroupTheme" />
+            android:theme="@style/AppTheme" />
         <activity android:name=".Activities.UserDetailActivity" />
         <activity
             android:name=".Activities.SettingsActivity"

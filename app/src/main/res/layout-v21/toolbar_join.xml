@@ -13,7 +13,8 @@
         android:layout_toStartOf="@+id/settings"
         android:gravity="center"
         android:textColor="#096800"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:elevation="10dp" />
 
 
 </LinearLayout>
