@@ -1,6 +1,7 @@
 package com.main.lets.lets.Actions;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -50,7 +51,7 @@ public class GroupActions implements View.OnClickListener {
     public void onClick(View v) {
         try {
             Dialog.Builder builder = null;
-            DialogFragment fragment = null;
+            DialogFragment fragment;
             switch (((TextView) v).getText().toString()) {
                 case "Comment":
                     builder = new SimpleDialog.Builder() {
@@ -187,6 +188,38 @@ public class GroupActions implements View.OnClickListener {
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             super.onPositiveActionClicked(fragment);
+                            CharSequence[] values = getSelectedValues();
+
+                            for(CharSequence s: values){
+                                for(int i = 0; i < mFeed.mMemberTags.size(); i++){
+                                    Entity e = new Entity(mFeed.mMemberTags.get(i));
+                                    if(s.toString().equals(e.mText)){
+                                        Log.println(Log.ASSERT, "GroupActions", s.toString());
+                                        try {
+                                            Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers,
+                                                                      org.json.JSONObject response) {
+
+
+                                                }
+
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                                      JSONObject errorResponse) {
+
+                                                }
+                                            });
+                                        } catch (JSONException e1) {
+                                            e1.printStackTrace();
+                                        }
+
+                                    }
+
+                                }
+                            }
+
                         }
 
                         @Override
@@ -222,7 +255,7 @@ public class GroupActions implements View.OnClickListener {
                     };
 
                     ((SimpleDialog.Builder) builder).multiChoiceItems(adminsList)
-                            .title("Remove Members")
+                            .title("Remove Admins")
                             .positiveAction("Remove")
                             .negativeAction("Cancel");
 
@@ -285,6 +318,11 @@ public class GroupActions implements View.OnClickListener {
                                 .positiveAction("Okay")
                                 .negativeAction("Cancel");
                     }
+
+                    break;
+
+                case "Edit Group":
+                    mFeed.mAdapter.toggleEditable();
 
                     break;
 

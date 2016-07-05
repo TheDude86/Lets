@@ -47,6 +47,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     public OnEntityClickListener mEntityClickListener;
     public enum Status {GUEST, MEMBER, ADMIN, OWNER}
     public HashMap<String, TextView>  mActions;
+    public GroupDetailViewHolder mHolder;
     public Status mStatus = Status.GUEST;
     public AppCompatActivity mActivity;
     public ArrayList<String> mList;
@@ -116,7 +117,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     }
 
     private void loadGroupInfo(final GroupDetailViewHolder holder) {
-        Log.println(Log.ASSERT, "GroupDetailAdapter", "Test");
+        mHolder = holder;
+
         try {
             JSONObject j = new JSONObject(mList.get(0));
 
@@ -192,6 +194,16 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             e.printStackTrace();
         }
 
+    }
+
+    public void toggleEditable(){
+        if(mHolder.mName.isFocusable()){
+            mHolder.mName.setFocusableInTouchMode(false);
+            mHolder.mName.setFocusable(false);
+        }else {
+            mHolder.mName.setFocusableInTouchMode(true);
+            mHolder.mName.setFocusable(true);
+        }
     }
 
     public void addElement(String s) {

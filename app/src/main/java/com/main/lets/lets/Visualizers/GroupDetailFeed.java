@@ -30,6 +30,7 @@ public class GroupDetailFeed extends Client {
     public ArrayList<JSONObject> mAdminTags;
     public ArrayList<JSONObject> mComments;
     public String ShallonCreamerIsATwat;
+    public GroupDetailAdapter mAdapter;
     public AppCompatActivity mActivity;
     public ArrayList<String> mMembers;
     public RecyclerView mRecyclerView;
@@ -62,14 +63,14 @@ public class GroupDetailFeed extends Client {
                 StaggeredGridLayoutManager.VERTICAL));
 
         try {
-            final GroupDetailAdapter g = new GroupDetailAdapter(mActivity,
+            mAdapter = new GroupDetailAdapter(mActivity,
                     j.getJSONArray("Group_info").getJSONObject(0).toString(), mID);
 
             for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-                g.addElement(j.getJSONArray("Group_users").getJSONObject(i).toString());
+                mAdapter.addElement(j.getJSONArray("Group_users").getJSONObject(i).toString());
                 mMemberTags.add(j.getJSONArray("Group_users").getJSONObject(i));
                 if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID)
-                    g.updateStatus(GroupDetailAdapter.Status.MEMBER);
+                    mAdapter.updateStatus(GroupDetailAdapter.Status.MEMBER);
             }
 
             loadUserDetails(0);
@@ -77,13 +78,13 @@ public class GroupDetailFeed extends Client {
             for (int i = 0; i < j.getJSONArray("Group_admins").length(); i++) {
                 mAdminTags.add(j.getJSONArray("Group_admins").getJSONObject(i));
                 if (j.getJSONArray("Group_admins").getJSONObject(i).getInt("user_id") == mID)
-                    g.updateStatus(GroupDetailAdapter.Status.ADMIN);
+                    mAdapter.updateStatus(GroupDetailAdapter.Status.ADMIN);
             }
 
-            g.setOnCommentsClickListener(new GroupDetailAdapter.OnCommentsClickListener() {
+            mAdapter.setOnCommentsClickListener(new GroupDetailAdapter.OnCommentsClickListener() {
                 @Override
                 public void onClick() {
-                    g.clearFeed();
+                    mAdapter.clearFeed();
                     try {
 
                         for (JSONObject j : mComments) {
@@ -108,7 +109,7 @@ public class GroupDetailFeed extends Client {
                                 }
                             }
 
-                            g.addElement(s + j.getString("text"));
+                            mAdapter.addElement(s + j.getString("text"));
 
                         }
 
@@ -119,18 +120,18 @@ public class GroupDetailFeed extends Client {
                 }
             });
 
-            g.setOnMembersClickListener(new GroupDetailAdapter.OnMembersClickListener() {
+            mAdapter.setOnMembersClickListener(new GroupDetailAdapter.OnMembersClickListener() {
                 @Override
                 public void onClick() {
-                    g.clearFeed();
+                    mAdapter.clearFeed();
 
                     for (JSONObject j : mMemberTags)
-                        g.addElement(j.toString());
+                        mAdapter.addElement(j.toString());
 
                 }
             });
 
-            g.setOnEntityClickListener(new GroupDetailAdapter.OnEntityClickListener() {
+            mAdapter.setOnEntityClickListener(new GroupDetailAdapter.OnEntityClickListener() {
                 @Override
                 public void onClick(int position) {
                     Intent intent = new Intent(mActivity, UserDetailActivity.class);
@@ -140,17 +141,17 @@ public class GroupDetailFeed extends Client {
                 }
             });
 
-            g.setOnDraw(new GroupDetailAdapter.OnDraw() {
+            mAdapter.setOnDraw(new GroupDetailAdapter.OnDraw() {
                 @Override
                 public void draw(HashMap<String, TextView> actions) {
-                    GroupActions groupActions = new GroupActions(GroupDetailFeed.this, j, g.mStatus);
+                    GroupActions groupActions = new GroupActions(GroupDetailFeed.this, j, mAdapter.mStatus);
                     groupActions.draw(actions);
 
                 }
             });
 
 
-            mRecyclerView.setAdapter(g);
+            mRecyclerView.setAdapter(mAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
         }

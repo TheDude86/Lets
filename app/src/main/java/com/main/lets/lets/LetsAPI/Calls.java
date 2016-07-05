@@ -252,9 +252,17 @@ public class Calls {
         post("group/addComment", params, jsonHttpResponseHandler);
     }
 
+    public static void removeUserFromGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("user_to_remove_id", userID);
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("group/removeUser", params, jsonHttpResponseHandler);
+    }
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 
     }
-
 }
