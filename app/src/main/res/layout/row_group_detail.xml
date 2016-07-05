@@ -29,7 +29,7 @@
                 android:id="@+id/image"
                 android:layout_gravity="center" />
 
-            <TextView
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
@@ -40,9 +40,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_marginTop="15dp"
-                android:textSize="35dp"
+                android:textSize="35sp"
                 android:background="#FFFFFF"
-                android:gravity="center_vertical|center_horizontal" />
+                android:gravity="center_vertical|center_horizontal"/>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -99,12 +99,13 @@
                 android:textColor="#00ffffff" />
         </LinearLayout>
 
-        <TextView
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Bio"
             android:id="@+id/txt_bio"
+            android:background="@null"
             android:layout_margin="15dp" />
 
         <include

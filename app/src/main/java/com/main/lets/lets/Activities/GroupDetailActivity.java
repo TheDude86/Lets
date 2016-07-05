@@ -33,16 +33,16 @@ public class GroupDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
-        ((TextView)findViewById(R.id.btn_join)).setText("Join Group");
+        ((TextView) findViewById(R.id.btn_join)).setText("Join Group");
         final GroupDetailFeed g = new GroupDetailFeed(this, getIntent().getStringExtra("token"),
                 getIntent().getIntExtra("id", -1));
 
         try {
             final JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
-            for(int i = 0; i < j.getJSONArray("Group_users").length(); i++){
-                if(j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") ==
-                        getIntent().getIntExtra("id", -1)){
+            for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
+                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") ==
+                        getIntent().getIntExtra("id", -1)) {
                     findViewById(R.id.layout_join).setVisibility(View.GONE);
                 }
             }
@@ -52,13 +52,13 @@ public class GroupDetailActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,
                                               org.json.JSONArray response) {
-                            for(int i = 0; i < response.length(); i++)
+                            for (int i = 0; i < response.length(); i++) {
                                 try {
                                     g.mComments.add(response.getJSONObject(i));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
+                            }
                             g.draw(j);
 
                         }

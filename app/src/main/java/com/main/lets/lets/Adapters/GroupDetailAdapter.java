@@ -48,27 +48,14 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     public enum Status {GUEST, MEMBER, ADMIN, OWNER}
     public HashMap<String, TextView>  mActions;
     public Status mStatus = Status.GUEST;
-    public ArrayList<String> mList;
     public AppCompatActivity mActivity;
+    public ArrayList<String> mList;
+    public OnDraw mDraw;
 
     public GroupDetailAdapter(AppCompatActivity a, String s, int id) {
-        mActions = new HashMap<>();
         mList = new ArrayList<>();
         mActivity = a;
         mList.add(s);
-
-        mActions.put("transfer", formattedTextView("Transfer Ownership"));
-        mActions.put("delete", formattedTextView("Delete Group"));
-
-        mActions.put("remove members", formattedTextView("Remove Members"));
-        mActions.put("remove admins", formattedTextView("Remove Admins"));
-        mActions.put("add admins", formattedTextView("Add Admins"));
-        mActions.put("edit", formattedTextView("Edit Group"));
-
-        mActions.put("invite group", formattedTextView("Invite to Event"));
-        mActions.put("invite users", formattedTextView("Invite User"));
-        mActions.put("leave", formattedTextView("Leave Group"));
-        mActions.put("comment", formattedTextView("Comment"));
 
         try {
             if(new JSONObject(s).getInt("god") == id){
@@ -129,6 +116,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     }
 
     private void loadGroupInfo(final GroupDetailViewHolder holder) {
+        Log.println(Log.ASSERT, "GroupDetailAdapter", "Test");
         try {
             JSONObject j = new JSONObject(mList.get(0));
 
@@ -145,6 +133,22 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
                     holder.mImage.setImageBitmap(myBitmap);
                 }
             });
+
+            mActions = new HashMap<>();
+            mActions.put("transfer", formattedTextView("Transfer Ownership"));
+            mActions.put("delete", formattedTextView("Delete Group"));
+
+            mActions.put("remove members", formattedTextView("Remove Members"));
+            mActions.put("remove admins", formattedTextView("Remove Admins"));
+            mActions.put("add admins", formattedTextView("Add Admins"));
+            mActions.put("edit", formattedTextView("Edit Group"));
+
+            mActions.put("invite group", formattedTextView("Invite to Event"));
+            mActions.put("invite users", formattedTextView("Invite User"));
+            mActions.put("leave", formattedTextView("Leave Group"));
+            mActions.put("comment", formattedTextView("Comment"));
+
+            mDraw.draw(mActions);
 
             holder.mName.setText(j.getString("group_name"));
             holder.mBio.setText(j.getString("bio"));
@@ -215,44 +219,6 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     }
 
     public void loadAdminActions(GroupDetailViewHolder holder) {
-        mActions.get("add admins").setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<String> members = new ArrayList<String>();
-
-                DialogFragment.Builder builder = new SimpleDialog.Builder(){
-                    @Override
-                    public void onPositiveActionClicked(DialogFragment fragment) {
-                        CharSequence[] values =  getSelectedValues();
-                        if(values == null)
-                            Toast.makeText(mActivity, "You have selected nothing.", Toast.LENGTH_SHORT).show();
-                        else{
-                            StringBuffer sb = new StringBuffer();
-                            sb.append("You have selected ");
-                            for(int i = 0; i < values.length; i++)
-                                sb.append(values[i]).append(i == values.length - 1? "." : ", ");
-                            Toast.makeText(mActivity, sb.toString(), Toast.LENGTH_SHORT).show();
-                        }
-                        super.onPositiveActionClicked(fragment);
-                    }
-
-                    @Override
-                    public void onNegativeActionClicked(DialogFragment fragment) {
-                        Toast.makeText(mActivity, "Cancelled" , Toast.LENGTH_SHORT).show();
-                        super.onNegativeActionClicked(fragment);
-                    }
-                };
-
-                ((SimpleDialog.Builder)builder).multiChoiceItems(new String[]{"Soup", "Pizza", "Hotdogs", "Hamburguer", "Coffee", "Juice", "Milk", "Water"}, 2, 5)
-                        .title("Food Order")
-                        .positiveAction("OK")
-                        .negativeAction("CANCEL");
-
-                DialogFragment fragment = DialogFragment.newInstance(builder);
-                fragment.show(mActivity.getSupportFragmentManager(), null);
-            }
-        });
-
         holder.mActionsList.addView(mActions.get("remove members"));
         holder.mActionsList.addView(mActions.get("remove admins"));
         holder.mActionsList.addView(mActions.get("add admins"));
@@ -299,6 +265,12 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
 
     public void setOnEntityClickListener(OnEntityClickListener e) {
         mEntityClickListener = e;
+    }
+
+    public void setOnDraw(OnDraw d) { mDraw = d; }
+
+    public interface OnDraw {
+        void draw(HashMap<String, TextView> actions);
     }
 
     public interface OnEntityClickListener {

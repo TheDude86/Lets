@@ -3,6 +3,7 @@ package com.main.lets.lets.Holders;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,14 +19,14 @@ public class GroupDetailViewHolder extends RecyclerView.ViewHolder {
     public ImageView mImage;
     public Button mComments;
     public Button mMembers;
-    public TextView mName;
-    public TextView mBio;
+    public EditText mName;
+    public EditText mBio;
 
     public GroupDetailViewHolder(View itemView) {
         super(itemView);
-        mBio = (TextView) itemView.findViewById(R.id.txt_bio);
+        mBio = (EditText) itemView.findViewById(R.id.txt_bio);
         mImage = (ImageView) itemView.findViewById(R.id.image);
-        mName = (TextView) itemView.findViewById(R.id.txt_name);
+        mName = (EditText) itemView.findViewById(R.id.txt_name);
         mMembers = (Button) itemView.findViewById(R.id.btn_users);
         mComments = (Button) itemView.findViewById(R.id.btn_comments);
         mActions = (LinearLayout) itemView.findViewById(R.id.actions);

@@ -1,32 +1,24 @@
 package com.main.lets.lets.Visualizers;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.telecom.Call;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Actions.GroupActions;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.GroupDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
-import com.rey.material.app.Dialog;
-import com.rey.material.app.DialogFragment;
-import com.rey.material.app.SimpleDialog;
-import com.rey.material.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -65,7 +57,7 @@ public class GroupDetailFeed extends Client {
     }
 
     @Override
-    public void draw(JSONObject j) {
+    public void draw(final JSONObject j) {
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
                 StaggeredGridLayoutManager.VERTICAL));
 
@@ -148,12 +140,15 @@ public class GroupDetailFeed extends Client {
                 }
             });
 
-            switch (g.mStatus) {
-                case MEMBER:
-                    loadMemberActions(j, g);
-            }
+            g.setOnDraw(new GroupDetailAdapter.OnDraw() {
+                @Override
+                public void draw(HashMap<String, TextView> actions) {
+                    GroupActions groupActions = new GroupActions(GroupDetailFeed.this, j, g.mStatus);
+                    groupActions.draw(actions);
 
-            loadMemberActions(j, g);
+                }
+            });
+
 
             mRecyclerView.setAdapter(g);
         } catch (JSONException e) {
@@ -162,64 +157,6 @@ public class GroupDetailFeed extends Client {
 
     }
 
-    public void loadMemberActions(final JSONObject j, GroupDetailAdapter g) {
-        g.mActions.get("comment").setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SimpleDialog.Builder builder = new SimpleDialog.Builder() {
-
-                    @Override
-                    protected void onBuildDone(Dialog dialog) {
-                        dialog.layoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    }
-
-                    @Override
-                    public void onPositiveActionClicked(DialogFragment fragment) {
-                        EditText e = (EditText) fragment.getDialog().findViewById(R.id.text);
-                        Log.println(Log.ASSERT, "GroupDetailFeed", "Test");
-
-                        try {
-                            Calls.addGroupComment(j.getJSONArray("Group_info").getJSONObject(0)
-                                    .getInt("group_id"), e.getText().toString(),
-                                    ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                        @Override
-                                        public void onSuccess(int statusCode, Header[] headers,
-                                                              org.json.JSONObject response) {
-                                            Log.println(Log.ASSERT, "GroupDetailFeed", response.toString());
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                              JSONObject errorResponse) {
-
-                                        }
-
-                            });
-                        } catch (JSONException e1) {
-                            e1.printStackTrace();
-                        }
-
-                        super.onPositiveActionClicked(fragment);
-                    }
-
-                    @Override
-                    public void onNegativeActionClicked(DialogFragment fragment) {
-                        super.onNegativeActionClicked(fragment);
-                    }
-                };
-
-                builder.title("Add Comment")
-                        .positiveAction("COMMENT")
-                        .negativeAction("CANCEL")
-                        .contentView(R.layout.dialog_comment);
-
-                DialogFragment fragment = DialogFragment.newInstance(builder);
-                fragment.show(mActivity.getSupportFragmentManager(), null);
-            }
-        });
-
-    }
 
     public void loadUserDetails(final int position) {
         if (position >= mMemberTags.size())
