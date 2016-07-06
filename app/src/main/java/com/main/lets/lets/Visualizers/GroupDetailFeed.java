@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -137,6 +138,7 @@ public class GroupDetailFeed extends Client {
                         }
 
                     } catch (JSONException e) {
+                        Log.println(Log.ASSERT, "GroupDetailFeed", "Test Git");
                         e.printStackTrace();
                     }
 
