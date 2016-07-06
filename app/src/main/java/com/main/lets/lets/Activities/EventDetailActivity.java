@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -29,7 +30,7 @@ public class EventDetailActivity extends AppCompatActivity {
             Log.println(Log.ASSERT, "EventDetailActivity", getIntent().getStringExtra("JSON"));
             JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
-            EventDetailFeed f = new EventDetailFeed(this, (UltimateRecyclerView)findViewById(R.id.event_detail_list), j);
+            EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)findViewById(R.id.event_detail_list), j);
             Event e = new Event(j);
 
             final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);

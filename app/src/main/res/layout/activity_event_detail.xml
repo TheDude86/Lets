@@ -45,14 +45,14 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <com.marshalchen.ultimaterecyclerview.UltimateRecyclerView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/event_detail_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 
-    </com.marshalchen.ultimaterecyclerview.UltimateRecyclerView>
+    </android.support.v7.widget.RecyclerView>
 
 
 </android.support.design.widget.CoordinatorLayout>

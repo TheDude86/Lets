@@ -1,6 +1,7 @@
 package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
@@ -21,20 +22,43 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/30/2016.
  */
 public class EventDetailFeed extends Client {
-    UltimateRecyclerView mRecyclerView;
+    ArrayList<String> mUsers;
+    ArrayList<String> mComments;
+    RecyclerView mRecyclerView;
     EventDetailAdapter mEventAdapter;
     Activity mActivity;
 
-    public EventDetailFeed(Activity a, UltimateRecyclerView r, JSONObject j) {
-        ArrayList<String> l = new ArrayList<>();
+    public EventDetailFeed(Activity a, RecyclerView r, JSONObject j) {
+        mComments = new ArrayList<>();
+        mUsers = new ArrayList<>();
         mRecyclerView = r;
         mActivity = a;
 
-        l.add(j.toString());
-        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-        mEventAdapter = new EventDetailAdapter(a, l);
-        mRecyclerView.setAdapter(mEventAdapter);
+        mRecyclerView.setLayoutManager(
+                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+        mEventAdapter = new EventDetailAdapter(a, j.toString());
 
+        mEventAdapter.setOnAttandanceClicked(new EventDetailAdapter.OnAttendanceClicked() {
+            @Override
+            public void onClicked() {
+                mEventAdapter.clearFeed();
+
+                for (String s: mUsers)
+                    mEventAdapter.addElement(s);
+            }
+        });
+
+        mEventAdapter.setOnCommentsClicked(new EventDetailAdapter.OnCommentsClicked() {
+            @Override
+            public void onClicked() {
+                mEventAdapter.clearFeed();
+
+                for (String s: mComments)
+                    mEventAdapter.addElement(s);
+            }
+        });
+
+        mRecyclerView.setAdapter(mEventAdapter);
     }
 
     @Override
@@ -43,7 +67,8 @@ public class EventDetailFeed extends Client {
 
             Calls.getEvent(j.getInt("Event_ID"), new JsonHttpResponseHandler() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
+                public void onSuccess(int statusCode, Header[] headers,
+                                      org.json.JSONObject response) {
                     Log.e("Event", response.toString());
 
                     try {
@@ -51,8 +76,8 @@ public class EventDetailFeed extends Client {
                         String s = "";
 
                         for (int i = 0; i < j.length(); i++) {
-                            mEventAdapter.insert(j.getJSONObject(i).toString());
-                            mEventAdapter.mUsers.add(j.getJSONObject(i).toString());
+                            mUsers.add(j.getJSONObject(i).toString());
+                            mEventAdapter.addElement(j.getJSONObject(i).toString());
 
                             if (s.length() < 1)
                                 s = j.getJSONObject(i).getString("name");
@@ -67,7 +92,7 @@ public class EventDetailFeed extends Client {
                         j = response.getJSONArray("Comments");
 
                         for (int i = 0; i < j.length(); i++) {
-                            mEventAdapter.mComment.add(j.getJSONObject(i).toString());
+                            mComments.add(j.getJSONObject(i).toString());
 
                         }
 
