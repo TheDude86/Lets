@@ -261,6 +261,41 @@ public class Calls {
         post("group/removeUser", params, jsonHttpResponseHandler);
     }
 
+    public static void leaveGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("group/leave", params, jsonHttpResponseHandler);
+    }
+
+    public static void transferOwner(int groupID, int newOwnerID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("group_id", groupID);
+        params.put("new_owner_id", newOwnerID);
+        client.addHeader("Authorization", token);
+
+        post("group/transferOwnership", params, jsonHttpResponseHandler);
+    }
+
+    public static void addAdmin(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("admin_id", userID);
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("group/addAdmin", params, jsonHttpResponseHandler);
+    }
+
+    public static void joinGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("invite_user", userID);
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("group/inviteUser", params, jsonHttpResponseHandler);
+    }
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 

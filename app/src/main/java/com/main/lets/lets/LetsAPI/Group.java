@@ -7,6 +7,7 @@ import org.json.JSONException;
  */
 public class Group extends Entity{
     private org.json.JSONObject JSON;
+    private boolean isHidden;
     private boolean isPublic;
     private String pic_ref;
     private int mSettings;
@@ -19,6 +20,7 @@ public class Group extends Entity{
         super(j.getInt("group_id"), j.getString("group_name"), EntityType.GROUP);
         mTitle = j.getString("group_name");
         isPublic = j.getBoolean("public");
+        isHidden = j.getBoolean("hidden");
         mSettings = j.getInt("settings");
         pic_ref = j.getString("pic_ref");
         groupID = j.getInt("group_id");
@@ -90,5 +92,13 @@ public class Group extends Entity{
 
     public void setmSettings(int mSettings) {
         this.mSettings = mSettings;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
     }
 }

@@ -15,6 +15,7 @@ import com.main.lets.lets.R;
  */
 public class GroupDetailViewHolder extends RecyclerView.ViewHolder {
     public LinearLayout mActionsList;
+    public LinearLayout mMainLayout;
     public LinearLayout mActions;
     public ImageView mImage;
     public Button mComments;
@@ -30,6 +31,7 @@ public class GroupDetailViewHolder extends RecyclerView.ViewHolder {
         mMembers = (Button) itemView.findViewById(R.id.btn_users);
         mComments = (Button) itemView.findViewById(R.id.btn_comments);
         mActions = (LinearLayout) itemView.findViewById(R.id.actions);
+        mMainLayout = (LinearLayout) itemView.findViewById(R.id.main_layout);
         mActionsList = (LinearLayout) itemView.findViewById(R.id.actions_list);
 
     }

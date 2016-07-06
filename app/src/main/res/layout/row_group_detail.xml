@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
+    android:animateLayoutChanges="true"
     android:orientation="vertical"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="1dp">
@@ -12,15 +13,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         android:layout_height="match_parent">
 
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="290dp"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
             android:background="#f6ebc1"
+            android:animateLayoutChanges="true"
             android:id="@+id/frame">
 
             <ImageView
@@ -36,8 +37,6 @@
                 android:text="Group Name"
                 android:paddingBottom="10dp"
                 android:id="@+id/txt_name"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal|bottom"
                 android:layout_marginTop="15dp"
                 android:textSize="35sp"
@@ -49,9 +48,6 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignEnd="@+id/txt_bio"
-                android:layout_alignBottom="@+id/txt_friends"
                 android:background="#b3b3b3"
                 android:id="@+id/line"
                 android:layout_gravity="center_horizontal|bottom">
@@ -61,7 +57,7 @@
                     android:layout_height="wrap_content"
                     android:text="This text is as insignificat as Shallon&apos;s existance"
                     android:id="@+id/ShallonDidNineEleven"
-                    android:textSize="0dp"
+                    android:textSize="0sp"
                     android:textColor="#00ffffff" />
             </LinearLayout>
 
@@ -71,12 +67,12 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
             android:id="@+id/actions">
 
             <include
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_below="@+id/frame"
                 layout="@layout/toolbar_group_actions" />
         </LinearLayout>
 
@@ -84,9 +80,6 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignEnd="@+id/txt_bio"
-            android:layout_alignBottom="@+id/txt_friends"
             android:background="#b3b3b3"
             android:id="@+id/linearLayout2"
             android:layout_gravity="center_horizontal|bottom" >
@@ -96,29 +89,32 @@
                 android:layout_height="wrap_content"
                 android:text="This text is as insignificat as Shallon&apos;s existance"
                 android:id="@+id/textView21"
-                android:textSize="0dp"
+                android:textSize="0sp"
                 android:textColor="#00ffffff" />
         </LinearLayout>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Bio"
+            android:id="@+id/txt_bio"
+            android:background="@null"
+            android:layout_margin="15dp" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             android:id="@+id/main_layout">
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Bio"
-                android:id="@+id/txt_bio"
-                android:background="@null"
-                android:layout_margin="15dp" />
         </LinearLayout>
 
         <include
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
             layout="@layout/toolbar_group_detail" />
 
     </LinearLayout>

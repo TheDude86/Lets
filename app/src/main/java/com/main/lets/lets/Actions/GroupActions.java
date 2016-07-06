@@ -2,8 +2,10 @@ package com.main.lets.lets.Actions;
 
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +50,7 @@ public class GroupActions implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
         try {
             Dialog.Builder builder = null;
             DialogFragment fragment;
@@ -151,15 +153,34 @@ public class GroupActions implements View.OnClickListener {
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             CharSequence[] values = getSelectedValues();
-                            if (values == null)
-                                Toast.makeText(mFeed.mActivity, "You have selected nothing.", Toast.LENGTH_SHORT).show();
-                            else {
-                                StringBuffer sb = new StringBuffer();
-                                sb.append("You have selected ");
-                                for (int i = 0; i < values.length; i++)
-                                    sb.append(values[i]).append(i == values.length - 1 ? "." : ", ");
-                                Toast.makeText(mFeed.mActivity, sb.toString(), Toast.LENGTH_SHORT).show();
+                            Entity e;
+                            for(CharSequence c : values){
+                                for (JSONObject j : mFeed.mMemberTags){
+                                     e = new Entity(j);
+                                    if(e.mText.equals(c)){
+                                        try {
+                                            Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers,
+                                                                      JSONObject response) {
+
+
+                                                }
+
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                                      JSONObject errorResponse) {
+
+                                                }
+                                            });
+                                        } catch (JSONException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }
                             }
+
                             super.onPositiveActionClicked(fragment);
                         }
 
@@ -190,14 +211,14 @@ public class GroupActions implements View.OnClickListener {
                             super.onPositiveActionClicked(fragment);
                             CharSequence[] values = getSelectedValues();
 
-                            for(CharSequence s: values){
-                                for(int i = 0; i < mFeed.mMemberTags.size(); i++){
+                            for (CharSequence s : values) {
+                                for (int i = 0; i < mFeed.mMemberTags.size(); i++) {
                                     Entity e = new Entity(mFeed.mMemberTags.get(i));
-                                    if(s.toString().equals(e.mText)){
+                                    if (s.toString().equals(e.mText)) {
                                         Log.println(Log.ASSERT, "GroupActions", s.toString());
                                         try {
                                             Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                                                 @Override
                                                 public void onSuccess(int statusCode, Header[] headers,
                                                                       org.json.JSONObject response) {
@@ -272,6 +293,35 @@ public class GroupActions implements View.OnClickListener {
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             super.onPositiveActionClicked(fragment);
+
+                            for (JSONObject j : mFeed.mAdminTags) {
+                                Entity e = new Entity(j);
+                                Log.println(Log.ASSERT, "GroupActions", e.mText + " == " + getSelectedValue());
+                                if (e.mText.equals(getSelectedValue())) {
+                                    try {
+                                        Calls.transferOwner(mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                                .getInt("group_id"), e.mID, mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                            @Override
+                                            public void onSuccess(int statusCode, Header[] headers,
+                                                                  JSONObject response) {
+                                                mFeed.mAdapter.mStatus = GroupDetailAdapter.Status.ADMIN;
+                                                mStatus = GroupDetailAdapter.Status.ADMIN;
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                                  JSONObject errorResponse) {
+
+                                            }
+                                        });
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+                                }
+                            }
+
                         }
 
                         @Override
@@ -282,7 +332,7 @@ public class GroupActions implements View.OnClickListener {
 
                     ((SimpleDialog.Builder) builder).items(newOwnerList, -1)
                             .title("Remove Members")
-                            .positiveAction("Remove")
+                            .positiveAction("Transfer")
                             .negativeAction("Cancel");
 
                     fragment = DialogFragment.newInstance(builder);
@@ -294,8 +344,28 @@ public class GroupActions implements View.OnClickListener {
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             super.onPositiveActionClicked(fragment);
-                            if (mStatus != GroupDetailAdapter.Status.OWNER)
+                            if (mStatus != GroupDetailAdapter.Status.OWNER) {
+                                try {
+                                    Calls.leaveGroup(mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                            .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers,
+                                                              org.json.JSONObject response) {
+
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                              JSONObject errorResponse) {
+
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                                 mFeed.mActivity.finish();
+                            }
 
                         }
 
@@ -322,7 +392,9 @@ public class GroupActions implements View.OnClickListener {
                     break;
 
                 case "Edit Group":
-                    mFeed.mAdapter.toggleEditable();
+                    mFeed.editGroup();
+
+
 
                     break;
 
@@ -340,4 +412,5 @@ public class GroupActions implements View.OnClickListener {
         }
 
     }
+
 }

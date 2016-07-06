@@ -1,8 +1,8 @@
 package com.main.lets.lets.Adapters;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,30 +10,27 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.Holders.GroupDetailViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
-
-import android.view.ViewGroup.LayoutParams;
-import android.widget.Toast;
-
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Group;
 import com.main.lets.lets.R;
-import com.rey.material.app.DialogFragment;
-import com.rey.material.app.SimpleDialog;
-import com.rey.material.app.TimePickerDialog;
+import com.rey.material.widget.CheckBox;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
@@ -45,8 +42,10 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     public OnCommentsClickListener mCommentsClickListener;
     public OnMembersClickListener mMembersClickListener;
     public OnEntityClickListener mEntityClickListener;
+
     public enum Status {GUEST, MEMBER, ADMIN, OWNER}
-    public HashMap<String, TextView>  mActions;
+
+    public HashMap<String, TextView> mActions;
     public GroupDetailViewHolder mHolder;
     public Status mStatus = Status.GUEST;
     public AppCompatActivity mActivity;
@@ -59,7 +58,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
         mList.add(s);
 
         try {
-            if(new JSONObject(s).getInt("god") == id){
+            if (new JSONObject(s).getInt("god") == id) {
                 mStatus = Status.OWNER;
             }
         } catch (JSONException e) {
@@ -68,8 +67,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void updateStatus(Status s){
-        if(mStatus != Status.OWNER)
+    public void updateStatus(Status s) {
+        if (mStatus != Status.OWNER)
             mStatus = s;
     }
 
@@ -105,7 +104,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             holder.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mEntityClickListener != null)
+                    if (mEntityClickListener != null)
                         mEntityClickListener.onClick(index - 1);
                 }
             });
@@ -171,7 +170,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
                 }
             });
 
-            switch (mStatus){
+            switch (mStatus) {
                 case GUEST:
                     holder.mActions.setVisibility(View.GONE);
 
@@ -196,14 +195,88 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
 
     }
 
-    public void toggleEditable(){
-        if(mHolder.mName.isFocusable()){
+    /**
+     * Toggles whether the user can edit the group or not.
+     *
+     * @return if the group is editable, it returns true, if the group is not editable then it
+     * returns false.
+     */
+    public boolean toggleEditable() {
+        if (mHolder.mName.isFocusable()) {
             mHolder.mName.setFocusableInTouchMode(false);
             mHolder.mName.setFocusable(false);
-        }else {
-            mHolder.mName.setFocusableInTouchMode(true);
-            mHolder.mName.setFocusable(true);
+            mHolder.mBio.setFocusableInTouchMode(false);
+            mHolder.mBio.setFocusable(false);
+
+            mHolder.mName.setTextColor(Color.BLACK);
+            mHolder.mBio.setTextColor(Color.BLACK);
+
+            mHolder.mMainLayout.removeAllViews();
+
+            return false;
         }
+
+        mHolder.mName.setFocusableInTouchMode(true);
+        mHolder.mName.setFocusable(true);
+        mHolder.mBio.setFocusableInTouchMode(true);
+        mHolder.mBio.setFocusable(true);
+
+        try {
+            Group g = new Group( new JSONObject(mList.get(0)));
+            LinearLayout l = new LinearLayout(mActivity);
+            RadioButton publicGroup = new RadioButton(mActivity);
+            RadioButton hiddenGroup = new RadioButton(mActivity);
+            RadioButton openGroup = new RadioButton(mActivity);
+            RadioButton requestGroup = new RadioButton(mActivity);
+            RadioButton inviteGroup = new RadioButton(mActivity);
+            RadioGroup visibilityGroup = new RadioGroup(mActivity);
+            RadioGroup accessGroup = new RadioGroup(mActivity);
+            TextView visibilityText = new TextView(mActivity);
+            TextView accessText = new TextView(mActivity);
+
+            accessGroup.addView(openGroup);
+            accessGroup.addView(requestGroup);
+            accessGroup.addView(inviteGroup);
+
+            visibilityGroup.addView(publicGroup);
+            visibilityGroup.addView(hiddenGroup);
+
+            openGroup.setText("Open");
+            requestGroup.setText("On Request");
+            inviteGroup.setText("Invite Only");
+
+            publicGroup.setText("Public");
+            hiddenGroup.setText("Hidden");
+
+            if (g.isHidden())
+                publicGroup.setChecked(true);
+            else
+                hiddenGroup.setChecked(true);
+
+            if(g.isPublic())
+                openGroup.setChecked(true);
+            else
+                inviteGroup.setChecked(true);
+
+
+            accessText.setText("Set Group Joining Options");
+            visibilityText.setText("Set Group Visibility");
+
+            l.setOrientation(LinearLayout.VERTICAL);
+            l.addView(visibilityText);
+            l.addView(visibilityGroup);
+            l.addView(accessText);
+            l.addView(accessGroup);
+            mHolder.mMainLayout.addView(l);
+            mHolder.mName.setTextColor(Color.RED);
+            mHolder.mBio.setTextColor(Color.RED);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return true;
     }
 
     public void addElement(String s) {
@@ -279,7 +352,9 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
         mEntityClickListener = e;
     }
 
-    public void setOnDraw(OnDraw d) { mDraw = d; }
+    public void setOnDraw(OnDraw d) {
+        mDraw = d;
+    }
 
     public interface OnDraw {
         void draw(HashMap<String, TextView> actions);

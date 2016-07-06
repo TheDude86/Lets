@@ -9,11 +9,10 @@
         android:text="Join Event"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/settings"
         android:gravity="center"
         android:textColor="#096800"
         android:textStyle="bold"
+        android:animateLayoutChanges="true"
         android:elevation="10dp" />
 
 
