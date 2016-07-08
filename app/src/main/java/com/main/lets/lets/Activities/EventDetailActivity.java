@@ -27,10 +27,11 @@ public class EventDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_detail);
 
         try {
-            Log.println(Log.ASSERT, "EventDetailActivity", getIntent().getStringExtra("JSON"));
             JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
-            EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)findViewById(R.id.event_detail_list), j);
+            EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)
+                    findViewById(R.id.event_detail_list), getIntent().getStringExtra("token"),
+                    getIntent().getIntExtra("id",-1));
             Event e = new Event(j);
 
             final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);

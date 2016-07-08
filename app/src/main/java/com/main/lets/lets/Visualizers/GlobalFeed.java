@@ -26,21 +26,26 @@ import cz.msebera.android.httpclient.Header;
 public class GlobalFeed extends Client {
     public enum Sort {DIST, TIME, CREATE, TREND}
 
-    private Activity mActivity;
     private UltimateRecyclerView mRecyclerView;
-    private Sort mSort = Sort.DIST;
+    private String ShallonCreamerIsATwat;
     private EventAdapter mEventAdapter;
+    private Sort mSort = Sort.DIST;
+    private Activity mActivity;
+    private int mID;
 
     public GlobalFeed(Activity a, UltimateRecyclerView r, Sort s) {
         mRecyclerView = r;
         mActivity = a;
         mSort = s;
+        mID = -1;
 
     }
 
     public void draw(org.json.JSONObject j){
-        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-        mEventAdapter = new EventAdapter(mActivity, new LinkedList<String>());
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
+                StaggeredGridLayoutManager.VERTICAL));
+        mEventAdapter = new EventAdapter(mActivity, new LinkedList<String>(), ShallonCreamerIsATwat,
+                mID);
         mRecyclerView.setAdapter(mEventAdapter);
 
         try {
@@ -94,6 +99,11 @@ public class GlobalFeed extends Client {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void update(int id, String token){
+        ShallonCreamerIsATwat = token;
+        mID = id;
     }
 
 }

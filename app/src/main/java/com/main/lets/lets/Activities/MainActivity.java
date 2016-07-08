@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
 
         //Login object used for auto login for returning users
-        mLogin = new Login(this, new JsonHttpResponseHandler(){
+        mLogin = new Login(this, new JsonHttpResponseHandler() {
 
             /**
              * The login object will attempt to login automatically if there are saved credentials
@@ -74,14 +75,16 @@ public class MainActivity extends AppCompatActivity {
              *                 returns an error message of login failed
              */
             @Override
-            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response){
+            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
                 try {
-                    if(response.has("accessToken")){
+                    if (response.has("accessToken")) {
                         mMap.put("token", response.getString("accessToken"));
                         mMap.put("userID", response.getInt("user_id"));
                         mProfileFeed.updateToken("Bearer " + response.getString("accessToken"));
+                        mGlobalFeed.update(response.getInt("user_id"),
+                                "Bearer " + response.getString("accessToken"));
 
-                    }else{
+                    } else {
                         Login.clearInfo(MainActivity.this);
 
                     }
@@ -241,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, GroupCreateActivity.class);
-                i.putExtra("token", (String)mMap.get("token"));
+                i.putExtra("token", (String) mMap.get("token"));
                 startActivity(i);
 
             }
@@ -286,9 +289,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Need this to make the application multidexed, with all of the libraries, there are more than
      * 4K functions which is the max for a single dex file in Android
-     *
+     * <p/>
      * Why does this have to be done manually and this doesn't come standard in Android?  Who the fuck
      * knows, Google is just full of lazy bastards.
+     *
      * @param base (for the super method)
      */
     @Override
@@ -302,13 +306,13 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SETTINGS) {
             if (resultCode == RESULT_OK) {
-                if(data.getBooleanExtra("LoggedOut", false))
+                if (data.getBooleanExtra("LoggedOut", false))
                     mProfileFeed.updateToken("Bearer ");
 
-                if(mActive.equals(mGlobalFeed.getClass().toString())){
+                if (mActive.equals(mGlobalFeed.getClass().toString())) {
                     mGlobalFeed.draw(new JSONObject(mMap));
 
-                }else if(mActive.equals(mProfileFeed.getClass().toString())){
+                } else if (mActive.equals(mProfileFeed.getClass().toString())) {
                     mProfileFeed.draw(null);
 
                 }

@@ -247,6 +247,8 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                             intent = new Intent(mActivity, EventDetailActivity.class);
                             intent.putExtra("JSON", new JSONObject(s).getJSONArray("Event_info")
                                     .getJSONObject(0).toString());
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            intent.putExtra("id", mID);
                             mActivity.startActivityForResult(intent, DETAIL_CODE);
 
                             break;

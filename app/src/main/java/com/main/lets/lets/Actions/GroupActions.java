@@ -1,5 +1,6 @@
 package com.main.lets.lets.Actions;
 
+import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -66,6 +67,8 @@ public class GroupActions implements View.OnClickListener {
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             mFeed.mComments = new ArrayList<>();
+                            final ProgressDialog dialog = ProgressDialog.show(mFeed.mActivity, "",
+                                    "Loading. Please wait...", true);
                             EditText e = (EditText) fragment.getDialog().findViewById(R.id.text);
                             try {
                                 Calls.addGroupComment(mJSON.getJSONArray("Group_info").getJSONObject(0)
@@ -85,6 +88,7 @@ public class GroupActions implements View.OnClickListener {
                                                                     for (int i = 0; i < response.length(); i++) {
                                                                         try {
                                                                             mFeed.mComments.add(response.getJSONObject(i));
+                                                                            dialog.hide();
                                                                         } catch (JSONException e) {
                                                                             e.printStackTrace();
                                                                         }
@@ -154,13 +158,13 @@ public class GroupActions implements View.OnClickListener {
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             CharSequence[] values = getSelectedValues();
                             Entity e;
-                            for(CharSequence c : values){
-                                for (JSONObject j : mFeed.mMemberTags){
-                                     e = new Entity(j);
-                                    if(e.mText.equals(c)){
+                            for (CharSequence c : values) {
+                                for (JSONObject j : mFeed.mMemberTags) {
+                                    e = new Entity(j);
+                                    if (e.mText.equals(c)) {
                                         try {
                                             Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                                                 @Override
                                                 public void onSuccess(int statusCode, Header[] headers,
                                                                       JSONObject response) {
@@ -186,7 +190,6 @@ public class GroupActions implements View.OnClickListener {
 
                         @Override
                         public void onNegativeActionClicked(DialogFragment fragment) {
-                            Toast.makeText(mFeed.mActivity, "Cancelled", Toast.LENGTH_SHORT).show();
                             super.onNegativeActionClicked(fragment);
                         }
                     };
@@ -320,6 +323,7 @@ public class GroupActions implements View.OnClickListener {
                                     }
 
                                 }
+
                             }
 
                         }
@@ -395,9 +399,50 @@ public class GroupActions implements View.OnClickListener {
                     mFeed.editGroup();
 
 
-
                     break;
+                case "Delete Group":
+                    builder = new SimpleDialog.Builder() {
+                        @Override
+                        public void onPositiveActionClicked(DialogFragment fragment) {
+                            super.onPositiveActionClicked(fragment);
+                            try {
+                                final ProgressDialog dialog = ProgressDialog.show(mFeed.mActivity, "",
+                                        "Loading. Please wait...", true);
 
+                                Calls.deleteGroup(mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                        .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers,
+                                                          org.json.JSONObject response) {
+                                        dialog.hide();
+                                        mFeed.mActivity.finish();
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                          JSONObject errorResponse) {
+
+                                    }
+                                });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            mFeed.mActivity.finish();
+
+
+                        }
+
+                        @Override
+                        public void onNegativeActionClicked(DialogFragment fragment) {
+                            super.onNegativeActionClicked(fragment);
+                        }
+                    };
+
+                    ((SimpleDialog.Builder) builder).message("Are you sure?  This cannot be undone!")
+                            .title("Delete Group")
+                            .positiveAction("Delete")
+                            .negativeAction("Cancel");
 
             }
 

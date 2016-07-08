@@ -296,6 +296,23 @@ public class Calls {
         post("group/inviteUser", params, jsonHttpResponseHandler);
     }
 
+    public static void addComment(int eventID, String token, String message, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("event_id", eventID);
+        params.put("message", message);
+        client.addHeader("Authorization", token);
+
+        post("event/addComment", params, jsonHttpResponseHandler);
+    }
+
+    public static void deleteGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("group/delete", params, jsonHttpResponseHandler);
+    }
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 

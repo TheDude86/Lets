@@ -16,9 +16,16 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp">
 
-        <include layout="@layout/toolbar_join"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="match_parent"
+            android:id="@+id/layout_join">
+
+            <include layout="@layout/toolbar_join"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/event_time"

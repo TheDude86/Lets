@@ -3,6 +3,7 @@ package com.main.lets.lets.Adapters;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -208,8 +209,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             mHolder.mBio.setFocusableInTouchMode(false);
             mHolder.mBio.setFocusable(false);
 
-            mHolder.mName.setTextColor(Color.BLACK);
-            mHolder.mBio.setTextColor(Color.BLACK);
+            mHolder.mName.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            mHolder.mBio.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
 
             mHolder.mMainLayout.removeAllViews();
 
@@ -268,8 +269,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             l.addView(accessText);
             l.addView(accessGroup);
             mHolder.mMainLayout.addView(l);
-            mHolder.mName.setTextColor(Color.RED);
-            mHolder.mBio.setTextColor(Color.RED);
+            mHolder.mName.getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            mHolder.mBio.getBackground().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
 
         } catch (JSONException e) {
             e.printStackTrace();

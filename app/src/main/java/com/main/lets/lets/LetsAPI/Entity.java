@@ -36,20 +36,20 @@ public class Entity  extends Client{
                 mID = j.getInt("Sender");
                 mText = j.getString("User_Name");
 
-            } else if (j.has("user_id")) {
+            } else if (j.has("user_id") && !j.has("text")) {
                 mType = EntityType.USER;
                 mID = j.getInt("user_id");
                 mText = j.getString("name");
 
-            } else if (j.has("event_id")) {
+            } else if (j.has("event_id") && !j.has("text")) {
                 mType = EntityType.EVENT;
                 mID = j.getInt("event_id");
                 mText = j.getString("event_name");
 
-            } else if(j.has("Message")){
-                mID = -1;
+            } else if(j.has("text")){
                 mType = EntityType.COMMENT;
-                mText = j.getString("name") + ": \n" + j.getString("Message");
+                mID = j.getInt("user_id");
+                mText = j.getString("text");
 
             } else if(j.has("group_name")){
                 mType = EntityType.GROUP;

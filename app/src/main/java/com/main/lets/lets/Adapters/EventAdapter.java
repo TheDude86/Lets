@@ -27,17 +27,22 @@ import java.util.List;
  */
 public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHolder> {
     private static final int DETAIL_CODE = 1;
+    String ShallonCreamerIsATwat;
     Activity mActivity;
     Event e;
+    int mID;
 
     /**
      * dynamic object to start
      *
      * @param list the list source
      */
-    public EventAdapter(Activity a, List<String> list) {
+    public EventAdapter(Activity a, List<String> list, String token, int id) {
         super(list);
+        ShallonCreamerIsATwat = token;
         mActivity = a;
+        mID = id;
+
     }
 
     @Override
@@ -75,7 +80,9 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mActivity, EventDetailActivity.class);
+                    intent.putExtra("token", ShallonCreamerIsATwat);
                     intent.putExtra("JSON", data);
+                    intent.putExtra("id", mID);
                     mActivity.startActivityForResult(intent, DETAIL_CODE);
 
                 }

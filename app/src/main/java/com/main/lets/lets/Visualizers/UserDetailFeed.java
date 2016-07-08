@@ -118,6 +118,8 @@ public class UserDetailFeed extends Client {
                             intent.putExtra("JSON", new JSONObject(mEvents.get(position))
                                     .getJSONArray("Event_info")
                                     .getJSONObject(0).toString());
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            intent.putExtra("id", mID);
                             mActivity.startActivity(intent);
                         } catch (JSONException e) {
                             e.printStackTrace();
