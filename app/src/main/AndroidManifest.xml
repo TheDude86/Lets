@@ -58,6 +58,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.main.lets.lets.Activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".Activities.SearchActivity"
+            android:theme="@style/SearchTheme" />
+        <activity android:name=".Activities.InviteActivity"></activity>
     </application>
 
 </manifest>

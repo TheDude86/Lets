@@ -1,6 +1,7 @@
 package com.main.lets.lets.Actions;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Adapters.GroupDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
@@ -443,6 +445,19 @@ public class GroupActions implements View.OnClickListener {
                             .title("Delete Group")
                             .positiveAction("Delete")
                             .negativeAction("Cancel");
+
+                    break;
+                case "Invite Friends":
+                    Intent intent = new Intent(mFeed.mActivity, InviteActivity.class);
+                    intent.putExtra("invite_id", mJSON.getJSONArray("Group_info")
+                            .getJSONObject(0).getInt("group_id"));
+                    intent.putExtra("token", mFeed.ShallonCreamerIsATwat);
+                    intent.putExtra("entities","Friends");
+                    intent.putExtra("mode", "Group");
+                    intent.putExtra("id", mFeed.mID);
+                    mFeed.mActivity.startActivity(intent);
+
+                    break;
 
             }
 

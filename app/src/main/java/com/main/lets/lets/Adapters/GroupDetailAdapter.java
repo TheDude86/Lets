@@ -146,7 +146,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             mActions.put("edit", formattedTextView("Edit Group"));
 
             mActions.put("invite group", formattedTextView("Invite to Event"));
-            mActions.put("invite users", formattedTextView("Invite User"));
+            mActions.put("invite users", formattedTextView("Invite Friends"));
             mActions.put("leave", formattedTextView("Leave Group"));
             mActions.put("comment", formattedTextView("Comment"));
 

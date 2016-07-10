@@ -53,7 +53,7 @@ public class GlobalFeed extends Client {
             final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
                     "Loading. Please wait...", true);
 
-            int RANGE = 980000;
+            int RANGE = 9980000;
 
             Calls.getCloseEvents(j.getInt("latitude"), j.getInt("longitude"), RANGE, new JsonHttpResponseHandler() {
                 @Override

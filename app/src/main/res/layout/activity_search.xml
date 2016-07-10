@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Search for..."
+        android:textSize="30sp"
+        android:id="@+id/textView23"
+        android:paddingTop="40dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="50dp" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_alignBottom="@+id/textView23"
+        android:entries="@array/entities_array"
+        android:layout_toEndOf="@+id/textView23"
+        android:paddingBottom="40dp"
+        android:spinnerMode="dropdown" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/linearLayout3"
+        android:background="#c8c8c8"
+        android:layout_above="@+id/feed"
+        android:layout_alignParentStart="true"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/feed"
+        android:layout_below="@+id/search"
+        android:layout_alignParentStart="true" />
+
+    <android.support.v7.widget.SearchView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/search"
+        android:layout_below="@+id/textView23"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/spinner" />
+</RelativeLayout>

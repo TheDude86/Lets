@@ -6,6 +6,12 @@
         <item>Soonest</item>
         <item>Newly Created</item>
     </string-array>
+
+    <string-array name="entities_array">
+        <item>Events</item>
+        <item>People</item>
+        <item>Groups</item>
+    </string-array>
     <string name="title_activity_event_detail">EventDetailActivity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"

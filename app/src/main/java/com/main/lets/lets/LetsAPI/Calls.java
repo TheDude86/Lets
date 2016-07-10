@@ -235,7 +235,7 @@ public class Calls {
 
     }
 
-    public static void getGroupComments(int id, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void getGroupComments(int id, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", id);
         client.addHeader("Authorization", token);
@@ -243,7 +243,7 @@ public class Calls {
         post("group/getComments", params, jsonHttpResponseHandler);
     }
 
-    public static void addGroupComment(int id, String s, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void addGroupComment(int id, String s, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", id);
         params.put("message", s);
@@ -261,7 +261,7 @@ public class Calls {
         post("group/removeUser", params, jsonHttpResponseHandler);
     }
 
-    public static void leaveGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void leaveGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
@@ -269,7 +269,7 @@ public class Calls {
         post("group/leave", params, jsonHttpResponseHandler);
     }
 
-    public static void transferOwner(int groupID, int newOwnerID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void transferOwner(int groupID, int newOwnerID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", groupID);
         params.put("new_owner_id", newOwnerID);
@@ -278,7 +278,7 @@ public class Calls {
         post("group/transferOwnership", params, jsonHttpResponseHandler);
     }
 
-    public static void addAdmin(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void addAdmin(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("admin_id", userID);
         params.put("group_id", groupID);
@@ -287,7 +287,7 @@ public class Calls {
         post("group/addAdmin", params, jsonHttpResponseHandler);
     }
 
-    public static void joinGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void joinGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("invite_user", userID);
         params.put("group_id", groupID);
@@ -296,7 +296,7 @@ public class Calls {
         post("group/inviteUser", params, jsonHttpResponseHandler);
     }
 
-    public static void addComment(int eventID, String token, String message, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void addComment(int eventID, String token, String message, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("event_id", eventID);
         params.put("message", message);
@@ -305,12 +305,39 @@ public class Calls {
         post("event/addComment", params, jsonHttpResponseHandler);
     }
 
-    public static void deleteGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void deleteGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
         post("group/delete", params, jsonHttpResponseHandler);
+    }
+
+    public static void search(String text, int limit, int offset, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("search_term", text);
+        params.put("limit", limit);
+        params.put("offset", offset);
+
+        post("search/name", params, jsonHttpResponseHandler);
+    }
+
+    public static void inviteGroupToEvent(int eventID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("event_id", eventID);
+        params.put("group_id", groupID);
+        client.addHeader("Authorization", token);
+
+        post("event/inviteGroup", params, jsonHttpResponseHandler);
+    }
+
+    public static void inviteUserToEvent(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("event_id", eventID);
+        params.put("invite_user_id", userID);
+        client.addHeader("Authorization", token);
+
+        post("event/inviteUser", params, jsonHttpResponseHandler);
     }
 
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {

@@ -150,15 +150,12 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
 
                         break;
-
                     case 2:
 
                         break;
-
                     case 3:
 
                         break;
-
                     default:
 
                         break;
@@ -176,8 +173,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.println(Log.ASSERT, "Has Token", mMap.containsKey("token") ? (String) mMap.get("token") : "No");
-
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                intent.putExtra("token", "Bearer " + mMap.get("token"));
+                intent.putExtra("userID", mMap.containsKey("userID") ? (int) mMap.get("userID") : -1);
+                startActivity(intent);
             }
         });
 
