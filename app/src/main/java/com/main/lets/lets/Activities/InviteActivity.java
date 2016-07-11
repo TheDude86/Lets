@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -43,7 +44,8 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         mID = getIntent().getIntExtra("id", -1);
 
-        loadFeed(buttons);
+        loadFeed(buttons, getIntent().getStringExtra("mode").equals("Group") ?
+                InviteFeed.Mode.GROUP : InviteFeed.Mode.EVENT);
 
         TextView right = (TextView) findViewById(R.id.entity_right);
         TextView left = (TextView) findViewById(R.id.entity_left);
@@ -83,7 +85,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void loadFeed(String[] feeds) {
+    public void loadFeed(final String[] feeds, final InviteFeed.Mode m) {
         for (String s : feeds) {
             switch (s) {
                 case "Friends":
@@ -99,7 +101,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
-                            mInviteFeed.draw(mUsers);
+                                mInviteFeed.draw(mUsers);
 
                         }
                     });
@@ -118,6 +120,9 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
+                            if(!inArray(feeds, "Friends"))
+                                mInviteFeed.draw(mEvents);
+
                         }
                     });
 
@@ -135,6 +140,9 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
+                            if(!inArray(feeds, "Events"))
+                                mInviteFeed.draw(mGroups);
+
                         }
                     });
 
@@ -142,6 +150,15 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
 
+    }
+
+    public boolean inArray(Object[] list, Object object){
+        for (Object o : list){
+            if(o.equals(object))
+                return true;
+        }
+
+        return false;
     }
 
 }

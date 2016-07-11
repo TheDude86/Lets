@@ -63,33 +63,45 @@ public class GroupActions implements View.OnClickListener {
 
                         @Override
                         protected void onBuildDone(Dialog dialog) {
-                            dialog.layoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            dialog.layoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                ViewGroup.LayoutParams.WRAP_CONTENT);
                         }
 
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             mFeed.mComments = new ArrayList<>();
                             final ProgressDialog dialog = ProgressDialog.show(mFeed.mActivity, "",
-                                    "Loading. Please wait...", true);
+                                                                              "Loading. Please " +
+                                                                                      "wait...",
+                                                                              true);
                             EditText e = (EditText) fragment.getDialog().findViewById(R.id.text);
                             try {
-                                Calls.addGroupComment(mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                Calls.addGroupComment(
+                                        mJSON.getJSONArray("Group_info").getJSONObject(0)
                                                 .getInt("group_id"), e.getText().toString(),
                                         mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers,
                                                                   org.json.JSONObject response) {
                                                 try {
-                                                    Calls.getGroupComments(mJSON.getJSONArray("Group_info")
-                                                                    .getJSONObject(0).getInt("group_id"),
+                                                    Calls.getGroupComments(
+                                                            mJSON.getJSONArray("Group_info")
+                                                                    .getJSONObject(0)
+                                                                    .getInt("group_id"),
                                                             mFeed.ShallonCreamerIsATwat,
                                                             new JsonHttpResponseHandler() {
                                                                 @Override
-                                                                public void onSuccess(int statusCode, Header[] headers,
-                                                                                      org.json.JSONArray response) {
-                                                                    for (int i = 0; i < response.length(); i++) {
+                                                                public void onSuccess(
+                                                                        int statusCode,
+                                                                        Header[] headers,
+                                                                        org.json.JSONArray
+                                                                                response) {
+                                                                    for (int i = 0; i < response
+                                                                            .length(); i++) {
                                                                         try {
-                                                                            mFeed.mComments.add(response.getJSONObject(i));
+                                                                            mFeed.mComments
+                                                                                    .add(response.getJSONObject(
+                                                                                            i));
                                                                             dialog.hide();
                                                                         } catch (JSONException e) {
                                                                             e.printStackTrace();
@@ -100,8 +112,11 @@ public class GroupActions implements View.OnClickListener {
                                                                 }
 
                                                                 @Override
-                                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                                                      JSONObject errorResponse) {
+                                                                public void onFailure(
+                                                                        int statusCode,
+                                                                        Header[] headers,
+                                                                        Throwable throwable,
+                                                                        JSONObject errorResponse) {
 
                                                                 }
 
@@ -113,7 +128,8 @@ public class GroupActions implements View.OnClickListener {
                                             }
 
                                             @Override
-                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                            public void onFailure(int statusCode, Header[] headers,
+                                                                  Throwable throwable,
                                                                   JSONObject errorResponse) {
 
                                             }
@@ -165,21 +181,32 @@ public class GroupActions implements View.OnClickListener {
                                     e = new Entity(j);
                                     if (e.mText.equals(c)) {
                                         try {
-                                            Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                                @Override
-                                                public void onSuccess(int statusCode, Header[] headers,
-                                                                      JSONObject response) {
+                                            Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info")
+                                                                   .getJSONObject(0)
+                                                                   .getInt("group_id"),
+                                                           mFeed.ShallonCreamerIsATwat,
+                                                           new JsonHttpResponseHandler() {
+                                                               @Override
+                                                               public void onSuccess(int statusCode,
+                                                                                     Header[]
+                                                                                             headers,
+                                                                                     JSONObject
+                                                                                             response) {
 
 
-                                                }
+                                                               }
 
-                                                @Override
-                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                                      JSONObject errorResponse) {
+                                                               @Override
+                                                               public void onFailure(int statusCode,
+                                                                                     Header[]
+                                                                                             headers,
+                                                                                     Throwable
+                                                                                             throwable,
+                                                                                     JSONObject
+                                                                                             errorResponse) {
 
-                                                }
-                                            });
+                                                               }
+                                                           });
                                         } catch (JSONException e1) {
                                             e1.printStackTrace();
                                         }
@@ -222,21 +249,32 @@ public class GroupActions implements View.OnClickListener {
                                     if (s.toString().equals(e.mText)) {
                                         Log.println(Log.ASSERT, "GroupActions", s.toString());
                                         try {
-                                            Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                    .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                                @Override
-                                                public void onSuccess(int statusCode, Header[] headers,
-                                                                      org.json.JSONObject response) {
+                                            Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray(
+                                                    "Group_info").getJSONObject(0)
+                                                                              .getInt("group_id"),
+                                                                      mFeed.ShallonCreamerIsATwat,
+                                                                      new JsonHttpResponseHandler
+                                                                              () {
+                                                                          @Override
+                                                                          public void onSuccess(
+                                                                                  int statusCode,
+                                                                                  Header[] headers,
+                                                                                  org.json.JSONObject response) {
 
 
-                                                }
+                                                                          }
 
-                                                @Override
-                                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                                      JSONObject errorResponse) {
+                                                                          @Override
+                                                                          public void onFailure(
+                                                                                  int statusCode,
+                                                                                  Header[] headers,
+                                                                                  Throwable
+                                                                                          throwable,
+                                                                                  JSONObject
+                                                                                          errorResponse) {
 
-                                                }
-                                            });
+                                                                          }
+                                                                      });
                                         } catch (JSONException e1) {
                                             e1.printStackTrace();
                                         }
@@ -301,25 +339,34 @@ public class GroupActions implements View.OnClickListener {
 
                             for (JSONObject j : mFeed.mAdminTags) {
                                 Entity e = new Entity(j);
-                                Log.println(Log.ASSERT, "GroupActions", e.mText + " == " + getSelectedValue());
+                                Log.println(Log.ASSERT, "GroupActions",
+                                            e.mText + " == " + getSelectedValue());
                                 if (e.mText.equals(getSelectedValue())) {
                                     try {
-                                        Calls.transferOwner(mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                .getInt("group_id"), e.mID, mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                            @Override
-                                            public void onSuccess(int statusCode, Header[] headers,
-                                                                  JSONObject response) {
-                                                mFeed.mAdapter.mStatus = GroupDetailAdapter.Status.ADMIN;
-                                                mStatus = GroupDetailAdapter.Status.ADMIN;
+                                        Calls.transferOwner(
+                                                mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                                        .getInt("group_id"), e.mID,
+                                                mFeed.ShallonCreamerIsATwat,
+                                                new JsonHttpResponseHandler() {
+                                                    @Override
+                                                    public void onSuccess(int statusCode,
+                                                                          Header[] headers,
+                                                                          JSONObject response) {
+                                                        mFeed.mAdapter.mStatus =
+                                                                GroupDetailAdapter.Status.ADMIN;
+                                                        mStatus = GroupDetailAdapter.Status.ADMIN;
 
-                                            }
+                                                    }
 
-                                            @Override
-                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                                  JSONObject errorResponse) {
+                                                    @Override
+                                                    public void onFailure(int statusCode,
+                                                                          Header[] headers,
+                                                                          Throwable throwable,
+                                                                          JSONObject
+                                                                                  errorResponse) {
 
-                                            }
-                                        });
+                                                    }
+                                                });
                                     } catch (JSONException e1) {
                                         e1.printStackTrace();
                                     }
@@ -352,21 +399,28 @@ public class GroupActions implements View.OnClickListener {
                             super.onPositiveActionClicked(fragment);
                             if (mStatus != GroupDetailAdapter.Status.OWNER) {
                                 try {
-                                    Calls.leaveGroup(mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                            .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                        @Override
-                                        public void onSuccess(int statusCode, Header[] headers,
-                                                              org.json.JSONObject response) {
+                                    Calls.leaveGroup(
+                                            mJSON.getJSONArray("Group_info").getJSONObject(0)
+                                                    .getInt("group_id"),
+                                            mFeed.ShallonCreamerIsATwat,
+                                            new JsonHttpResponseHandler() {
+                                                @Override
+                                                public void onSuccess(int statusCode,
+                                                                      Header[] headers,
+                                                                      org.json.JSONObject
+                                                                              response) {
 
 
-                                        }
+                                                }
 
-                                        @Override
-                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                              JSONObject errorResponse) {
+                                                @Override
+                                                public void onFailure(int statusCode,
+                                                                      Header[] headers,
+                                                                      Throwable throwable,
+                                                                      JSONObject errorResponse) {
 
-                                        }
-                                    });
+                                                }
+                                            });
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -388,8 +442,9 @@ public class GroupActions implements View.OnClickListener {
                                 .negativeAction("Cancel");
 
                     } else {
-                        ((SimpleDialog.Builder) builder).message("You can either delete the group " +
-                                "or transfer ownership then leave")
+                        ((SimpleDialog.Builder) builder)
+                                .message("You can either delete the group " +
+                                                 "or transfer ownership then leave")
                                 .title("I'm sorry Dave, I'm afraid I can't let you do that...")
                                 .positiveAction("Okay")
                                 .negativeAction("Cancel");
@@ -408,25 +463,31 @@ public class GroupActions implements View.OnClickListener {
                         public void onPositiveActionClicked(DialogFragment fragment) {
                             super.onPositiveActionClicked(fragment);
                             try {
-                                final ProgressDialog dialog = ProgressDialog.show(mFeed.mActivity, "",
-                                        "Loading. Please wait...", true);
+                                final ProgressDialog dialog = ProgressDialog
+                                        .show(mFeed.mActivity, "",
+                                              "Loading. Please wait...", true);
 
                                 Calls.deleteGroup(mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                        .getInt("group_id"), mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers,
-                                                          org.json.JSONObject response) {
-                                        dialog.hide();
-                                        mFeed.mActivity.finish();
+                                                          .getInt("group_id"),
+                                                  mFeed.ShallonCreamerIsATwat,
+                                                  new JsonHttpResponseHandler() {
+                                                      @Override
+                                                      public void onSuccess(int statusCode,
+                                                                            Header[] headers,
+                                                                            org.json.JSONObject response) {
+                                                          dialog.hide();
+                                                          mFeed.mActivity.finish();
 
-                                    }
+                                                      }
 
-                                    @Override
-                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                          JSONObject errorResponse) {
+                                                      @Override
+                                                      public void onFailure(int statusCode,
+                                                                            Header[] headers,
+                                                                            Throwable throwable,
+                                                                            JSONObject errorResponse) {
 
-                                    }
-                                });
+                                                      }
+                                                  });
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -441,7 +502,8 @@ public class GroupActions implements View.OnClickListener {
                         }
                     };
 
-                    ((SimpleDialog.Builder) builder).message("Are you sure?  This cannot be undone!")
+                    ((SimpleDialog.Builder) builder)
+                            .message("Are you sure?  This cannot be undone!")
                             .title("Delete Group")
                             .positiveAction("Delete")
                             .negativeAction("Cancel");
@@ -452,10 +514,21 @@ public class GroupActions implements View.OnClickListener {
                     intent.putExtra("invite_id", mJSON.getJSONArray("Group_info")
                             .getJSONObject(0).getInt("group_id"));
                     intent.putExtra("token", mFeed.ShallonCreamerIsATwat);
-                    intent.putExtra("entities","Friends");
+                    intent.putExtra("entities", "Friends");
                     intent.putExtra("mode", "Group");
                     intent.putExtra("id", mFeed.mID);
                     mFeed.mActivity.startActivity(intent);
+
+                    break;
+                case "Invite to Event":
+                    Intent eventIntent = new Intent(mFeed.mActivity, InviteActivity.class);
+                    eventIntent.putExtra("invite_id", mJSON.getJSONArray("Group_info")
+                            .getJSONObject(0).getInt("group_id"));
+                    eventIntent.putExtra("token", mFeed.ShallonCreamerIsATwat);
+                    eventIntent.putExtra("entities", "Events:Groups");
+                    eventIntent.putExtra("mode", "Event");
+                    eventIntent.putExtra("id", mFeed.mID);
+                    mFeed.mActivity.startActivity(eventIntent);
 
                     break;
 

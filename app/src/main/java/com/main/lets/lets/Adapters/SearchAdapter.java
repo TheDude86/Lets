@@ -54,10 +54,10 @@ public class SearchAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         try {
             final SearchViewHolder h = (SearchViewHolder) holder;
-            final Entity e = new Entity(mList.getJSONObject(position));
+            final Entity e = new Entity(mList.getJSONObject(h.getAdapterPosition()));
             if (mActive == SearchFeed.Viewing.EVENT) {
                 Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory)).into((h.mImage));
             } else if(e.mPic != null){
@@ -83,14 +83,21 @@ public class SearchAdapter extends RecyclerView.Adapter {
                 public void onClick(View v) {
                     if (mOnEntityClicked != null){
                         if(e.mPic == null){
-                            h.mLayout.setBackgroundColor(h.clicked ? Color.WHITE : Color.rgb(255, 255, 204));
-                            h.clicked = !h.clicked;
+                            if(!mSelected.contains(h.getAdapterPosition()))
+                                mSelected.add(h.getAdapterPosition());
+
                         }
 
-                        mOnEntityClicked.onClicked(position);
+                        mOnEntityClicked.onClicked(h.getAdapterPosition());
                     }
                 }
             });
+
+            if(h.getAdapterPosition() == 0)
+                h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
+            else
+                h.mLayout.setBackgroundColor(Color.WHITE);
+
 
             for (Integer i: mSelected){
                 if (e.mID == i){
@@ -98,6 +105,8 @@ public class SearchAdapter extends RecyclerView.Adapter {
 
                 }
             }
+
+            Log.println(Log.ASSERT, "SearchAdapter", "Position: " + position + " holder isClicked: " + h.clicked + " Title: " + e.mText);
 
         } catch (JSONException e1) {
             e1.printStackTrace();

@@ -3,6 +3,7 @@ package com.main.lets.lets.Visualizers;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.View;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -64,11 +65,12 @@ public class InviteFeed extends Client {
             @Override
             public void onClick(View v) {
                 if (mActive == Mode.GROUP) {
-                    for (Integer i : mSelectedUsers) {
+                    for (final Integer i : mSelectedUsers) {
                         Calls.joinGroup(i, inviteID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
+                                Log.println(Log.ASSERT, "InviteFeed", i + " " + response.toString());
                             }
                         });
                     }
@@ -76,21 +78,25 @@ public class InviteFeed extends Client {
                     mActivity.finish();
 
                 } else {
-                    for (Integer i : mSelectedGroups) {
+                    for (final Integer i : mSelectedGroups) {
                         Calls.inviteGroupToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
+                                Log.println(Log.ASSERT, "InviteFeed", i + " " + response.toString());
+
                             }
                         });
 
                     }
 
-                    for (Integer i : mSelectedUsers) {
+                    for (final Integer i : mSelectedUsers) {
                         Calls.inviteUserToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
+                                Log.println(Log.ASSERT, "InviteFeed", i + " " + response.toString());
+
                             }
                         });
                     }
