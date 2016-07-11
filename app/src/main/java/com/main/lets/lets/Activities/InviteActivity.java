@@ -43,9 +43,26 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         String[] buttons = getIntent().getStringExtra("entities").split(":");
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         mID = getIntent().getIntExtra("id", -1);
+        loadFeed(buttons);
 
-        loadFeed(buttons, getIntent().getStringExtra("mode").equals("Group") ?
-                InviteFeed.Mode.GROUP : InviteFeed.Mode.EVENT);
+        switch (getIntent().getStringExtra("mode")) {
+            case "G2EFG":
+                mInviteFeed = new InviteFeed(this, InviteFeed.Mode.G2EFG, ShallonCreamerIsATwat, mID,
+                        getIntent().getIntExtra("invite_id", -1));
+
+                break;
+            case "U2GFG":
+                mInviteFeed = new InviteFeed(this, InviteFeed.Mode.U2GFG, ShallonCreamerIsATwat, mID,
+                        getIntent().getIntExtra("invite_id", -1));
+
+                break;
+            case "UG2EFE":
+                mInviteFeed = new InviteFeed(this, InviteFeed.Mode.UG2EFE, ShallonCreamerIsATwat, mID,
+                        getIntent().getIntExtra("invite_id", -1));
+
+                break;
+
+        }
 
         TextView right = (TextView) findViewById(R.id.entity_right);
         TextView left = (TextView) findViewById(R.id.entity_left);
@@ -59,9 +76,6 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         else
             findViewById(R.id.toolbar_entities).setVisibility(View.GONE);
 
-        mInviteFeed = new InviteFeed(this, getIntent().getStringExtra("mode").equals("Group") ?
-                InviteFeed.Mode.GROUP : InviteFeed.Mode.EVENT, ShallonCreamerIsATwat, mID,
-                getIntent().getIntExtra("invite_id", -1));
 
     }
 
@@ -85,7 +99,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void loadFeed(final String[] feeds, final InviteFeed.Mode m) {
+    public void loadFeed(final String[] feeds) {
         for (String s : feeds) {
             switch (s) {
                 case "Friends":
@@ -101,7 +115,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
-                                mInviteFeed.draw(mUsers);
+                            mInviteFeed.draw(mUsers);
 
                         }
                     });
@@ -120,7 +134,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
-                            if(!inArray(feeds, "Friends"))
+                            if (!inArray(feeds, "Friends"))
                                 mInviteFeed.draw(mEvents);
 
                         }
@@ -140,7 +154,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                 e.printStackTrace();
                             }
 
-                            if(!inArray(feeds, "Events"))
+                            if (!inArray(feeds, "Events"))
                                 mInviteFeed.draw(mGroups);
 
                         }
@@ -152,9 +166,9 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public boolean inArray(Object[] list, Object object){
-        for (Object o : list){
-            if(o.equals(object))
+    public boolean inArray(Object[] list, Object object) {
+        for (Object o : list) {
+            if (o.equals(object))
                 return true;
         }
 

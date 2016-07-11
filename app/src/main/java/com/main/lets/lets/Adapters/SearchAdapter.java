@@ -33,11 +33,12 @@ import cz.msebera.android.httpclient.Header;
  * Created by jnovosel on 7/8/16.
  */
 public class SearchAdapter extends RecyclerView.Adapter {
-    OnEntityClickListener mOnEntityClicked;
-    ArrayList<Integer> mSelected;
-    AppCompatActivity mActivity;
-    SearchFeed.Viewing mActive;
-    JSONArray mList;
+    public OnEntityClickListener mOnEntityClicked;
+    public ArrayList<Integer> mSelected;
+    public AppCompatActivity mActivity;
+    public SearchFeed.Viewing mActive;
+    public boolean mSelectable;
+    public JSONArray mList;
 
     public SearchAdapter(AppCompatActivity a, JSONArray l, SearchFeed.Viewing active) {
         mSelected = new ArrayList<>();
@@ -60,7 +61,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
             final Entity e = new Entity(mList.getJSONObject(h.getAdapterPosition()));
             if (mActive == SearchFeed.Viewing.EVENT) {
                 Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory)).into((h.mImage));
-            } else if(e.mPic != null){
+            } else if (e.mPic != null) {
                 Calls.loadImage(e.mPic, new FileAsyncHttpResponseHandler(mActivity) {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
@@ -81,33 +82,31 @@ public class SearchAdapter extends RecyclerView.Adapter {
             h.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mOnEntityClicked != null){
-                        if(e.mPic == null){
-                            if(!mSelected.contains(h.getAdapterPosition()))
-                                mSelected.add(h.getAdapterPosition());
+                    if (mOnEntityClicked != null) {
+                        if (mSelectable) {
+                            if (!mSelected.contains(e.mID)) {
+                                mSelected.add(e.mID);
+                                h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
+
+                            } else {
+                                mSelected.remove(Integer.valueOf(e.mID));
+                                h.mLayout.setBackgroundColor(Color.WHITE);
+
+                            }
 
                         }
 
-                        mOnEntityClicked.onClicked(h.getAdapterPosition());
+                        mOnEntityClicked.onClicked(h.getAdapterPosition(), h);
                     }
                 }
             });
 
-            if(h.getAdapterPosition() == 0)
+            if (mSelected.contains(e.mID))
                 h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
             else
                 h.mLayout.setBackgroundColor(Color.WHITE);
 
-
-            for (Integer i: mSelected){
-                if (e.mID == i){
-                    h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
-
-                }
-            }
-
-            Log.println(Log.ASSERT, "SearchAdapter", "Position: " + position + " holder isClicked: " + h.clicked + " Title: " + e.mText);
-
+            
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
@@ -124,8 +123,8 @@ public class SearchAdapter extends RecyclerView.Adapter {
                 .replaceAll("\\s+", "").toLowerCase(), "drawable", context.getPackageName());
     }
 
-    public void setSelected(ArrayList<Integer> s){
-        mSelected = s;
+    public void setSelected(ArrayList<Integer> s) {
+        mSelected = (ArrayList)s.clone();
     }
 
     public void setOnEntityClicked(OnEntityClickListener e) {
@@ -133,7 +132,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnEntityClickListener {
-        void onClicked(int position);
+        void onClicked(int position, SearchViewHolder holder);
     }
 
 }

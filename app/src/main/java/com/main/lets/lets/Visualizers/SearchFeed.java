@@ -6,6 +6,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
 import com.main.lets.lets.Adapters.SearchAdapter;
+import com.main.lets.lets.Holders.SearchViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 
@@ -67,7 +68,7 @@ public class SearchFeed extends Client {
             SearchAdapter s = new SearchAdapter(mActivity, activeFeed, active);
             s.setOnEntityClicked(new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position) {
+                public void onClicked(int position, SearchViewHolder h) {
                     try {
                         Entity e = new Entity(activeFeed.getJSONObject(position));
                         e.loadDetailActivity(mActivity, ShallonCreamerIsATwat, mID);

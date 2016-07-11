@@ -1,6 +1,5 @@
 package com.main.lets.lets.Visualizers;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
@@ -15,6 +14,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
@@ -38,16 +38,18 @@ import cz.msebera.android.httpclient.Header;
  */
 public class EventDetailFeed extends Client {
     EventDetailAdapter mEventAdapter;
+    ArrayList<JSONObject> mUsers;
     String ShallonCreamerIsATwat;
     AppCompatActivity mActivity;
     ArrayList<String> mComments;
+    ArrayList<String> mUserTags;
     RecyclerView mRecyclerView;
-    ArrayList<String> mUsers;
     int mID;
 
     public EventDetailFeed(AppCompatActivity a, RecyclerView r, String token, int id) {
         ShallonCreamerIsATwat = token;
         mComments = new ArrayList<>();
+        mUserTags = new ArrayList<>();
         mUsers = new ArrayList<>();
         mRecyclerView = r;
         mActivity = a;
@@ -71,7 +73,7 @@ public class EventDetailFeed extends Client {
                     mEventAdapter.clearFeed();
 
                     try {
-                        for (String s : mUsers)
+                        for (String s : mUserTags)
                             mEventAdapter.addElement(new Entity(new JSONObject(s)).mText);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -89,7 +91,7 @@ public class EventDetailFeed extends Client {
                         for (String s : mComments) {
                             Entity comment = new Entity(new JSONObject(s));
 
-                            for (String u : mUsers) {
+                            for (String u : mUserTags) {
                                 Entity user = new Entity(new JSONObject(u));
                                 if (comment.mID == user.mID) {
                                     mEventAdapter.addElement(user.mText + ":\n" + comment.mText);
@@ -113,8 +115,8 @@ public class EventDetailFeed extends Client {
                 public void onClicked(int position) {
                     if (mEventAdapter.type == EventDetailAdapter.ViewType.USERS) {
                         Intent intent = new Intent(mActivity, UserDetailActivity.class);
+                        intent.putExtra("JSON", mUsers.get(position).toString());
                         intent.putExtra("token", ShallonCreamerIsATwat);
-                        intent.putExtra("JSON", mUsers.get(position));
                         mActivity.startActivity(intent);
                     }
                 }
@@ -145,7 +147,7 @@ public class EventDetailFeed extends Client {
                         String s = "";
 
                         for (int i = 0; i < json.length(); i++) {
-                            mUsers.add(json.getJSONObject(i).toString());
+                            mUserTags.add(json.getJSONObject(i).toString());
                             mEventAdapter.addElement(new Entity(json.getJSONObject(i)).mText);
 
                             if (new Entity(json.getJSONObject(i)).mID == mID) {
@@ -164,6 +166,8 @@ public class EventDetailFeed extends Client {
 
 
                         }
+
+                        loadUserDetails(0);
 
                         mEventAdapter.getmMainHolder().mAttendance.setText(s);
 
@@ -195,10 +199,38 @@ public class EventDetailFeed extends Client {
 
     }
 
+    public void loadUserDetails(final int index) {
+        if(index >= mUserTags.size())
+            return;
+
+        try {
+            Calls.getProfileByID(new Entity(new JSONObject(mUserTags.get(index))).mID,
+                    ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    try {
+                        Log.println(Log.ASSERT, "EventDetailFeed", response.getJSONObject(0).toString());
+                        mUsers.add(response.getJSONObject(0));
+                        loadUserDetails(index + 1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            });
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public class ActionDialogFragment extends DialogFragment {
-        CharSequence[] memberActions = {"Invite User", "Invite Group", "Comment", "Show on Map",
+        CharSequence[] memberActions = {"Invite", "Comment", "Show on Map",
                 "Leave Event"};
-        CharSequence[] hostActions = {"Invite User", "Invite Group", "Comment", "Show on Map",
+        CharSequence[] hostActions = {"Invite", "Comment", "Show on Map",
                 "Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
 
         CharSequence[] guestActions = {"Join Event"};
@@ -230,7 +262,6 @@ public class EventDetailFeed extends Client {
                     list = guestActions;
 
                     break;
-
                 default:
                     list = guestActions;
 
@@ -262,13 +293,16 @@ public class EventDetailFeed extends Client {
 
             switch (i) {
                 case 0:
+                    Intent intent = new Intent(mActivity, InviteActivity.class);
+                    intent.putExtra("invite_id", event.getmEventID());
+                    intent.putExtra("token", ShallonCreamerIsATwat);
+                    intent.putExtra("entities", "Friends:Groups");
+                    intent.putExtra("mode", "UG2EFE");
+                    intent.putExtra("id", mID);
+                    mActivity.startActivity(intent);
 
                     break;
                 case 1:
-
-                    break;
-
-                case 2:
                     builder = new SimpleDialog.Builder() {
 
                         @Override
@@ -288,7 +322,7 @@ public class EventDetailFeed extends Client {
                                                               org.json.JSONObject response) {
                                             String comment = "";
                                             try {
-                                                for (String s : mUsers) {
+                                                for (String s : mUserTags) {
                                                     Entity entity = new Entity(new JSONObject(s));
                                                     if (mID == entity.mID)
                                                         comment = entity.mText + ":\n" + e.getText().toString();

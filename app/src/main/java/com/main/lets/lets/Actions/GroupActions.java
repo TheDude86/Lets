@@ -515,7 +515,7 @@ public class GroupActions implements View.OnClickListener {
                             .getJSONObject(0).getInt("group_id"));
                     intent.putExtra("token", mFeed.ShallonCreamerIsATwat);
                     intent.putExtra("entities", "Friends");
-                    intent.putExtra("mode", "Group");
+                    intent.putExtra("mode", "U2GFG");
                     intent.putExtra("id", mFeed.mID);
                     mFeed.mActivity.startActivity(intent);
 
@@ -525,8 +525,8 @@ public class GroupActions implements View.OnClickListener {
                     eventIntent.putExtra("invite_id", mJSON.getJSONArray("Group_info")
                             .getJSONObject(0).getInt("group_id"));
                     eventIntent.putExtra("token", mFeed.ShallonCreamerIsATwat);
-                    eventIntent.putExtra("entities", "Events:Groups");
-                    eventIntent.putExtra("mode", "Event");
+                    eventIntent.putExtra("entities", "Events");
+                    eventIntent.putExtra("mode", "G2EFG");
                     eventIntent.putExtra("id", mFeed.mID);
                     mFeed.mActivity.startActivity(eventIntent);
 

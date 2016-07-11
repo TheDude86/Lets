@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
@@ -14,6 +16,7 @@ import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.Adapters.UserDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +32,11 @@ import cz.msebera.android.httpclient.Header;
 public class UserDetailFeed extends Client {
     ArrayList<String> mFriends, mFriendTags, mGroups, mEvents, mEventTags, mGroupTags;
 
+    enum Relationship {NONE, REQUEST, FRIEND, OWNER}
+
     enum Viewing {EVENT, GROUP, USER}
 
+    Relationship mRelationship = Relationship.NONE;
     Viewing active = Viewing.USER;
     String ShallonCreamerIsATwat;
     UserDetailAdapter mAdapter;
@@ -61,10 +67,59 @@ public class UserDetailFeed extends Client {
             e.printStackTrace();
         }
 
+        mActivity.findViewById(R.id.add_friend).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (mRelationship) {
+                    case NONE:
+                        try {
+                            Calls.sendFriendRequest(mJSON.getInt("User_ID"), ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    ((TextView) mActivity.findViewById(R.id.add_text)).setText("Friend request sent");
+                                    mRelationship = Relationship.REQUEST;
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        break;
+                    case REQUEST:
+                        //Dialog to revoke friend request
+
+                        break;
+                    case FRIEND:
+                        //Hide
+
+                        break;
+                    case OWNER:
+                        //Load Edit Profile Activity
+                }
+            }
+        });
+
+        mActivity.findViewById(R.id.options).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.println(Log.ASSERT, "UserDetailFeed", "Add more user commands");
+            }
+        });
+
     }
 
     @Override
     public void draw(JSONObject j) {
+        try {
+            if (mJSON.getInt("User_ID") == mID) {
+                mRelationship = Relationship.OWNER;
+                ((TextView) mActivity.findViewById(R.id.add_text)).setText("Edit Profile");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         mRecyclerView.setLayoutManager(
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         mAdapter = new UserDetailAdapter(mActivity, mJSON);
@@ -211,7 +266,7 @@ public class UserDetailFeed extends Client {
     }
 
     public void loadGroupDetails(final int index) {
-        if(index >= mGroupTags.size())
+        if (index >= mGroupTags.size())
             return;
 
         try {
@@ -358,9 +413,24 @@ public class UserDetailFeed extends Client {
                 for (int i = 0; i < response.length(); i++) {
                     try {
 
-                        if (response.getJSONObject(i).getBoolean("status"))
+
+                        if (response.getJSONObject(i).getBoolean("status")) {
                             //Loads the friends into a temporary array list
                             mFriendTags.add(response.getJSONObject(i).toString());
+
+                            //Removes the add friend button if the user is a friend of the logged in user
+                            if (new Entity(response.getJSONObject(i)).mID == mID) {
+                                mActivity.findViewById(R.id.add_friend).setVisibility(View.GONE);
+                                mRelationship = Relationship.FRIEND;
+                            }
+                        } else {
+                            //Removes the add friend button if the user is a friend of the logged in user
+                            if (new Entity(response.getJSONObject(i)).mID == mID) {
+                                ((TextView) mActivity.findViewById(R.id.add_text)).setText("Friend request sent");
+                                mRelationship = Relationship.REQUEST;
+                            }
+                        }
+
 
                     } catch (org.json.JSONException e) {
                         e.printStackTrace();

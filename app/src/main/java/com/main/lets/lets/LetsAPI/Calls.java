@@ -340,6 +340,14 @@ public class Calls {
         post("event/inviteUser", params, jsonHttpResponseHandler);
     }
 
+    public static void sendFriendRequest(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("reciever_id", userID);
+        client.addHeader("Authorization", token);
+
+        post("user/sendFriendRequest", params, jsonHttpResponseHandler);
+    }
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 

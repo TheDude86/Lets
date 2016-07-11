@@ -36,7 +36,8 @@ public class SearchActivity extends AppCompatActivity {
 
         //The Search bar is for users to input strings and search for users, events, and groups
         SearchView searchView = (SearchView) findViewById(R.id.search);
-
+        searchView.setIconifiedByDefault(false);
+        searchView.requestFocus();
 
         //Searches the database for the inputted string and displays the active feed and the results
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
