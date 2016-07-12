@@ -50,7 +50,7 @@ public class InviteFeed extends Client {
      * - U2GFG: "User to Group from Group" (Invite users to a group from the group detail activity)
      */
     public enum Mode {
-        UG2EFE, G2EFG, U2GFG
+        UG2EFE, G2EFG, U2GFG, U2CFE
     }
 
     String ShallonCreamerIsATwat;
@@ -117,6 +117,21 @@ public class InviteFeed extends Client {
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
 
+                            }
+                        });
+                    }
+
+                    mActivity.finish();
+
+                } else if (mActive == Mode.U2CFE){
+
+                    for (final Integer i : mSelectedUsers) {
+                        Calls.addCohost(mInviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers,
+                                                  JSONObject response) {
+                                super.onSuccess(statusCode, headers, response);
                             }
                         });
                     }

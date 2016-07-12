@@ -534,11 +534,6 @@ public class GroupActions implements View.OnClickListener {
 
             }
 
-            if (builder != null) {
-                fragment = DialogFragment.newInstance(builder);
-                fragment.show(mFeed.mActivity.getSupportFragmentManager(), null);
-
-            }
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -348,6 +348,15 @@ public class Calls {
         post("user/sendFriendRequest", params, jsonHttpResponseHandler);
     }
 
+    public static void addCohost(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+        RequestParams params = new RequestParams();
+        params.put("new_cohost_id", userID);
+        params.put("event_id", eventID);
+        client.addHeader("Authorization", token);
+
+        post("event/addCohost", params, jsonHttpResponseHandler);
+    }
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 

@@ -61,7 +61,11 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                         getIntent().getIntExtra("invite_id", -1));
 
                 break;
+            case "U2CFE":
+                mInviteFeed = new InviteFeed(this, InviteFeed.Mode.U2CFE, ShallonCreamerIsATwat, mID,
+                                             getIntent().getIntExtra("invite_id", -1));
 
+                break;
         }
 
         TextView right = (TextView) findViewById(R.id.entity_right);
