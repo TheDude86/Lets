@@ -208,6 +208,8 @@ public class EventDetailFeed extends Client {
         if (index >= mUserTags.size())
             return;
 
+        Log.println(Log.ASSERT, "EventDetailFeed", "Test");
+
         try {
             Calls.getProfileByID(new Entity(new JSONObject(mUserTags.get(index))).mID,
                                  ShallonCreamerIsATwat, new JsonHttpResponseHandler() {

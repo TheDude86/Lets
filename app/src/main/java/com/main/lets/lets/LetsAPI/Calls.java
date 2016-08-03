@@ -29,15 +29,31 @@ public class Calls {
      * links get updated then it is easy to update the client.
      */
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+    protected static final String TransferOwnership = "group/transferOwnership";
+    protected static final String SendFriendRequest = "user/sendFriendRequest";
+    protected static final String InviteGroupToEvent = "event/inviteGroup";
     protected static final String GetCloseEvents = "event/getCloseEvents";
     protected static final String GetProfileByID = "user/getProfileById";
+    protected static final String GetGroupComments = "group/getComments";
+    protected static final String InviteUserToEvent = "event/inviteUser";
+    protected static final String AddGroupComment = "group/addComment";
+    protected static final String GroupRemoveUser = "group/removeUser";
+    protected static final String GroupInviteUser = "group/inviteUser";
+    protected static final String EventAddComment = "event/addComment";
     protected static final String GetEventById = "event/getEventById";
     protected static final String GetMyProfile = "user/getMyProfile";
     protected static final String GetAttended = "user/getAttended";
     protected static final String LoginSecure = "user/loginSecure";
+    protected static final String EditProfile = "user/editProfile";
     protected static final String GetGroupInfo = "group/getInfo";
     protected static final String GetFriends = "user/getFriends";
+    protected static final String AddCohost = "event/addCohost";
     protected static final String GetGroups = "user/getGroups";
+    protected static final String CreateEvent = "event/create";
+    protected static final String GroupDelete = "group/delete";
+    protected static final String AddAdmin = "group/addAdmin";
+    protected static final String LeaveGroup = "group/leave";
+    protected static final String SearchName = "search/name";
 
     protected static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -109,7 +125,7 @@ public class Calls {
 
         RequestParams params = new RequestParams();
         client.addHeader("Authorization", token);
-        params.put("user_id", id);
+        params.put("search_user_id", id);
         post(GetProfileByID, params, jsonHttpResponseHandler);
 
     }
@@ -215,7 +231,7 @@ public class Calls {
         params.put("name", mUserInfo.get("name"));
         params.put("bio", mUserInfo.get("bio"));
         client.addHeader("Authorization", token);
-        post("user/editProfile", params, jsonHttpResponseHandler);
+        post(EditProfile, params, jsonHttpResponseHandler);
     }
 
     public static void createEvent(HashMap<String, String> mMap, String token,
@@ -231,7 +247,7 @@ public class Calls {
         params.put("start_time", mMap.get("Start Time"));
         client.addHeader("Authorization", token);
 
-        post("event/create", params, jsonHttpResponseHandler);
+        post(CreateEvent, params, jsonHttpResponseHandler);
 
     }
 
@@ -240,7 +256,7 @@ public class Calls {
         params.put("group_id", id);
         client.addHeader("Authorization", token);
 
-        post("group/getComments", params, jsonHttpResponseHandler);
+        post(GetGroupComments, params, jsonHttpResponseHandler);
     }
 
     public static void addGroupComment(int id, String s, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -249,7 +265,7 @@ public class Calls {
         params.put("message", s);
         client.addHeader("Authorization", token);
 
-        post("group/addComment", params, jsonHttpResponseHandler);
+        post(AddGroupComment, params, jsonHttpResponseHandler);
     }
 
     public static void removeUserFromGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -258,7 +274,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("group/removeUser", params, jsonHttpResponseHandler);
+        post(GroupRemoveUser, params, jsonHttpResponseHandler);
     }
 
     public static void leaveGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -266,7 +282,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("group/leave", params, jsonHttpResponseHandler);
+        post(LeaveGroup, params, jsonHttpResponseHandler);
     }
 
     public static void transferOwner(int groupID, int newOwnerID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -275,7 +291,7 @@ public class Calls {
         params.put("new_owner_id", newOwnerID);
         client.addHeader("Authorization", token);
 
-        post("group/transferOwnership", params, jsonHttpResponseHandler);
+        post(TransferOwnership, params, jsonHttpResponseHandler);
     }
 
     public static void addAdmin(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -284,7 +300,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("group/addAdmin", params, jsonHttpResponseHandler);
+        post(AddAdmin, params, jsonHttpResponseHandler);
     }
 
     public static void joinGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -293,7 +309,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("group/inviteUser", params, jsonHttpResponseHandler);
+        post(GroupInviteUser, params, jsonHttpResponseHandler);
     }
 
     public static void addComment(int eventID, String token, String message, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -302,7 +318,7 @@ public class Calls {
         params.put("message", message);
         client.addHeader("Authorization", token);
 
-        post("event/addComment", params, jsonHttpResponseHandler);
+        post(EventAddComment, params, jsonHttpResponseHandler);
     }
 
     public static void deleteGroup(int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -310,7 +326,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("group/delete", params, jsonHttpResponseHandler);
+        post(GroupDelete, params, jsonHttpResponseHandler);
     }
 
     public static void search(String text, int limit, int offset, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -319,7 +335,7 @@ public class Calls {
         params.put("limit", limit);
         params.put("offset", offset);
 
-        post("search/name", params, jsonHttpResponseHandler);
+        post(SearchName, params, jsonHttpResponseHandler);
     }
 
     public static void inviteGroupToEvent(int eventID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -328,7 +344,7 @@ public class Calls {
         params.put("group_id", groupID);
         client.addHeader("Authorization", token);
 
-        post("event/inviteGroup", params, jsonHttpResponseHandler);
+        post(InviteGroupToEvent, params, jsonHttpResponseHandler);
     }
 
     public static void inviteUserToEvent(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
@@ -337,24 +353,24 @@ public class Calls {
         params.put("invite_user_id", userID);
         client.addHeader("Authorization", token);
 
-        post("event/inviteUser", params, jsonHttpResponseHandler);
+        post(InviteUserToEvent, params, jsonHttpResponseHandler);
     }
 
-    public static void sendFriendRequest(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void sendFriendRequest(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("reciever_id", userID);
         client.addHeader("Authorization", token);
 
-        post("user/sendFriendRequest", params, jsonHttpResponseHandler);
+        post(SendFriendRequest, params, jsonHttpResponseHandler);
     }
 
-    public static void addCohost(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler){
+    public static void addCohost(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("new_cohost_id", userID);
         params.put("event_id", eventID);
         client.addHeader("Authorization", token);
 
-        post("event/addCohost", params, jsonHttpResponseHandler);
+        post(AddCohost, params, jsonHttpResponseHandler);
     }
 
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {

@@ -99,12 +99,12 @@ public class UserDetailFeed extends Client {
             }
         });
 
-        mActivity.findViewById(R.id.options).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.println(Log.ASSERT, "UserDetailFeed", "Add more user commands");
-            }
-        });
+//        mActivity.findViewById(R.id.options).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.println(Log.ASSERT, "UserDetailFeed", "Add more user commands");
+//            }
+//        });
 
     }
 
