@@ -1,26 +1,25 @@
 package com.main.lets.lets.Activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dd.CircularProgressButton;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
@@ -28,14 +27,12 @@ import com.rey.material.app.DialogFragment;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.app.TimePickerDialog;
 import com.rey.material.widget.Slider;
-import com.rey.material.widget.Switch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -47,7 +44,10 @@ public class EventCreateActivity extends AppCompatActivity {
     //HashMap only stores strings because it is used to create the post request and all params
     //must be strings
     private HashMap<String, String> mMap;
-    String ShallonCreamerIsATwat;
+    private String ShallonCreamerIsATwat;
+    private EditText mLocationLabel;
+    private EditText mLocation;
+    private LatLng mCoords;
     private Calendar mCalendar;
 
     @Override
@@ -55,22 +55,18 @@ public class EventCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_create);
 
-        //Getting all of the views from the XML file
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager()
-                .findFragmentById(R.id.autocomplete_fragment);
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         final EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
+        mLocationLabel = (EditText) findViewById(R.id.locationLabel);
         ShallonCreamerIsATwat = getIntent().getStringExtra("token");
         final EditText title = (EditText) findViewById(R.id.title);
         final EditText date = (EditText) findViewById(R.id.date);
         final EditText time = (EditText) findViewById(R.id.time);
         Slider duration = (Slider) findViewById(R.id.duration);
+        mLocation = (EditText) findViewById(R.id.location);
         mCalendar = Calendar.getInstance();
-
-
 
         /*
          *Initializing the HashMap that contains all of the following information:
@@ -120,36 +116,11 @@ public class EventCreateActivity extends AppCompatActivity {
             }
         });
 
-        //The listener for Google's search widget when the user has searched for a place
-        // and selected one
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-
-            /**
-             * When the user select's a location from the search widget, the HashMap is updated here
-             * with new Latitude, Longitude, and Map Title values
-             * @param place the parameter from the widget when it closes containing all of the
-             *              place's
-             *              important information
-             */
+        mLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPlaceSelected(Place place) {
-                //If the map has old values stored, remove them all
-                if (mMap.containsKey("Latitude")) {
-                    mMap.remove("Latitude");
-                    mMap.remove("Longitude");
-                    mMap.remove("Map Title");
-                }
+            public void onClick(View view) {
+                onPickButtonClick();
 
-                //Values about the event's location
-                mMap.put("Latitude", place.getLatLng().latitude + "");
-                mMap.put("Longitude", place.getLatLng().longitude + "");
-                mMap.put("Map Title", place.getName().toString());
-
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
             }
         });
 
@@ -371,6 +342,7 @@ public class EventCreateActivity extends AppCompatActivity {
                 }
 
                 //Checks to see if the user has written a title
+
                 if (title.getText().toString().equals("")) {
                     create.setProgress(0);
                     return;
@@ -378,7 +350,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
                 //Checks to see if the user has selected a location (Only have to check "Latitude"
                 //because "Latitude" will never be put without "Longitude" and "Map Title"
-                if (!mMap.containsKey("Latitude")) {
+                if (mCoords == null || mLocationLabel.getText().toString().equals("")) {
                     create.setProgress(0);
                     return;
                 }
@@ -394,6 +366,10 @@ public class EventCreateActivity extends AppCompatActivity {
                 mMap.put("Start Time",
                          new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mCalendar.getTime()));
 
+                mMap.put("Latitude", mCoords.latitude + "");
+                mMap.put("Longitude", mCoords.longitude + "");
+
+                mMap.put("Map Title", mLocationLabel.getText().toString());
 
                 Calls.createEvent(mMap, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                     @Override
@@ -439,6 +415,48 @@ public class EventCreateActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode, Intent data) {
+
+        if (requestCode == 0
+                && resultCode == Activity.RESULT_OK) {
+
+            // The user has selected a place. Extract the name and address.
+            final Place place = PlacePicker.getPlace(data, this);
+
+            final CharSequence name = place.getName();
+            final CharSequence address = place.getAddress();
+            String attributions = PlacePicker.getAttributions(data);
+            if (attributions == null) {
+                attributions = "";
+            }
+
+            mLocationLabel.setText(name);
+            mCoords = place.getLatLng();
+            mLocation.setText(address);
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public void onPickButtonClick() {
+        // Construct an intent for the place picker
+        try {
+            PlacePicker.IntentBuilder intentBuilder =
+                    new PlacePicker.IntentBuilder();
+            Intent intent = intentBuilder.build(this);
+            // Start the intent by requesting a result,
+            // identified by a request code.
+            startActivityForResult(intent, 0);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            // ...
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // ...
+        }
+    }
 
     public static void post(String url, RequestParams params,
                             AsyncHttpResponseHandler responseHandler) {

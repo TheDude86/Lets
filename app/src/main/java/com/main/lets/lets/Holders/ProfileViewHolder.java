@@ -209,6 +209,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                     switch (view) {
                         case FRIENDS:
                             for (String l : mDetailList) {
+                                Log.println(Log.ASSERT, "ProfileViewHolder", l);
                                 if (new User(new JSONObject(l)).getUserID() == id)
                                     s = l;
 

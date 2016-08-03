@@ -111,6 +111,7 @@ public class ProfileFeed extends Client {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,
                                               org.json.JSONObject response) {
+
                             try {
                                 ShallonCreamerIsATwat += response.getString("accessToken");
                                 mUserInfo.put("userID", response.getInt("user_id"));
@@ -153,12 +154,14 @@ public class ProfileFeed extends Client {
                  */
                 @Override
                 public void onSuccess(int statusCode, Header[] headers,
-                                      org.json.JSONArray response) {
+                                      JSONObject response) {
                     try {
+
                         //Saving the user's info locally
-                        mUser = response.getJSONObject(0);
+                        mUser = response.getJSONArray("info").getJSONObject(0);
+                        Log.println(Log.ASSERT, "ProfileFeed", mUser.toString());
                         ArrayList<String> l = new ArrayList<>();
-                        l.add(response.getJSONObject(0).toString());
+                        l.add(mUser.toString());
                         //Passes the user's info to the profile adapter
                         mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
                                 (int) mUserInfo.get("userID"));

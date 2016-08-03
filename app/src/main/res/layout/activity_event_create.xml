@@ -140,25 +140,15 @@
                 android:text="Where is it?"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <fragment
-                android:id="@+id/autocomplete_fragment"
-                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-
-                android:layout_below="@+id/textView8"
-                tools:layout="@layout/place_autocomplete_fragment" />
-
             <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/autocomplete_fragment"
                 android:layout_marginTop="50dp"
                 android:text="@string/descriptionText"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_below="@+id/locationLabel"/>
 
             <EditText
                 android:id="@+id/description"
@@ -209,6 +199,37 @@
                 app:cpb_textComplete="Complete"
                 app:cpb_textError="Something went wrong"
                 app:cpb_textIdle="Create Event" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/location"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_below="@+id/textView8"
+                android:layout_alignParentStart="true"
+                android:layout_alignEnd="@+id/description"
+                android:text="Select Location"/>
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/locationLabel"
+                android:layout_below="@+id/location"
+                android:layout_alignParentStart="true"
+                android:layout_alignEnd="@+id/location"
+                android:text="Location Label"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="(This can be anything you want)"
+                android:id="@+id/textView25"
+                android:layout_below="@+id/locationLabel"
+                android:layout_alignEnd="@+id/locationLabel"/>
 
 
         </RelativeLayout>
