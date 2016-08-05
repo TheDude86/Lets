@@ -1,19 +1,32 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.microsoft.azure.storage.*;
+import com.microsoft.azure.storage.blob.*;
+
 import com.rey.material.app.Dialog;
 import com.rey.material.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
@@ -28,6 +41,11 @@ public class Calls {
      * code in other classes and also place all of the URLs in the same place in the code so if any
      * links get updated then it is easy to update the client.
      */
+    public static final String storageConnectionString =
+            "DefaultEndpointsProtocol=http;" +
+                    "AccountName=your_storage_account;" +
+                    "AccountKey=your_storage_account_key";
+
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
     protected static final String TransferOwnership = "group/transferOwnership";
     protected static final String SendFriendRequest = "user/sendFriendRequest";
@@ -377,4 +395,85 @@ public class Calls {
         client.get(url, fileAsyncHttpResponseHandler);
 
     }
+
+    // usually, subclasses of AsyncTask are declared inside the activity class.
+    // that way, you can easily modify the UI thread from here
+    private class DownloadTask extends AsyncTask<String, Integer, String> {
+
+        private Context context;
+        private PowerManager.WakeLock mWakeLock;
+
+        public DownloadTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... sUrl) {
+            InputStream input = null;
+            OutputStream output = null;
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(sUrl[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+                // expect HTTP 200 OK, so we don't mistakenly save error report
+                // instead of the file
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return "Server returned HTTP " + connection.getResponseCode()
+                            + " " + connection.getResponseMessage();
+                }
+
+                // this will be useful to display download percentage
+                // might be -1: server did not report the length
+                int fileLength = connection.getContentLength();
+
+                // download the file
+                input = connection.getInputStream();
+                output = new FileOutputStream("/sdcard/file_name.extension");
+
+                byte data[] = new byte[4096];
+                long total = 0;
+                int count;
+                while ((count = input.read(data)) != -1) {
+                    // allow canceling with back button
+                    if (isCancelled()) {
+                        input.close();
+                        return null;
+                    }
+                    total += count;
+                    // publishing the progress....
+                    if (fileLength > 0) // only if total length is known
+                        publishProgress((int) (total * 100 / fileLength));
+                    output.write(data, 0, count);
+                }
+            } catch (Exception e) {
+                return e.toString();
+            } finally {
+                try {
+                    if (output != null)
+                        output.close();
+                    if (input != null)
+                        input.close();
+                } catch (IOException ignored) {
+                }
+
+                if (connection != null)
+                    connection.disconnect();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            mWakeLock.release();
+
+            if (result != null)
+                Toast.makeText(context,"Download error: "+result, Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 }

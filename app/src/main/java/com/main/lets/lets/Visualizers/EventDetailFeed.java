@@ -215,11 +215,9 @@ public class EventDetailFeed extends Client {
                                  ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,
-                                              JSONArray response) {
+                                              JSONObject response) {
                             try {
-                                Log.println(Log.ASSERT, "EventDetailFeed",
-                                            response.getJSONObject(0).toString());
-                                mUsers.add(response.getJSONObject(0));
+                                mUsers.add(response.getJSONArray("info").getJSONObject(0));
                                 loadUserDetails(index + 1);
                             } catch (JSONException e) {
                                 e.printStackTrace();

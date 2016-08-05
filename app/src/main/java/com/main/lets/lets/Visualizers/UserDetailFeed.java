@@ -474,9 +474,9 @@ public class UserDetailFeed extends Client {
             Entity e = new Entity(new JSONObject(mFriendTags.get(index)));
             Calls.getProfileByID(e.mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     try {
-                        mFriends.add(response.getJSONObject(0).toString());
+                        mFriends.add(response.getJSONArray("info").getJSONObject(0).toString());
                         loadFriendDetails(index + 1);
                     } catch (JSONException e1) {
                         e1.printStackTrace();

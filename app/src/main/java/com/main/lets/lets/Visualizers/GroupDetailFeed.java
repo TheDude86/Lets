@@ -193,9 +193,9 @@ public class GroupDetailFeed extends Client {
                     new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,
-                                              org.json.JSONArray response) {
+                                              org.json.JSONObject response) {
                             try {
-                                mMembers.add(response.getJSONObject(0).toString());
+                                mMembers.add(response.getJSONArray("info").getJSONObject(0).toString());
                                 loadUserDetails(position + 1);
                             } catch (JSONException e) {
                                 e.printStackTrace();

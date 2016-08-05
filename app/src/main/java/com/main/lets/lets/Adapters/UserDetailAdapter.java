@@ -15,11 +15,17 @@ import com.main.lets.lets.Holders.UserDetailViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -117,20 +123,7 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
             });
             mHolder.mInterests.setText("Fix this too");
 
-            Calls.loadImage(json.getString("Profile_Picture"), new FileAsyncHttpResponseHandler(mActivity) {
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                    Log.println(Log.ASSERT, "UserDetailAdapter", "Test failed");
-
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, File response) {
-                    Bitmap myBitmap = BitmapFactory.decodeFile(response.getAbsolutePath());
-                    mHolder.mPic.setImageBitmap(myBitmap);
-                }
-            });
-
+            Picasso.with(mActivity).load(json.getString("Profile_Picture")).into(mHolder.mPic);
 
         } catch (JSONException e) {
             e.printStackTrace();

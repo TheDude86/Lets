@@ -159,9 +159,9 @@ public class ProfileFeed extends Client {
 
                         //Saving the user's info locally
                         mUser = response.getJSONArray("info").getJSONObject(0);
-                        Log.println(Log.ASSERT, "ProfileFeed", mUser.toString());
                         ArrayList<String> l = new ArrayList<>();
                         l.add(mUser.toString());
+
                         //Passes the user's info to the profile adapter
                         mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
                                 (int) mUserInfo.get("userID"));

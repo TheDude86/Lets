@@ -169,7 +169,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         //initializing the view holder
         mDemoHolder = new ProfileViewHolder(view, mActivity, ShallonCreamerIsATwat, mID);
 
-
         //Setting the onClicked listeners for the buttons of the profile feed, the buttons allow
         //the user to choose which feed they want to search through and when clicked, that feed
         //becomes the active feed in the Entity Adapter
@@ -406,10 +405,10 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                      * @param response JSON array object with all of user's info
                      */
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
                             //Adds the user info to the friends array list
-                            mFriends.add(response.getJSONObject(0).toString());
+                            mFriends.add(response.getJSONArray("info").getJSONObject(0).toString());
                             //Recursively calls itself again and iterates through the index by one
                             loadFriendsHelper(friends, index + 1);
 
