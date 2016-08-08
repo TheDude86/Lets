@@ -3,6 +3,7 @@ package com.main.lets.lets.Activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
                 try {
                     if (response.has("accessToken")) {
+                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+                        preferences.edit().putInt("UserID", response.getInt("user_id"));
+                        preferences.edit().commit();
+
                         mMap.put("token", response.getString("accessToken"));
                         mMap.put("userID", response.getInt("user_id"));
                         mProfileFeed.updateToken("Bearer " + response.getString("accessToken"));

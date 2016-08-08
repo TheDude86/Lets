@@ -118,9 +118,17 @@ public class EventDetailFeed extends Client {
                 public void onClicked(int position) {
                     if (mEventAdapter.type == EventDetailAdapter.ViewType.USERS) {
                         Intent intent = new Intent(mActivity, UserDetailActivity.class);
-                        intent.putExtra("JSON", mUsers.get(position).toString());
-                        intent.putExtra("token", ShallonCreamerIsATwat);
-                        mActivity.startActivity(intent);
+
+                        try {
+
+                            intent.putExtra("UserID", (new JSONObject(mUserTags.get(position)))
+                                        .getInt("user_id"));
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            mActivity.startActivity(intent);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });

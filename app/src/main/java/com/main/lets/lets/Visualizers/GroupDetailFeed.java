@@ -160,9 +160,15 @@ public class GroupDetailFeed extends Client {
                 @Override
                 public void onClick(int position) {
                     Intent intent = new Intent(mActivity, UserDetailActivity.class);
-                    intent.putExtra("JSON", mMembers.get(position));
-                    intent.putExtra("token", ShallonCreamerIsATwat);
-                    mActivity.startActivity(intent);
+
+                    try {
+                        intent.putExtra("UserID", mMemberTags.get(position).getInt("user_id"));
+                        intent.putExtra("token", ShallonCreamerIsATwat);
+                        mActivity.startActivity(intent);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
 

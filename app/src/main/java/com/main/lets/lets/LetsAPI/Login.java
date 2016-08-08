@@ -2,6 +2,7 @@ package com.main.lets.lets.LetsAPI;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -106,6 +107,11 @@ public class Login {
             e.printStackTrace();
         }
 
+        SharedPreferences preferences = a.getPreferences(Context.MODE_PRIVATE);
+        preferences.edit().putString("email", email);
+        preferences.edit().putString("password", password);
+        preferences.edit().commit();
+
     }
 
     /**
@@ -125,6 +131,11 @@ public class Login {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        SharedPreferences preferences = a.getPreferences(Context.MODE_PRIVATE);
+        preferences.edit().remove("password");
+        preferences.edit().remove("email");
+        preferences.edit().commit();
     }
 
 }

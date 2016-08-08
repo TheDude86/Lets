@@ -202,61 +202,34 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         e.setOnEntityClickListener(new EntityAdapter.OnEntityClickListener() {
             @Override
             public void onClicked(int id) {
-                try {
-                    Intent intent;
-                    String s = null;
+                Intent intent;
+                String s = null;
 
-                    switch (view) {
-                        case FRIENDS:
-                            for (String l : mDetailList) {
-                                Log.println(Log.ASSERT, "ProfileViewHolder", l);
-                                if (new User(new JSONObject(l)).getUserID() == id)
-                                    s = l;
+                switch (view) {
+                    case FRIENDS:
+                        intent = new Intent(mActivity, UserDetailActivity.class);
+                        intent.putExtra("token", ShallonCreamerIsATwat);
+                        intent.putExtra("id", mID);
+                        intent.putExtra("UserID", id);
+                        mActivity.startActivityForResult(intent, USER_DETAIL_CODE);
+                        break;
+                    case GROUPS:
 
-                            }
+                        intent = new Intent(mActivity, GroupDetailActivity.class);
+                        intent.putExtra("token", ShallonCreamerIsATwat);
+                        intent.putExtra("id", mID);
+                        intent.putExtra("GroupID", id);
+                        mActivity.startActivity(intent);
 
-                            intent = new Intent(mActivity, UserDetailActivity.class);
-                            intent.putExtra("JSON", s);
-                            intent.putExtra("id", mID);
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            mActivity.startActivityForResult(intent, USER_DETAIL_CODE);
+                        break;
+                    case EVENTS:
+                        intent = new Intent(mActivity, EventDetailActivity.class);
+                        intent.putExtra("token", ShallonCreamerIsATwat);
+                        intent.putExtra("EventID", id);
+                        intent.putExtra("id", mID);
+                        mActivity.startActivityForResult(intent, DETAIL_CODE);
 
-                            break;
-                        case GROUPS:
-                            for (String l : mDetailList) {
-                                if (new Group(new JSONObject(l).getJSONArray("Group_info")
-                                                      .getJSONObject(0)).getGroupID() == id)
-                                    s = l;
-
-                            }
-
-                            intent = new Intent(mActivity, GroupDetailActivity.class);
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            intent.putExtra("id", mID);
-                            intent.putExtra("JSON", s);
-                            mActivity.startActivity(intent);
-
-                            break;
-                        case EVENTS:
-                            for (String l : mDetailList) {
-                                if (new Event(new JSONObject(l).getJSONArray("Event_info")
-                                                      .getJSONObject(0)).getmEventID() == id)
-                                    s = l;
-
-                            }
-
-                            intent = new Intent(mActivity, EventDetailActivity.class);
-                            intent.putExtra("JSON", new JSONObject(s).getJSONArray("Event_info")
-                                    .getJSONObject(0).toString());
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            intent.putExtra("id", mID);
-                            mActivity.startActivityForResult(intent, DETAIL_CODE);
-
-                            break;
-                    }
-
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
+                        break;
                 }
 
             }

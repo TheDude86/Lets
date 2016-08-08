@@ -1,5 +1,6 @@
 package com.main.lets.lets.Activities;
 
+import android.app.ProgressDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -38,42 +39,70 @@ public class GroupDetailActivity extends AppCompatActivity {
                 getIntent().getIntExtra("id", -1));
 
         try {
-            final JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
-            for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") ==
-                        getIntent().getIntExtra("id", -1)) {
-                    findViewById(R.id.layout_join).setVisibility(View.GONE);
-                }
+            if (getIntent().getStringExtra("JSON") != null) {
+                loadActivity(new JSONObject(getIntent().getStringExtra("JSON")));
+
+            } else {
+                final ProgressDialog dialog = ProgressDialog.show(this, "",
+                                                                  "Loading. Please wait...", true);
+                Calls.getGroupInfo(getIntent().getIntExtra("GroupID", -1), new JsonHttpResponseHandler() {
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        try {
+                            loadActivity(response);
+                            dialog.hide();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+
             }
 
-            Calls.getGroupComments(j.getJSONArray("Group_info").getJSONObject(0).getInt("group_id"),
-                    getIntent().getStringExtra("token"), new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers,
-                                              org.json.JSONArray response) {
-                            for (int i = 0; i < response.length(); i++) {
-                                try {
-                                    g.mComments.add(response.getJSONObject(i));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            g.draw(j);
-
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                              JSONObject errorResponse) {
-
-                        }
-
-                    });
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
+
+    public void loadActivity(final JSONObject j) throws JSONException {
+        final GroupDetailFeed g = new GroupDetailFeed(this, getIntent().getStringExtra("token"),
+                                                      getIntent().getIntExtra("id", -1));
+        for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
+            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") ==
+                    getIntent().getIntExtra("id", -1)) {
+                findViewById(R.id.layout_join).setVisibility(View.GONE);
+            }
+        }
+
+        Calls.getGroupComments(j.getJSONArray("Group_info").getJSONObject(0).getInt("group_id"),
+                               getIntent().getStringExtra("token"), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers,
+                                          org.json.JSONArray response) {
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                g.mComments.add(response.getJSONObject(i));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        g.draw(j);
+
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                          JSONObject errorResponse) {
+
+                    }
+
+                });
+    }
+
 }

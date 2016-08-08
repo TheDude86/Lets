@@ -175,7 +175,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setFriendsClicked(new ProfileViewHolder.OnFriendsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mFriendTags, mFriends, EntityAdapter.Viewing.FRIENDS);
+                mDemoHolder.loadFeed(mFriendTags, mFriendTags, EntityAdapter.Viewing.FRIENDS);
             }
 
         });
@@ -183,7 +183,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setGroupsClicked(new ProfileViewHolder.OnGroupsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mGroupTags, mGroups, EntityAdapter.Viewing.GROUPS);
+                mDemoHolder.loadFeed(mGroupTags, mGroupTags, EntityAdapter.Viewing.GROUPS);
             }
 
         });
@@ -191,7 +191,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setEventsClicked(new ProfileViewHolder.OnEventsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mEventTags, mEvents, EntityAdapter.Viewing.EVENTS);
+                mDemoHolder.loadFeed(mEventTags, mEventTags, EntityAdapter.Viewing.EVENTS);
             }
         });
 
