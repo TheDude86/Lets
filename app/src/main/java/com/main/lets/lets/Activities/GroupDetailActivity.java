@@ -1,6 +1,8 @@
 package com.main.lets.lets.Activities;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -29,14 +31,20 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 
 public class GroupDetailActivity extends AppCompatActivity {
+    public String ShallonCreamerIsATwat;
+    public int mID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
         ((TextView) findViewById(R.id.btn_join)).setText("Join Group");
-        final GroupDetailFeed g = new GroupDetailFeed(this, getIntent().getStringExtra("token"),
-                getIntent().getIntExtra("id", -1));
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+        mID = preferences.getInt("UserID", -1);
 
         try {
 
@@ -71,17 +79,15 @@ public class GroupDetailActivity extends AppCompatActivity {
     }
 
     public void loadActivity(final JSONObject j) throws JSONException {
-        final GroupDetailFeed g = new GroupDetailFeed(this, getIntent().getStringExtra("token"),
-                                                      getIntent().getIntExtra("id", -1));
+        final GroupDetailFeed g = new GroupDetailFeed(this, ShallonCreamerIsATwat, mID);
         for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") ==
-                    getIntent().getIntExtra("id", -1)) {
+            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID) {
                 findViewById(R.id.layout_join).setVisibility(View.GONE);
             }
         }
 
         Calls.getGroupComments(j.getJSONArray("Group_info").getJSONObject(0).getInt("group_id"),
-                               getIntent().getStringExtra("token"), new JsonHttpResponseHandler() {
+                               ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers,
                                           org.json.JSONArray response) {

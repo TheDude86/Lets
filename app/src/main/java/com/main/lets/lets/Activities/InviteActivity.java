@@ -1,6 +1,8 @@
 package com.main.lets.lets.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +34,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
     JSONObject mEvents;
     JSONObject mGroups;
     JSONObject mUsers;
+    String mMode;
     int mID;
 
     @Override
@@ -41,11 +44,20 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
 
 
         String[] buttons = getIntent().getStringExtra("entities").split(":");
-        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
-        mID = getIntent().getIntExtra("id", -1);
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+        mID = preferences.getInt("UserID", -1);
+
+        Log.println(Log.ASSERT, "InviteActivity", "ID: " + mID + " Token: " + ShallonCreamerIsATwat);
+
         loadFeed(buttons);
 
-        switch (getIntent().getStringExtra("mode")) {
+        mMode = getIntent().getStringExtra("mode");
+
+        switch (mMode) {
             case "G2EFG":
                 mInviteFeed = new InviteFeed(this, InviteFeed.Mode.G2EFG, ShallonCreamerIsATwat, mID,
                         getIntent().getIntExtra("invite_id", -1));
@@ -107,14 +119,33 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         for (String s : feeds) {
             switch (s) {
                 case "Friends":
+
                     Calls.getFriends(mID, new JsonHttpResponseHandler() {
+
                         @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        public void onSuccess(int statusCode, Header[] headers,
+                                              JSONArray response) {
+
                             try {
+                                Log.println(Log.ASSERT, "InviteActivity", "Members: " + response.toString());
+
+                                for (int i = 0; i < response.length(); i++){
+                                    if (response.getJSONObject(i) != null) {
+                                        if (!response.getJSONObject(i).getBoolean("status")){
+                                            response.remove(i);
+                                            i--;
+                                        }
+                                    }
+
+                                }
+
                                 JSONObject j = new JSONObject();
+
                                 j.put("json", response);
                                 j.put("type", 0);
                                 mUsers = j;
+
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -122,6 +153,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                             mInviteFeed.draw(mUsers);
 
                         }
+
                     });
 
                     break;
@@ -146,7 +178,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
 
                     break;
                 case "Groups":
-                    Calls.getGroups(mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                    Calls.getAdminGroups(mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                             try {

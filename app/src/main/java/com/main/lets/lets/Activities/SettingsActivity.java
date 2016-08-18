@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -333,8 +334,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class UserPreferenceFragment extends Fragment {
         HashMap<String, Object> mUserInfo;
+        boolean mPhotoChanged = false;
         int SELECT_PHOTO = 0;
         ImageView mProfile;
+        Bitmap mImage;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -347,6 +350,48 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (b != null)
                 ShallonCreamerIsATwat = b.getString("token");
 
+        }
+
+        public void editProfile(final ProgressDialog dialog){
+            Calls.editProfile(mUserInfo, ShallonCreamerIsATwat,
+                              new JsonHttpResponseHandler() {
+
+                                  @Override
+                                  public void onFailure(int statusCode,
+                                                        cz.msebera.android.httpclient
+                                                                .Header[] headers,
+                                                        Throwable throwable,
+                                                        org.json.JSONArray errorResponse) {
+                                      Log.e("Async Test Failure", errorResponse.toString());
+                                      dialog.hide();
+
+                                  }
+
+                                  @Override
+                                  public void onFailure(int statusCode,
+                                                        cz.msebera.android.httpclient
+                                                                .Header[] headers,
+                                                        String s, Throwable throwable) {
+                                      getActivity().finish();
+                                      Log.e("SettingsActivity", "Async Test Failure");
+
+                                      dialog.hide();
+
+                                  }
+
+                                  @Override
+                                  public void onSuccess(int i,
+                                                        cz.msebera.android.httpclient
+                                                                .Header[] headers,
+                                                        JSONObject json) {
+                                      Log.println(Log.ASSERT, "SettingsActivity:",
+                                                  json.toString());
+                                      dialog.hide();
+                                      getActivity().finish();
+
+                                  }
+
+                              });
         }
 
         @Override
@@ -392,43 +437,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
                                                                       "Saving. Please wait...", true);
 
-                    Calls.editProfile(mUserInfo, ShallonCreamerIsATwat,
-                                      new JsonHttpResponseHandler() {
+                    if (mPhotoChanged) {
+                        SharedPreferences preferences = PreferenceManager
+                                .getDefaultSharedPreferences(getActivity().getBaseContext());
 
-                                          @Override
-                                          public void onFailure(int statusCode,
-                                                                cz.msebera.android.httpclient
-                                                                        .Header[] headers,
-                                                                Throwable throwable,
-                                                                org.json.JSONArray errorResponse) {
-                                              Log.e("Async Test Failure", errorResponse.toString());
-                                              dialog.hide();
+                        ShallonCreamerIsATwat = preferences.getString("Token", "");
+                        int id = preferences.getInt("UserID", -1);
 
-                                          }
+                        long millis = System.currentTimeMillis();
+                        String name = "user" + id + "-" + millis;
 
-                                          @Override
-                                          public void onFailure(int statusCode,
-                                                                cz.msebera.android.httpclient
-                                                                        .Header[] headers,
-                                                                String s, Throwable throwable) {
-                                              getActivity().finish();
-                                              dialog.hide();
+                        mUserInfo.put("picRef",  "https://let.blob.core.windows.net/mycontainer/" + name);
 
-                                          }
+                        Calls.uploadImage(mImage, getActivity(), name,
+                                          new Calls.UploadImage.onFinished() {
+                                              @Override
+                                              public void onFinished() {
 
-                                          @Override
-                                          public void onSuccess(int i,
-                                                                cz.msebera.android.httpclient
-                                                                        .Header[] headers,
-                                                                JSONObject json) {
-                                              Log.println(Log.ASSERT, "SettingsActivity:",
-                                                          json.toString());
-                                              dialog.hide();
-                                              getActivity().finish();
+                                                  editProfile(dialog);
 
-                                          }
+                                              }
+                                          });
+                    } else {
+                        editProfile(dialog);
+                    }
 
-                                      });
+
+
 
                 }
 
@@ -490,14 +525,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                                     ((EditText) view.findViewById(R.id.edit_interests)).setText(rawString);
 
-                                    rawString = rawString.replace("Eating & Drinking", "Eat/Drink");
-                                    rawString = rawString.replace("TV & Movies", "TV/Movies");
-                                    rawString = rawString.replace("Studying", "Study");
-                                    rawString = rawString.replace("Relaxing", "Relax");
-                                    rawString = rawString.replace(" ", "");
-                                    rawString = rawString.replace("VideoGames", "Video Games");
-
-                                    mUserInfo.put("interests",rawString);
+                                    mUserInfo.put("interests",toInterestDataString(rawString));
 
                                 }
                             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -573,6 +601,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         }
 
                         ((EditText) (view.findViewById(R.id.edit_interests))).setText(interestString);
+                        mUserInfo.put("interests", toInterestDataString(interestString));
 
 
                         if (mUserInfo.get("gender") == 0)
@@ -616,6 +645,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return view;
         }
 
+        public String toInterestDataString(String rawString){
+            rawString = rawString.replace("Eating & Drinking", "Eat/Drink");
+            rawString = rawString.replace("TV & Movies", "TV/Movies");
+            rawString = rawString.replace("Studying", "Study");
+            rawString = rawString.replace("Relaxing", "Relax");
+            rawString = rawString.replace(" ", "");
+            rawString = rawString.replace("VideoGames", "Video Games");
+
+            return rawString;
+        }
+
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
             switch (requestCode) {
@@ -639,6 +679,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
 
+
             if (requestCode == 0) {
                 if (resultCode == RESULT_OK){
 
@@ -648,9 +689,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
                         if (selectedImage != null) {
-                            Log.println(Log.ASSERT, "SettingsActivity", "Not Null");
+                            mPhotoChanged = true;
                             mProfile.setImageBitmap(selectedImage);
-                            Calls.uploadImage(selectedImage, getActivity());
+                            mImage = selectedImage;
                         }
 
                     } catch (FileNotFoundException e) {

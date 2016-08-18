@@ -139,6 +139,7 @@ public class Login {
         preferences.edit().remove("password");
         preferences.edit().remove("UserID");
         preferences.edit().remove("email");
+        preferences.edit().remove("Token");
         preferences.edit().commit();
     }
 

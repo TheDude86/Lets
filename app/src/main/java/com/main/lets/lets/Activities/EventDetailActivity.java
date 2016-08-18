@@ -40,8 +40,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
                 EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)
-                        findViewById(R.id.event_detail_list), getIntent().getStringExtra("token"),
-                                                        getIntent().getIntExtra("id",-1));
+                        findViewById(R.id.event_detail_list));
                 Event e = new Event(j);
 
                 final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
@@ -83,7 +82,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
 
                             EventDetailFeed f = new EventDetailFeed(EventDetailActivity.this, (RecyclerView)
-                                    findViewById(R.id.event_detail_list), getIntent().getStringExtra("token"), preferences.getInt("UserID", -2));
+                                    findViewById(R.id.event_detail_list));
                             Event e = new Event(j);
 
                             final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);

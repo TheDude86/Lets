@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.PowerManager;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -58,10 +60,12 @@ public class Calls {
     protected static final String GetProfileByID = "user/getProfileById";
     protected static final String GetGroupComments = "group/getComments";
     protected static final String InviteUserToEvent = "event/inviteUser";
+    protected static final String GetAdminGroups = "user/getAdminGroups";
     protected static final String AddGroupComment = "group/addComment";
     protected static final String GroupRemoveUser = "group/removeUser";
     protected static final String GroupInviteUser = "group/inviteUser";
     protected static final String EventAddComment = "event/addComment";
+    protected static final String RemoveCohost = "event/removeCohost";
     protected static final String GetEventById = "event/getEventById";
     protected static final String GetMyProfile = "user/getMyProfile";
     protected static final String RemoveFriend = "user/removeFriend";
@@ -398,11 +402,27 @@ public class Calls {
 
     public static void removeFriend(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
-        params.put("" +
-                           "remove_user_id", userID);
+        params.put("remove_user_id", userID);
         client.addHeader("Authorization", token);
 
         post(RemoveFriend, params, jsonHttpResponseHandler);
+    }
+
+    public static void getAdminGroups(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("search_user_id", userID);
+        client.addHeader("Authorization", token);
+
+        post(GetAdminGroups, params, jsonHttpResponseHandler);
+    }
+
+    public static void removeCohost(int userID, int eventID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("cohost_id", userID);
+        params.put("event_id", eventID);
+        client.addHeader("Authorization", token);
+
+        post(RemoveCohost, params, jsonHttpResponseHandler);
     }
 
 
@@ -418,8 +438,8 @@ public class Calls {
     public static final String storageConnectionString = "DefaultEndpointsProtocol=http;"
             + "AccountName=let;" + "AccountKey=F+XpQRVgmHRaS9daL1/0TH8e0n6jsHU2cdmdhr4PeL5ayYOspWS5VMHgdm3OjCUnWBr9KMfz07LyjHg2iBJcjw==";
 
-    public static void uploadImage(Bitmap image, Context context){
-        new UploadImage(context, image).execute();
+    public static void uploadImage(Bitmap image, Context context, String s, UploadImage.onFinished finished){
+        new UploadImage(context, image, s, finished).execute();
 
     }
 
@@ -438,11 +458,16 @@ public class Calls {
     }
 
 
-    private static class UploadImage extends AsyncTask<Void, Void, Void>{
+    public static class UploadImage extends AsyncTask<Void, Void, Void>{
+        public onFinished mOnFinished;
         Context mContext;
+        String mFileName;
         Bitmap mImage;
 
-        public UploadImage(Context c, Bitmap b){
+
+        public UploadImage(Context c, Bitmap b, String name, onFinished finished){
+            mOnFinished = finished;
+            mFileName = name;
             mContext = c;
             mImage = b;
 
@@ -464,14 +489,17 @@ public class Calls {
                 CloudBlobContainer container = blobClient.getContainerReference("mycontainer");
 
                 // Create or overwrite the "myimage.jpg" blob with contents from a local file.
-                CloudBlockBlob blob = container.getBlockBlobReference("myimage");
+                CloudBlockBlob blob = container.getBlockBlobReference(mFileName);
 
-                // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
-                Uri tempUri = getImageUri(mContext, mImage);
 
-                // CALL THIS METHOD TO GET THE ACTUAL PATH
 
-                blob.uploadFromFile(getRealPathFromURI(tempUri, mContext));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                mImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+                byte[] bitmapdata = bos.toByteArray();
+                ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
+
+
+                blob.upload(bs, bitmapdata.length);
 
             }
             catch (Exception e)
@@ -486,11 +514,18 @@ public class Calls {
         @Override
         protected void onPostExecute(Void result) {
 
+            if (mOnFinished != null) {
+                mOnFinished.onFinished();
+            }
+
             Log.println(Log.ASSERT, "Calls", "DONE");
 
             super.onPostExecute(result);
         }
 
+        public interface onFinished {
+            void onFinished();
+        }
 
     }
 

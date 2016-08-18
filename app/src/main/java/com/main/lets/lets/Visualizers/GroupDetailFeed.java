@@ -39,6 +39,7 @@ public class GroupDetailFeed extends Client {
     public int mID;
 
     public GroupDetailFeed(AppCompatActivity a, String token, int id) {
+
         mRecyclerView = (RecyclerView) a.findViewById(R.id.feed);
         mJoinButton = (TextView) a.findViewById(R.id.btn_join);
         mMemberTags = new ArrayList<>();

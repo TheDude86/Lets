@@ -368,7 +368,8 @@ public class ProfileFeed extends Client {
                     //Loads the temporary array list into the profile adapter
                     mProfileAdapter.loadFriends(friends);
                     //Loads the active feed of the profile adapter to the friends feed
-                    mProfileAdapter.mDemoHolder.loadFeed(friends, new ArrayList<String>(),
+                    if (mProfileAdapter.mDemoHolder != null)
+                        mProfileAdapter.mDemoHolder.loadFeed(friends, new ArrayList<String>(),
                                                          EntityAdapter.Viewing.FRIENDS);
 
                 } catch (JSONException e) {

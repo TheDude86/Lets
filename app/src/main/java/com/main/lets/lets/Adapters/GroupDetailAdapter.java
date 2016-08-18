@@ -26,6 +26,7 @@ import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Group;
 import com.main.lets.lets.R;
 import com.rey.material.widget.CheckBox;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -122,19 +123,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
         try {
             JSONObject j = new JSONObject(mList.get(0));
 
-            Calls.loadImage(j.getString("pic_ref"), new FileAsyncHttpResponseHandler(mActivity) {
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                    Log.println(Log.ASSERT, "UserDetailAdapter", "Test failed");
-
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, File response) {
-                    Bitmap myBitmap = BitmapFactory.decodeFile(response.getAbsolutePath());
-                    holder.mImage.setImageBitmap(myBitmap);
-                }
-            });
+            Picasso.with(mActivity).load(j.getString("pic_ref")).into(holder.mImage);
 
             mActions = new HashMap<>();
             mActions.put("transfer", formattedTextView("Transfer Ownership"));

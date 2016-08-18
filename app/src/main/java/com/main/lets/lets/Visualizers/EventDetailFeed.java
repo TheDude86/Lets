@@ -5,12 +5,15 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -48,14 +51,20 @@ public class EventDetailFeed extends Client {
     JSONArray mCoHosts;
     int mID;
 
-    public EventDetailFeed(AppCompatActivity a, RecyclerView r, String token, int id) {
-        ShallonCreamerIsATwat = token;
+    public EventDetailFeed(AppCompatActivity a, RecyclerView r) {
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(a.getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+        mID = preferences.getInt("UserID", -1);
+
         mComments = new ArrayList<>();
         mUserTags = new ArrayList<>();
         mUsers = new ArrayList<>();
         mRecyclerView = r;
         mActivity = a;
-        mID = id;
+
 
     }
 
@@ -159,24 +168,27 @@ public class EventDetailFeed extends Client {
                         String s = "";
 
                         for (int i = 0; i < json.length(); i++) {
-                            mUserTags.add(json.getJSONObject(i).toString());
-                            mEventAdapter.addElement(new Entity(json.getJSONObject(i)).mText);
 
-                            if (new Entity(json.getJSONObject(i)).mID == mID) {
-                                mEventAdapter.getmMainHolder().mJoin.setText((new Event(j).getEnd()
-                                        .before(Calendar.getInstance().getTime())) ?
-                                                                                     "You attended this event" :
-                                                                                     "You're attending!");
+                            if (json.getJSONObject(i).getBoolean("status")){
+                                mUserTags.add(json.getJSONObject(i).toString());
+                                mEventAdapter.addElement(new Entity(json.getJSONObject(i)).mText);
 
-                                if (mEventAdapter.mStatus != EventDetailAdapter.MemberStatus.HOST)
-                                    mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                if (new Entity(json.getJSONObject(i)).mID == mID) {
+                                    mEventAdapter.getmMainHolder().mJoin.setText((new Event(j).getEnd()
+                                            .before(Calendar.getInstance().getTime())) ?
+                                                                                         "You attended this event" :
+                                                                                         "You're attending!");
+
+                                    if (mEventAdapter.mStatus != EventDetailAdapter.MemberStatus.HOST)
+                                        mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                }
+
+                                if (s.length() < 1)
+                                    s = json.getJSONObject(i).getString("name");
+                                else
+                                    s += ", " + json.getJSONObject(i).getString("name");
+
                             }
-
-                            if (s.length() < 1)
-                                s = json.getJSONObject(i).getString("name");
-                            else
-                                s += ", " + json.getJSONObject(i).getString("name");
-
 
                         }
 
@@ -440,6 +452,36 @@ public class EventDetailFeed extends Client {
                             CharSequence[] values = getSelectedValues();
                             Entity e;
 
+                            for (int i = 0; i < values.length; i++){
+                                for (int j = 0; j < mCoHosts.length(); j++){
+                                    try {
+                                        Entity user = new Entity(mCoHosts.getJSONObject(j));
+                                        if (values[i].equals(user.mText)){
+
+                                            Log.println(Log.ASSERT, "EventDetailFeed", ShallonCreamerIsATwat);
+
+                                            Calls.removeCohost(user.mID, event.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+
+
+                                                @Override
+                                                public void onSuccess(int statusCode,
+                                                                      Header[] headers,
+                                                                      JSONObject response) {
+                                                    Log.println(Log.ASSERT, "EventDetailFeed", response.toString());
+                                                }
+                                            });
+
+                                        }
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+                                }
+
+//                                Calls.removeCohost();
+
+                            }
+
                             super.onPositiveActionClicked(fragment);
                         }
 
@@ -454,6 +496,44 @@ public class EventDetailFeed extends Client {
                             .title("Remove Cohosts")
                             .positiveAction("Remove")
                             .negativeAction("Cancel");
+
+                    break;
+                case "Leave Event":
+                    AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
+
+                    alertDialog.setTitle("Coming Soon!");
+
+                    alertDialog.setMessage("Woot!");
+
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Awesome", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+
+                    });
+
+                    alertDialog.show();
+
+                    break;
+                case "Edit Event":
+                    AlertDialog editDialog = new AlertDialog.Builder(mActivity).create();
+
+                    editDialog.setTitle("Coming Soon!");
+
+                    editDialog.setMessage("Woot!");
+
+                    editDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Awesome", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+
+                    });
+
+                    editDialog.show();
 
                     break;
 

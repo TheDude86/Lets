@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = preferences.edit();
 
                         editor.putInt("UserID", response.getInt("user_id"));
+                        editor.putString("Token", "Bearer " + response.getString("accessToken"));
                         editor.commit();
 
                         Log.println(Log.ASSERT, "MainActivity", preferences.getInt("UserID", -1) + "");

@@ -99,7 +99,7 @@ public class InviteFeed extends Client {
                 } else if (mActive == Mode.UG2EFE) {
 
                     for (final Integer i : mSelectedGroups) {
-                        Log.println(Log.ASSERT, "InviteFeed", " event ID: " + inviteID + "Group ID: " + i);
+                        Log.println(Log.ASSERT, "InviteFeed", " event ID: " + inviteID + " Group ID: " + i);
                         Calls.inviteGroupToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -111,11 +111,10 @@ public class InviteFeed extends Client {
                     }
 
                     for (final Integer i : mSelectedUsers) {
-                        Log.println(Log.ASSERT, "InviteFeed", " event ID: " + inviteID + "User ID: " + i);
                         Calls.inviteUserToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                super.onSuccess(statusCode, headers, response);
+                                Log.println(Log.ASSERT, "InviteFeed", response.toString());
 
                             }
                         });
@@ -126,12 +125,15 @@ public class InviteFeed extends Client {
                 } else if (mActive == Mode.U2CFE){
 
                     for (final Integer i : mSelectedUsers) {
+                        Log.println(Log.ASSERT, "InviteFeed","Token: " + ShallonCreamerIsATwat);
+
                         Calls.addCohost(mInviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
 
                             @Override
                             public void onSuccess(int statusCode, Header[] headers,
                                                   JSONObject response) {
-                                super.onSuccess(statusCode, headers, response);
+                                Log.println(Log.ASSERT, "InviteFeed", response.toString());
+
                             }
                         });
                     }
