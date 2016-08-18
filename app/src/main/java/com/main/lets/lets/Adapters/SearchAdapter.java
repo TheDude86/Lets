@@ -51,7 +51,8 @@ public class SearchAdapter extends RecyclerView.Adapter {
     @Override
     public SearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new SearchViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_entity_with_picture, parent, false));
+                                            .inflate(R.layout.row_entity_with_picture, parent,
+                                                     false));
     }
 
     @Override
@@ -59,23 +60,19 @@ public class SearchAdapter extends RecyclerView.Adapter {
         try {
             final SearchViewHolder h = (SearchViewHolder) holder;
             final Entity e = new Entity(mList.getJSONObject(h.getAdapterPosition()));
+            Log.println(Log.ASSERT, "SearchAdapter",
+                        mList.getJSONObject(h.getAdapterPosition()).toString());
             if (mActive == SearchFeed.Viewing.EVENT) {
-                Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory)).into((h.mImage));
             } else if (e.mPic != null) {
-                Calls.loadImage(e.mPic, new FileAsyncHttpResponseHandler(mActivity) {
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                        Log.println(Log.ASSERT, "UserDetailAdapter", "Test failed");
 
-                    }
+                try {
+                    Picasso.with(mActivity).load(e.mPic).into(h.mImage);
 
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, File response) {
-                        Bitmap myBitmap = BitmapFactory.decodeFile(response.getAbsolutePath());
-                        h.mImage.setImageBitmap(myBitmap);
+                } catch (IllegalArgumentException e1) {
+                    Log.println(Log.ASSERT, "SearchAdapter", "Illegal URL: " + e.mPic);
 
-                    }
-                });
+                }
+                
             }
 
             h.mText.setText(e.mText);
@@ -85,6 +82,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
                     if (mOnEntityClicked != null) {
                         if (mSelectable) {
                             if (!mSelected.contains(e.mID)) {
+                                Log.println(Log.ASSERT, "SearchAdapter", e.mID + "");
                                 mSelected.add(e.mID);
                                 h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
 
@@ -96,7 +94,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
 
                         }
 
-                        mOnEntityClicked.onClicked(h.getAdapterPosition(), h);
+                        mOnEntityClicked.onClicked(h.getAdapterPosition(), h, e.mID);
                     }
                 }
             });
@@ -106,7 +104,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
             else
                 h.mLayout.setBackgroundColor(Color.WHITE);
 
-            
+
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
@@ -120,11 +118,12 @@ public class SearchAdapter extends RecyclerView.Adapter {
 
     public int getImageResourceId(Context context, int category) {
         return context.getResources().getIdentifier(("j" + Integer.toString(category))
-                .replaceAll("\\s+", "").toLowerCase(), "drawable", context.getPackageName());
+                                                            .replaceAll("\\s+", "").toLowerCase(),
+                                                    "drawable", context.getPackageName());
     }
 
     public void setSelected(ArrayList<Integer> s) {
-        mSelected = (ArrayList)s.clone();
+        mSelected = (ArrayList) s.clone();
     }
 
     public void setOnEntityClicked(OnEntityClickListener e) {
@@ -132,7 +131,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnEntityClickListener {
-        void onClicked(int position, SearchViewHolder holder);
+        void onClicked(int position, SearchViewHolder holder, int userID);
     }
 
 }

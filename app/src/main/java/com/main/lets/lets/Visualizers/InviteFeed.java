@@ -154,7 +154,7 @@ public class InviteFeed extends Client {
 
             mEventClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(final int position, SearchViewHolder holder) {
+                public void onClicked(final int position, SearchViewHolder holder, int userID) {
                     holder.mLayout.setBackgroundColor(Color.WHITE);
                     Dialog.Builder builder = new SimpleDialog.Builder() {
                         @Override
@@ -202,7 +202,7 @@ public class InviteFeed extends Client {
 
             mUserClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder holder) {
+                public void onClicked(int position, SearchViewHolder holder, int userID) {
                     try {
                         mSelectedUsers.add(new Entity(list.getJSONObject(position)).mID);
                     } catch (JSONException e) {
@@ -214,7 +214,7 @@ public class InviteFeed extends Client {
 
             mGroupClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder holder) {
+                public void onClicked(int position, SearchViewHolder holder, int userID) {
                     try {
                         mSelectedGroups.add(new Entity(list.getJSONObject(position)).mID);
                     } catch (JSONException e) {

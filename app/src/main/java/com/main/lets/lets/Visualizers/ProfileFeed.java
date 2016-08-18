@@ -116,7 +116,7 @@ public class ProfileFeed extends Client {
                                 ShallonCreamerIsATwat += response.getString("accessToken");
                                 mUserInfo.put("userID", response.getInt("user_id"));
                                 mUserInfo.put("token", ShallonCreamerIsATwat);
-                                Login.saveInfo(email, password, mActivity);
+                                Login.saveInfo(email, password, response.getInt("user_id"), mActivity.getBaseContext());
                                 draw(null);
 
                             } catch (JSONException e) {

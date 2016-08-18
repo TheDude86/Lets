@@ -24,6 +24,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.MainActivity;
+import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.ProfileViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
@@ -32,6 +33,7 @@ import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.quickAdapter.easyRegularAdapter;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,9 +60,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     public ArrayList<String> mGroups;
     public ArrayList<String> mEvents;
     private Activity mActivity;
+    public JSONObject mUser;
     private int mID;
-
-    private ImageView mPicture;
 
 
     /**
@@ -76,6 +77,14 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         super(a);
         mActivity = context;
         mID = id;
+
+        if (a.size() > 0) {
+            try {
+                mUser = new JSONObject(a.get(0));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         //Initializes as empty arrays because the network calls haven't returned yet.
         mGroups = new ArrayList<>();
@@ -169,6 +178,14 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         //initializing the view holder
         mDemoHolder = new ProfileViewHolder(view, mActivity, ShallonCreamerIsATwat, mID);
 
+        try {
+            loadUserInfo(mUser.getString("Profile_Picture"), mUser.getString("User_Name"),
+                         mUser.getString("Biography"), mUser.getInt("User_ID"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
         //Setting the onClicked listeners for the buttons of the profile feed, the buttons allow
         //the user to choose which feed they want to search through and when clicked, that feed
         //becomes the active feed in the Entity Adapter
@@ -196,6 +213,25 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         });
 
         return mDemoHolder;
+    }
+
+
+    public void loadUserInfo(String image, String name, String bio, final int id) {
+        Picasso.with(mActivity).load(image).into(mDemoHolder.mProPic);
+        mDemoHolder.mName.setText(name);
+        mDemoHolder.mBio.setText(bio);
+
+        mDemoHolder.mProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mActivity, UserDetailActivity.class);
+
+                intent.putExtra("UserID", id);
+                intent.putExtra("token", ShallonCreamerIsATwat);
+                mActivity.startActivity(intent);
+            }
+        });
+
     }
 
     /**
@@ -227,54 +263,54 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
         //Network call made to get an event's information
         Calls.getEvent(new JSONObject(events.get(index)).getInt("event_id"),
-                           new JsonHttpResponseHandler() {
+                       new JsonHttpResponseHandler() {
 
-                               /**
-                                * When the call is finished, a JSON object is returned as the
-                                * response containing all of the information about the group, the
-                                * JSON's string is then placed in an array list and then calls
-                                * itself again
-                                * @param statusCode (unused)
-                                * @param headers    (unused)
-                                * @param response   JSON containing all of a group's information
-                                */
-                               @Override
-                               public void onSuccess(int statusCode, Header[] headers,
-                                                     JSONObject response) {
+                           /**
+                            * When the call is finished, a JSON object is returned as the
+                            * response containing all of the information about the group, the
+                            * JSON's string is then placed in an array list and then calls
+                            * itself again
+                            * @param statusCode (unused)
+                            * @param headers    (unused)
+                            * @param response   JSON containing all of a group's information
+                            */
+                           @Override
+                           public void onSuccess(int statusCode, Header[] headers,
+                                                 JSONObject response) {
 
-                                   //TODO add check to make sure a valid event was returned
+                               //TODO add check to make sure a valid event was returned
 
-                                   //Adding the response to the array list, the response contains
-                                   // the group's info, members, and admins
-                                   mEvents.add(response.toString());
+                               //Adding the response to the array list, the response contains
+                               // the group's info, members, and admins
+                               mEvents.add(response.toString());
 
-                                   try {
-                                       //Recursively calls itself again iterating through the
-                                       // list by one
-                                       loadEventsHelper(events, index + 1);
-                                   } catch (JSONException e) {
-                                       e.printStackTrace();
-                                   }
-
+                               try {
+                                   //Recursively calls itself again iterating through the
+                                   // list by one
+                                   loadEventsHelper(events, index + 1);
+                               } catch (JSONException e) {
+                                   e.printStackTrace();
                                }
 
-                               /**
-                                * Called when there is an error with the server
-                                *
-                                * @param statusCode (unused)
-                                * @param headers (unused)
-                                * @param throwable (unused)
-                                * @param errorResponse (unused)
-                                */
-                               @Override
-                               public void onFailure(int statusCode, Header[] headers,
-                                                     Throwable throwable,
-                                                     org.json.JSONArray errorResponse) {
-                                   Log.e("Async Test Failure", errorResponse.toString());
-                               }
+                           }
+
+                           /**
+                            * Called when there is an error with the server
+                            *
+                            * @param statusCode (unused)
+                            * @param headers (unused)
+                            * @param throwable (unused)
+                            * @param errorResponse (unused)
+                            */
+                           @Override
+                           public void onFailure(int statusCode, Header[] headers,
+                                                 Throwable throwable,
+                                                 org.json.JSONArray errorResponse) {
+                               Log.e("Async Test Failure", errorResponse.toString());
+                           }
 
 
-                           });
+                       });
 
     }
 
@@ -431,16 +467,6 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                     }
 
                 });
-
-    }
-
-    /**
-     * Sets the user's profile picture in the profile feed
-     *
-     * @param b
-     */
-    public void setmPicture(Bitmap b) {
-        mPicture.setImageBitmap(b);
 
     }
 

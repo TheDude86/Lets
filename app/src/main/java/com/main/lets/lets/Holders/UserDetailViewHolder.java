@@ -3,7 +3,9 @@ package com.main.lets.lets.Holders;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.main.lets.lets.R;
@@ -14,6 +16,7 @@ import com.main.lets.lets.R;
 public class UserDetailViewHolder extends RecyclerView.ViewHolder {
     public Button mFriendsButton;
     public Button mGroupsButton;
+    public ImageButton mOptions;
     public Button mEventsButton;
     public TextView mInterests;
     public TextView mFriends;
@@ -26,6 +29,7 @@ public class UserDetailViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
 
         mInterests = (TextView) itemView.findViewById(R.id.txt_interests);
+        mOptions = (ImageButton) itemView.findViewById(R.id.options);
         mFriendsButton = (Button) itemView.findViewById(R.id.friends);
         mFriends = (TextView) itemView.findViewById(R.id.txt_friends);
         mGroupsButton = (Button) itemView.findViewById(R.id.groups);

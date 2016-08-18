@@ -38,9 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
-                android:paddingTop="10dp"
 
-                android:paddingBottom="10dp"
                 android:layout_gravity="center_horizontal|bottom">
 
                 <TextView
@@ -56,14 +54,15 @@
                     android:layout_centerHorizontal="true" />
 
                 <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:id="@+id/options"
-                    android:background="@drawable/ic_more_vert_black_24dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_width="41dp"
+                    android:layout_height="41dp"
+                    android:cropToPadding="false"
+                    android:src="@drawable/ic_more_vert_black_24dp"
+                    android:background="#00ffffff"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:id="@+id/options"/>
+
             </RelativeLayout>
 
         </FrameLayout>

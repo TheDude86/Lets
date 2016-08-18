@@ -2,8 +2,12 @@ package com.main.lets.lets.LetsAPI;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -21,6 +25,10 @@ import com.rey.material.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,10 +49,6 @@ public class Calls {
      * code in other classes and also place all of the URLs in the same place in the code so if any
      * links get updated then it is easy to update the client.
      */
-    public static final String storageConnectionString =
-            "DefaultEndpointsProtocol=http;" +
-                    "AccountName=your_storage_account;" +
-                    "AccountKey=your_storage_account_key";
 
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
     protected static final String TransferOwnership = "group/transferOwnership";
@@ -60,6 +64,7 @@ public class Calls {
     protected static final String EventAddComment = "event/addComment";
     protected static final String GetEventById = "event/getEventById";
     protected static final String GetMyProfile = "user/getMyProfile";
+    protected static final String RemoveFriend = "user/removeFriend";
     protected static final String GetAttended = "user/getAttended";
     protected static final String LoginSecure = "user/loginSecure";
     protected static final String EditProfile = "user/editProfile";
@@ -105,7 +110,7 @@ public class Calls {
      * @param range                   range to search for events
      * @param jsonHttpResponseHandler code to be executed
      */
-    public static void getCloseEvents(int latitude, int longitude, int range,
+    public static void getCloseEvents(double latitude, double longitude, int range,
                                       JsonHttpResponseHandler jsonHttpResponseHandler) {
 
         RequestParams params = new RequestParams();
@@ -376,7 +381,7 @@ public class Calls {
 
     public static void sendFriendRequest(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
-        params.put("reciever_id", userID);
+        params.put("recieverId", userID);
         client.addHeader("Authorization", token);
 
         post(SendFriendRequest, params, jsonHttpResponseHandler);
@@ -391,88 +396,101 @@ public class Calls {
         post(AddCohost, params, jsonHttpResponseHandler);
     }
 
+    public static void removeFriend(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("" +
+                           "remove_user_id", userID);
+        client.addHeader("Authorization", token);
+
+        post(RemoveFriend, params, jsonHttpResponseHandler);
+    }
+
+
+
+
+
+
     public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
         client.get(url, fileAsyncHttpResponseHandler);
 
     }
 
-    // usually, subclasses of AsyncTask are declared inside the activity class.
-    // that way, you can easily modify the UI thread from here
-    private class DownloadTask extends AsyncTask<String, Integer, String> {
+    public static final String storageConnectionString = "DefaultEndpointsProtocol=http;"
+            + "AccountName=let;" + "AccountKey=F+XpQRVgmHRaS9daL1/0TH8e0n6jsHU2cdmdhr4PeL5ayYOspWS5VMHgdm3OjCUnWBr9KMfz07LyjHg2iBJcjw==";
 
-        private Context context;
-        private PowerManager.WakeLock mWakeLock;
+    public static void uploadImage(Bitmap image, Context context){
+        new UploadImage(context, image).execute();
 
-        public DownloadTask(Context context) {
-            this.context = context;
+    }
+
+    public static Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public static String getRealPathFromURI(Uri uri, Context context) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+
+
+    private static class UploadImage extends AsyncTask<Void, Void, Void>{
+        Context mContext;
+        Bitmap mImage;
+
+        public UploadImage(Context c, Bitmap b){
+            mContext = c;
+            mImage = b;
+
         }
 
+
         @Override
-        protected String doInBackground(String... sUrl) {
-            InputStream input = null;
-            OutputStream output = null;
-            HttpURLConnection connection = null;
-            try {
-                URL url = new URL(sUrl[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
+        protected Void doInBackground(Void... params) {
+            try
+            {
+                // Retrieve storage account from connection-string.
+                CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
 
-                // expect HTTP 200 OK, so we don't mistakenly save error report
-                // instead of the file
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return "Server returned HTTP " + connection.getResponseCode()
-                            + " " + connection.getResponseMessage();
-                }
+                // Create the blob client.
+                CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
 
-                // this will be useful to display download percentage
-                // might be -1: server did not report the length
-                int fileLength = connection.getContentLength();
+                // Get a reference to a container.
+                // The container name must be lower case
+                CloudBlobContainer container = blobClient.getContainerReference("mycontainer");
 
-                // download the file
-                input = connection.getInputStream();
-                output = new FileOutputStream("/sdcard/file_name.extension");
+                // Create or overwrite the "myimage.jpg" blob with contents from a local file.
+                CloudBlockBlob blob = container.getBlockBlobReference("myimage");
 
-                byte data[] = new byte[4096];
-                long total = 0;
-                int count;
-                while ((count = input.read(data)) != -1) {
-                    // allow canceling with back button
-                    if (isCancelled()) {
-                        input.close();
-                        return null;
-                    }
-                    total += count;
-                    // publishing the progress....
-                    if (fileLength > 0) // only if total length is known
-                        publishProgress((int) (total * 100 / fileLength));
-                    output.write(data, 0, count);
-                }
-            } catch (Exception e) {
-                return e.toString();
-            } finally {
-                try {
-                    if (output != null)
-                        output.close();
-                    if (input != null)
-                        input.close();
-                } catch (IOException ignored) {
-                }
+                // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+                Uri tempUri = getImageUri(mContext, mImage);
 
-                if (connection != null)
-                    connection.disconnect();
+                // CALL THIS METHOD TO GET THE ACTUAL PATH
+
+                blob.uploadFromFile(getRealPathFromURI(tempUri, mContext));
+
             }
+            catch (Exception e)
+            {
+                // Output the stack trace.
+                e.printStackTrace();
+            }
+
             return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            mWakeLock.release();
+        protected void onPostExecute(Void result) {
 
-            if (result != null)
-                Toast.makeText(context,"Download error: "+result, Toast.LENGTH_LONG).show();
-            else
-                Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
+            Log.println(Log.ASSERT, "Calls", "DONE");
+
+            super.onPostExecute(result);
         }
+
 
     }
 

@@ -68,10 +68,10 @@ public class SearchFeed extends Client {
             SearchAdapter s = new SearchAdapter(mActivity, activeFeed, active);
             s.setOnEntityClicked(new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder h) {
+                public void onClicked(int position, SearchViewHolder holder, int userID) {
                     try {
                         Entity e = new Entity(activeFeed.getJSONObject(position));
-                        e.loadDetailActivity(mActivity, ShallonCreamerIsATwat, mID);
+                        e.loadDetailActivity(mActivity, ShallonCreamerIsATwat, userID);
 
                     } catch (JSONException e1) {
                         e1.printStackTrace();

@@ -1,20 +1,38 @@
 package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.InviteActivity;
+import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.Holders.UserDetailViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
+import com.rey.material.app.SimpleDialog;
+import com.rey.material.widget.EditText;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -27,6 +45,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -34,16 +53,18 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 6/30/2016.
  */
 public class UserDetailAdapter extends RecyclerView.Adapter {
+    public UserDetailActivity.Relationship mRelationship;
     ArrayList<String> mList = new ArrayList<>();
-     OnEntityClickListener mEntityClickListener;
+    OnEntityClickListener mEntityClickListener;
     OnFriendClickListener mFriendClickListener;
     OnGroupClickListener mGroupClickListener;
     OnEventClickListener mEventClickListener;
     public UserDetailViewHolder mHolder;
-    private Activity mActivity;
+    private AppCompatActivity mActivity;
 
-    public UserDetailAdapter(Activity a, JSONObject j) {
+    public UserDetailAdapter(AppCompatActivity a, JSONObject j, UserDetailActivity.Relationship r) {
         mList.add(j.toString());
+        mRelationship = r;
         mActivity = a;
 
     }
@@ -121,6 +142,17 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
                         mGroupClickListener.OnClick();
                 }
             });
+
+            mHolder.mOptions.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    ActionDialogFragment f = new ActionDialogFragment(mActivity);
+                    f.show(mActivity.getFragmentManager(), "Test");
+
+                }
+            });
+
             mHolder.mInterests.setText("Fix this too");
 
             Picasso.with(mActivity).load(json.getString("Profile_Picture")).into(mHolder.mPic);
@@ -190,6 +222,78 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
 
     public void setOnGroupClickListener(OnGroupClickListener g){
         mGroupClickListener = g;
+    }
+
+
+
+    public class ActionDialogFragment extends DialogFragment {
+        CharSequence[] mList = {"Report", "Block"};
+        CharSequence[] mFriendList = {"Report", "Block", "Unfriend"};
+
+
+        AppCompatActivity mActivity;
+
+        public ActionDialogFragment(AppCompatActivity a) {
+            mActivity = a;
+
+        }
+
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final CharSequence[] list;
+
+            if (mRelationship == UserDetailActivity.Relationship.FRIEND)
+                list = mFriendList;
+            else
+                list = mList;
+
+
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            builder.setTitle("Select Action")
+                    .setItems(list, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            runAction(list[which].toString());
+
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+
+        public void runAction(String s) {
+            com.rey.material.app.Dialog.Builder builder = null;
+            com.rey.material.app.DialogFragment fragment;
+
+            switch (s) {
+                case "Report":
+
+                    break;
+                case "Block":
+
+
+                    break;
+                case "Unfriend":
+
+                    break;
+
+            }
+
+            if (builder != null) {
+                fragment = com.rey.material.app.DialogFragment.newInstance(builder);
+                fragment.show(mActivity.getSupportFragmentManager(), null);
+            }
+
+        }
+
     }
 
 }

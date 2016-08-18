@@ -1,9 +1,11 @@
 package com.main.lets.lets.Activities;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -34,6 +36,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
         try {
             if (getIntent().getStringExtra("JSON") != null){
+
                 JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
 
                 EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)
@@ -72,9 +75,15 @@ public class EventDetailActivity extends AppCompatActivity {
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
                             JSONObject j = response.getJSONArray("Event_info").getJSONObject(0);
+
+                            SharedPreferences preferences = PreferenceManager
+                                    .getDefaultSharedPreferences(getBaseContext());
+
+                            Log.println(Log.ASSERT, "EventDetailActivity", preferences.getInt("UserID", -2) + "");
+
+
                             EventDetailFeed f = new EventDetailFeed(EventDetailActivity.this, (RecyclerView)
-                                    findViewById(R.id.event_detail_list), getIntent().getStringExtra("token"),
-                                                                    getIntent().getIntExtra("id",-1));
+                                    findViewById(R.id.event_detail_list), getIntent().getStringExtra("token"), preferences.getInt("UserID", -2));
                             Event e = new Event(j);
 
                             final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);

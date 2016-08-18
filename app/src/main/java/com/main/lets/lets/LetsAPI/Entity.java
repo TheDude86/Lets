@@ -88,7 +88,8 @@ public class Entity extends Client {
 
     }
 
-    public void loadDetailActivity(final AppCompatActivity mActivity, final String token, final int id) {
+    public void loadDetailActivity(final AppCompatActivity mActivity, final String token,
+                                   final int id) {
         final JsonHttpResponseHandler jsonHttpResponseHandler = new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -96,6 +97,14 @@ public class Entity extends Client {
                     Intent intent;
                     Log.println(Log.ASSERT, "Entity", "ID: " + id);
                     switch (mType) {
+                        case USER:
+                            intent = new Intent(mActivity, UserDetailActivity.class);
+
+                            intent.putExtra("UserID", id);
+                            intent.putExtra("token", token);
+                            mActivity.startActivity(intent);
+
+                            break;
                         case EVENT:
                             intent = new Intent(mActivity, EventDetailActivity.class);
                             intent.putExtra("JSON", response.getJSONArray("Event_info")

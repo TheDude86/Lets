@@ -2,6 +2,7 @@ package com.main.lets.lets.Holders;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
@@ -43,7 +45,11 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public String ShallonCreamerIsATwat;
     public RecyclerView mRecyclerView;
     public ArrayList<String> mList;
+    public RelativeLayout mProfile;
     public Activity mActivity;
+    public ImageView mProPic;
+    public TextView mName;
+    public TextView mBio;
     public Button bFriends;
     public String mSearch;
     public Button bGroups;
@@ -71,6 +77,13 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         mList = new ArrayList<>();
         mActivity = a;
         mID = id;
+
+
+        //User's info
+        mProfile = (RelativeLayout) itemView.findViewById(R.id.profile_layout);
+        mProPic = (ImageView) itemView.findViewById(R.id.pro_pic);
+        mName = (TextView) itemView.findViewById(R.id.name);
+        mBio = (TextView) itemView.findViewById(R.id.bio);
 
         //Filling the recycler view with the friends list (which is empty at this moment)
         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);

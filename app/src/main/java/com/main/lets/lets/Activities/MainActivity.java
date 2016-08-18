@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
@@ -79,9 +80,16 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
                 try {
                     if (response.has("accessToken")) {
-                        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-                        preferences.edit().putInt("UserID", response.getInt("user_id"));
-                        preferences.edit().commit();
+                        SharedPreferences preferences = PreferenceManager
+                                .getDefaultSharedPreferences(getBaseContext());
+
+                        SharedPreferences.Editor editor = preferences.edit();
+
+                        editor.putInt("UserID", response.getInt("user_id"));
+                        editor.commit();
+
+                        Log.println(Log.ASSERT, "MainActivity", preferences.getInt("UserID", -1) + "");
+
 
                         mMap.put("token", response.getString("accessToken"));
                         mMap.put("userID", response.getInt("user_id"));
@@ -89,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
                         mGlobalFeed.update(response.getInt("user_id"),
                                 "Bearer " + response.getString("accessToken"));
 
+
                     } else {
-                        Login.clearInfo(MainActivity.this);
+                        Login.clearInfo(getBaseContext());
 
                     }
 

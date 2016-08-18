@@ -1,6 +1,7 @@
 package com.main.lets.lets.Activities;
 
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -10,7 +11,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -19,6 +24,10 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.provider.SyncStateContract;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -31,28 +40,28 @@ import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.RadioButton;
 
-import com.dd.CircularProgressButton;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -324,6 +333,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class UserPreferenceFragment extends Fragment {
         HashMap<String, Object> mUserInfo;
+        int SELECT_PHOTO = 0;
+        ImageView mProfile;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -339,13 +350,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
             final View view = inflater.inflate(R.layout.fragment_edit_profile,
                                                container, false);
 
             final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
                                                               "Loading. Please wait...", true);
+
+            mProfile = (ImageView) view.findViewById(R.id.pro_pic);
+            mProfile.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+
+                    int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                                getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                    } else {
+
+                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                        photoPickerIntent.setType("image/*");
+                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+
+                    }
+
+                }
+            });
 
             view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -356,16 +389,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     mUserInfo.put("bio", ((EditText) view.findViewById(R.id.edit_bio)).getText()
                             .toString());
 
+                    final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+                                                                      "Saving. Please wait...", true);
+
                     Calls.editProfile(mUserInfo, ShallonCreamerIsATwat,
                                       new JsonHttpResponseHandler() {
-                                          @Override
-                                          public void onSuccess(int statusCode,
-                                                                cz.msebera.android.httpclient
-                                                                        .Header[] headers,
-                                                                org.json.JSONArray response) {
-                                              getActivity().finish();
-
-                                          }
 
                                           @Override
                                           public void onFailure(int statusCode,
@@ -374,6 +402,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                                 Throwable throwable,
                                                                 org.json.JSONArray errorResponse) {
                                               Log.e("Async Test Failure", errorResponse.toString());
+                                              dialog.hide();
+
                                           }
 
                                           @Override
@@ -382,6 +412,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                                         .Header[] headers,
                                                                 String s, Throwable throwable) {
                                               getActivity().finish();
+                                              dialog.hide();
 
                                           }
 
@@ -392,6 +423,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                                 JSONObject json) {
                                               Log.println(Log.ASSERT, "SettingsActivity:",
                                                           json.toString());
+                                              dialog.hide();
+                                              getActivity().finish();
 
                                           }
 
@@ -399,61 +432,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 }
 
-            });
-
-            //All of the checkbox listeners, they do basically the same stuff...
-            (view.findViewById(R.id.male)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("gender", 1);
-                    ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
-                }
-            });
-
-            (view.findViewById(R.id.female)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("gender", 0);
-                    ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(false);
-                }
-            });
-
-            (view.findViewById(R.id.tranny)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("gender", 2);
-                    ((CheckBox) (view.findViewById(R.id.female))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.male))).setChecked(false);
-                }
-            });
-
-            (view.findViewById(R.id.chk_public)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("privacy", 0);
-                    ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
-                }
-            });
-
-            (view.findViewById(R.id.chk_restricted)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("privacy", 1);
-                    ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(false);
-                }
-            });
-
-            (view.findViewById(R.id.chk_pussy)).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mUserInfo.put("privacy", 2);
-                    ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(false);
-                    ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(false);
-                }
             });
 
             (view.findViewById(R.id.edit_birthday)).setOnClickListener(new View.OnClickListener() {
@@ -508,8 +486,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int id) {
-                                    ((EditText) view.findViewById(R.id.edit_interests))
-                                            .setText(MapListToString(seletedItems));
+                                    String rawString = MapListToString(seletedItems);
+
+                                    ((EditText) view.findViewById(R.id.edit_interests)).setText(rawString);
+
+                                    rawString = rawString.replace("Eating & Drinking", "Eat/Drink");
+                                    rawString = rawString.replace("TV & Movies", "TV/Movies");
+                                    rawString = rawString.replace("Studying", "Study");
+                                    rawString = rawString.replace("Relaxing", "Relax");
+                                    rawString = rawString.replace(" ", "");
+                                    rawString = rawString.replace("VideoGames", "Video Games");
+
+                                    mUserInfo.put("interests",rawString);
 
                                 }
                             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -522,33 +510,43 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
             });
 
-            Log.println(Log.ASSERT, "SettingsActivity", ShallonCreamerIsATwat);
             Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode,
                                       cz.msebera.android.httpclient.Header[] headers,
-                                      org.json.JSONArray response) {
+                                      org.json.JSONObject response) {
                     try {
 
-                        mUserInfo.put("id", response.getJSONObject(0).getInt("User_ID"));
+                        mUserInfo.put("id", response.getJSONArray("info").getJSONObject(0)
+                                .getInt("User_ID"));
                         mUserInfo
-                                .put("email", response.getJSONObject(0).getString("Email_Address"));
-                        mUserInfo.put("name", response.getJSONObject(0).getString("User_Name"));
-                        mUserInfo.put("birthday", new Date(Long.parseLong(response.getJSONObject(0)
-                                                                                  .getString(
-                                                                                          "Birthday")
-                                                                                  .substring(6,
-                                                                                             response.getJSONObject(
-                                                                                                     0)
-                                                                                                     .getString(
-                                                                                                             "Birthday")
-                                                                                                     .length() - 2))));
-                        mUserInfo.put("bio", response.getJSONObject(0).getString("Biography"));
-                        mUserInfo.put("interests", response.getJSONObject(0).getInt("Interests"));
-                        mUserInfo.put("gender", response.getJSONObject(0).getInt("Gender"));
-                        mUserInfo.put("privacy", response.getJSONObject(0).getInt("Privacy"));
+                                .put("email", response.getJSONArray("info").getJSONObject(0)
+                                        .getString("Email_Address"));
+                        mUserInfo.put("name", response.getJSONArray("info").getJSONObject(0)
+                                .getString("User_Name"));
+
+                        String birthdayString = response.getJSONArray("info").getJSONObject(0)
+                                .getString("Birthday");
+                        long birthday = Long.parseLong(
+                                birthdayString.substring(6, birthdayString.length() - 2));
+
+                        mUserInfo.put("birthday", new Date(birthday));
+
+                        mUserInfo.put("bio", response.getJSONArray("info").getJSONObject(0)
+                                .getString("Biography"));
+                        mUserInfo.put("interests", response.getJSONArray("info").getJSONObject(0)
+                                .getInt("Interests"));
+                        mUserInfo.put("gender", response.getJSONArray("info").getJSONObject(0)
+                                .getInt("Gender"));
+                        mUserInfo.put("privacy", response.getJSONArray("info").getJSONObject(0)
+                                .getInt("Privacy"));
                         mUserInfo.put("picRef",
-                                      response.getJSONObject(0).getString("Profile_Picture"));
+                                      response.getJSONArray("info").getJSONObject(0)
+                                              .getString("Profile_Picture"));
+
+                        Picasso.with(getActivity()).load(
+                                (String) mUserInfo.get("picRef")).into(
+                                (ImageView) view.findViewById(R.id.pro_pic));
 
                         ((EditText) (view.findViewById(R.id.edit_name)))
                                 .setText((CharSequence) mUserInfo.get("name"));
@@ -559,23 +557,42 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         ((EditText) (view.findViewById(R.id.edit_bio)))
                                 .setText((CharSequence) mUserInfo.get("bio"));
 
+                        JSONObject interests = response.getJSONObject("interests");
+                        String interestString = "";
+                        Iterator<String> keys = interests.keys();
+
+                        while (keys.hasNext()){
+                            String key = keys.next();
+                            if (interests.getBoolean(key)) {
+                                if (interestString.length() == 0)
+                                    interestString = key;
+                                else
+                                    interestString += ", " + key;
+
+                            }
+                        }
+
+                        ((EditText) (view.findViewById(R.id.edit_interests))).setText(interestString);
+
+
                         if (mUserInfo.get("gender") == 0)
-                            ((CheckBox) (view.findViewById(R.id.female))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.female))).setChecked(true);
 
                         if (mUserInfo.get("gender") == 1)
-                            ((CheckBox) (view.findViewById(R.id.male))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.male))).setChecked(true);
 
                         if (mUserInfo.get("gender") == 2)
-                            ((CheckBox) (view.findViewById(R.id.tranny))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.tranny))).setChecked(true);
 
                         if (mUserInfo.get("privacy") == 0)
-                            ((CheckBox) (view.findViewById(R.id.chk_public))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.chk_public))).setChecked(true);
 
                         if (mUserInfo.get("privacy") == 1)
-                            ((CheckBox) (view.findViewById(R.id.chk_restricted))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.chk_restricted)))
+                                    .setChecked(true);
 
                         if (mUserInfo.get("privacy") == 2)
-                            ((CheckBox) (view.findViewById(R.id.chk_pussy))).setChecked(true);
+                            ((RadioButton) (view.findViewById(R.id.chk_pussy))).setChecked(true);
 
 
                     } catch (JSONException e) {
@@ -597,6 +614,54 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             });
 
             return view;
+        }
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+            switch (requestCode) {
+
+                case 2:
+                    if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                        photoPickerIntent.setType("image/*");
+                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            if (requestCode == 0) {
+                if (resultCode == RESULT_OK){
+
+                    try {
+                        final Uri imageUri = data.getData();
+                        final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+
+                        if (selectedImage != null) {
+                            Log.println(Log.ASSERT, "SettingsActivity", "Not Null");
+                            mProfile.setImageBitmap(selectedImage);
+                            Calls.uploadImage(selectedImage, getActivity());
+                        }
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.println(Log.ASSERT, "SettingsActivity", "Okay");
+
+                }
+            }
+
         }
 
         @Override
@@ -746,7 +811,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
             loggedOut = true;
-            Login.clearInfo(getActivity());
+            Login.clearInfo(getActivity().getBaseContext());
             getActivity().setResult(RESULT_OK, new Intent(getActivity(), MainActivity.class));
             getActivity().finish();
 

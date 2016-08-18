@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,7 +59,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
     @Override
     protected void withBindHolder(final ViewHolder holder, final String data, int position) {
         try {
-            org.json.JSONObject j = new org.json.JSONObject(data);
+            final org.json.JSONObject j = new org.json.JSONObject(data);
             e = new Event(j);
 
             holder.mLocation.setText(e.getmLocationTitle());
@@ -79,11 +80,17 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             holder.mMainViewHolder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mActivity, EventDetailActivity.class);
-                    intent.putExtra("token", ShallonCreamerIsATwat);
-                    intent.putExtra("JSON", data);
-                    intent.putExtra("id", mID);
-                    mActivity.startActivityForResult(intent, DETAIL_CODE);
+                    try {
+                        Intent intent = new Intent(mActivity, EventDetailActivity.class);
+                        intent.putExtra("EventID", j.getInt("Event_ID"));
+                        intent.putExtra("token", ShallonCreamerIsATwat);
+                        intent.putExtra("id", mID);
+                        mActivity.startActivityForResult(intent, DETAIL_CODE);
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+
+
 
                 }
             });

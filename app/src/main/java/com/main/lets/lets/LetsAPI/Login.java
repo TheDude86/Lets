@@ -3,6 +3,8 @@ package com.main.lets.lets.LetsAPI;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -93,7 +95,7 @@ public class Login {
      * @param password the user's password
      * @param a        activity used to save the user's credentials to the phone
      */
-    public static void saveInfo(String email, String password, Activity a) {
+    public static void saveInfo(String email, String password, int userID, Context a) {
         //putting the two strings together as one
         String string = email + ":" + password;
         FileOutputStream fos;
@@ -107,9 +109,10 @@ public class Login {
             e.printStackTrace();
         }
 
-        SharedPreferences preferences = a.getPreferences(Context.MODE_PRIVATE);
-        preferences.edit().putString("email", email);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a);
         preferences.edit().putString("password", password);
+        preferences.edit().putString("email", email);
+        preferences.edit().putInt("UserID", userID);
         preferences.edit().commit();
 
     }
@@ -120,7 +123,7 @@ public class Login {
      *
      * @param a activity used to write to the phone's data
      */
-    public static void clearInfo(Activity a) {
+    public static void clearInfo(Context a) {
         String string = "blank";
         FileOutputStream fos;
         try {
@@ -132,8 +135,9 @@ public class Login {
             e.printStackTrace();
         }
 
-        SharedPreferences preferences = a.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a);
         preferences.edit().remove("password");
+        preferences.edit().remove("UserID");
         preferences.edit().remove("email");
         preferences.edit().commit();
     }
