@@ -1,7 +1,10 @@
 package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
@@ -33,12 +36,13 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/30/2016.
  */
 public class ProfileFeed extends Client {
-    public static final String FILENAME = "userInfo";
+    public boolean[] mChecks = {false, false, false};
     String ShallonCreamerIsATwat = "Bearer ";
     UltimateRecyclerView mRecyclerView;
     HashMap<String, Object> mUserInfo;
     ProfileAdapter mProfileAdapter;
     LoginAdapter mLoginAdapter;
+    ProgressDialog dialog;
     Activity mActivity;
     JSONObject mUser;
 
@@ -56,6 +60,91 @@ public class ProfileFeed extends Client {
         mActivity = a;
         mUserInfo = m;
 
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(a.getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+
+        Log.println(Log.ASSERT, "ProfileFeed", ShallonCreamerIsATwat);
+
+        loadFeeds();
+
+    }
+
+
+    public void loadFeeds(){
+
+
+        if (!ShallonCreamerIsATwat.equals("")){
+
+            Log.println(Log.ASSERT, "Proiflefeed", ShallonCreamerIsATwat);
+
+            //Call made to get the user's information
+            Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                /**
+                 * When the call returns, the user's information is saved locally to mUser and
+                 * passed along the the mProfileAdapter.  It then makes three more calls to get
+                 * the user's friends, events attended/ attending, and groups and finally sets
+                 * the profile adapter as the active adapter.
+                 *
+                 * @param statusCode (unused)
+                 * @param headers (unused)
+                 * @param response JSON array object that contains the user's informations
+                 */
+                @Override
+                public void onSuccess(int statusCode, Header[] headers,
+                                      JSONObject response) {
+                    try {
+
+                        //Saving the user's info locally
+                        mUser = response.getJSONArray("info").getJSONObject(0);
+                        ArrayList<String> l = new ArrayList<>();
+                        l.add(mUser.toString());
+
+                        //Passes the user's info to the profile adapter
+                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
+                                                             (int) mUserInfo.get("userID"));
+
+                        //These functions loads the user's friends, groups, and events
+                        loadFriends();
+                        loadGroups();
+                        loadAttend();
+
+                        //Sets the adapter
+                        mRecyclerView.setAdapter(mProfileAdapter);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                /**
+                 * If something goes wrong with the call handle it here.
+                 *
+                 * @param statusCode (unused)
+                 * @param headers (unused)
+                 * @param throwable (unused)
+                 * @param errorResponse (unused)
+                 */
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                      org.json.JSONArray errorResponse) {
+                    Log.e("Async Test Failure", errorResponse.toString());
+                }
+
+            });
+        }
+    }
+
+    public boolean doChecks(){
+        for (boolean b: mChecks){
+            if (!b)
+                return false;
+
+        }
+
+        return true;
     }
 
     /**
@@ -77,7 +166,10 @@ public class ProfileFeed extends Client {
 
         //This is where the profile feed determines whether the user has logged it, the user will
         // have an access token
-        if (ShallonCreamerIsATwat.equals("Bearer ")) {
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mActivity.getBaseContext());
+
+        if (preferences.getString("Token", "").equals("")){
             //Loads the login adapter
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
@@ -116,7 +208,19 @@ public class ProfileFeed extends Client {
                                 ShallonCreamerIsATwat += response.getString("accessToken");
                                 mUserInfo.put("userID", response.getInt("user_id"));
                                 mUserInfo.put("token", ShallonCreamerIsATwat);
-                                Login.saveInfo(email, password, response.getInt("user_id"), mActivity.getBaseContext());
+
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext());
+
+                                SharedPreferences.Editor editor = preferences.edit();
+
+                                editor.putString("password", password);
+                                editor.putString("email", email);
+                                editor.putInt("UserID", response.getInt("user_id"));
+                                editor.putString("Token", "Bearer " + response.getString("accessToken"));
+                                editor.commit();
+
+
+                                loadFeeds();
                                 draw(null);
 
                             } catch (JSONException e) {
@@ -132,69 +236,26 @@ public class ProfileFeed extends Client {
 
             });
 
+            
+
             //Setting the adapter to be displayed to the user
             mRecyclerView.setAdapter(mLoginAdapter);
             //If the user has logged in
         } else {
+
             //Preparing the profile adapter to be set to the recycler view
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
 
-            //Call made to get the user's information
-            Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                /**
-                 * When the call returns, the user's information is saved locally to mUser and
-                 * passed along the the mProfileAdapter.  It then makes three more calls to get
-                 * the user's friends, events attended/ attending, and groups and finally sets
-                 * the profile adapter as the active adapter.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param response JSON array object that contains the user's informations
-                 */
-                @Override
-                public void onSuccess(int statusCode, Header[] headers,
-                                      JSONObject response) {
-                    try {
+            if(doChecks()){
+                mRecyclerView.setAdapter(mProfileAdapter);
 
-                        //Saving the user's info locally
-                        mUser = response.getJSONArray("info").getJSONObject(0);
-                        ArrayList<String> l = new ArrayList<>();
-                        l.add(mUser.toString());
+            } else {
+                dialog = ProgressDialog.show(mActivity, "", "Loading. Please wait...", true);
+            }
 
-                        //Passes the user's info to the profile adapter
-                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
-                                (int) mUserInfo.get("userID"));
 
-                        //These functions loads the user's friends, groups, and events
-                        loadFriends();
-                        loadGroups();
-                        loadAttend();
 
-                        //Sets the adapter
-                        mRecyclerView.setAdapter(mProfileAdapter);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                /**
-                 * If something goes wrong with the call handle it here.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param throwable (unused)
-                 * @param errorResponse (unused)
-                 */
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                      org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
-                }
-
-            });
         }
 
     }
@@ -232,6 +293,9 @@ public class ProfileFeed extends Client {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers,
                                                   org.json.JSONArray response) {
+
+                                mChecks[0] = true;
+
                                 ArrayList<String> groups = new ArrayList<>();
                                 try {
 
@@ -249,6 +313,7 @@ public class ProfileFeed extends Client {
                                     e.printStackTrace();
                                 }
 
+                                finishedLoadFeed();
                             }
 
                             /**
@@ -293,6 +358,8 @@ public class ProfileFeed extends Client {
                               @Override
                               public void onSuccess(int statusCode, Header[] headers,
                                                     org.json.JSONArray response) {
+                                  mChecks[1] = true;
+
                                   try {
 
                                       ArrayList<String> events = new ArrayList<>();
@@ -307,6 +374,8 @@ public class ProfileFeed extends Client {
                                   } catch (org.json.JSONException e) {
                                       e.printStackTrace();
                                   }
+
+                                  finishedLoadFeed();
                               }
 
                               /**
@@ -336,8 +405,6 @@ public class ProfileFeed extends Client {
     public void loadFriends() throws JSONException {
         //Call to get the user's friends
 
-        Log.println(Log.ASSERT, "ProfileFeed", mUserInfo.toString());
-
         Calls.getFriends((Integer) mUserInfo.get("userID"), new JsonHttpResponseHandler() {
             /**
              * When the call is made, it returns a JSON array object of all of
@@ -350,6 +417,8 @@ public class ProfileFeed extends Client {
              */
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                mChecks[2] = true;
+
                 ArrayList<String> friends = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
@@ -367,15 +436,12 @@ public class ProfileFeed extends Client {
                 try {
                     //Loads the temporary array list into the profile adapter
                     mProfileAdapter.loadFriends(friends);
-                    //Loads the active feed of the profile adapter to the friends feed
-                    if (mProfileAdapter.mDemoHolder != null)
-                        mProfileAdapter.mDemoHolder.loadFeed(friends, new ArrayList<String>(),
-                                                         EntityAdapter.Viewing.FRIENDS);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
+                finishedLoadFeed();
             }
 
             /**
@@ -393,6 +459,20 @@ public class ProfileFeed extends Client {
             }
 
         });
+
+    }
+
+    public void finishedLoadFeed() {
+        Log.println(Log.ASSERT, "ProfileFeed", mChecks.toString());
+
+        if (doChecks()) {
+            if (dialog != null) {
+                dialog.hide();
+                mRecyclerView.setAdapter(mProfileAdapter);
+
+            }
+
+        }
 
     }
 

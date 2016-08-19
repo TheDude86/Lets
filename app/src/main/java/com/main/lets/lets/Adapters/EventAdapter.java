@@ -59,6 +59,16 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
     @Override
     protected void withBindHolder(final ViewHolder holder, final String data, int position) {
         try {
+            final int[] bgColors = {mActivity.getResources().getColor(R.color.party),
+                    mActivity.getResources().getColor(R.color.eat),
+                    mActivity.getResources().getColor(R.color.study),
+                    mActivity.getResources().getColor(R.color.tv),
+                    mActivity.getResources().getColor(R.color.videogames),
+                    mActivity.getResources().getColor(R.color.sports),
+                    mActivity.getResources().getColor(R.color.music),
+                    mActivity.getResources().getColor(R.color.relax),
+                    mActivity.getResources().getColor(R.color.other)};
+
             final org.json.JSONObject j = new org.json.JSONObject(data);
             e = new Event(j);
 
@@ -66,16 +76,10 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             holder.mTime.setText(e.getTimeSpanString());
             holder.mTitle.setText(e.getmTitle());
 
-            Bitmap photo = BitmapFactory.decodeResource(mActivity.getResources(), e.getImageResourceId(mActivity));
             Picasso.with(mActivity).load(e.getImageResourceId(mActivity)).into((holder.mBackground));
 
-            Palette.generateAsync(photo, new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    int bgColor = palette.getMutedColor(mActivity.getResources().getColor(android.R.color.black));
-                    holder.mTextBackground.setBackgroundColor(bgColor);
-                }
-            });
+            holder.mTextBackground.setBackgroundColor(bgColors[j.getInt("Category")]);
+
 
             holder.mMainViewHolder.setOnClickListener(new View.OnClickListener() {
                 @Override

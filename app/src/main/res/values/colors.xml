@@ -3,4 +3,16 @@
     <color name="colorPrimary">#FFCC00</color>
     <color name="colorPrimaryDark">#FFB79200</color>
     <color name="colorAccent">#000000</color>
+
+
+    <color name="party">#5C4D81</color>
+    <color name="eat">#A18A4B</color>
+    <color name="study">#B7D0A7</color>
+    <color name="tv">#B2B2B2</color>
+    <color name="videogames">#999999</color>
+    <color name="sports">#73A0BA</color>
+    <color name="music">#A7449A</color>
+    <color name="relax">#E5D480</color>
+    <color name="other">#999999</color>
+
 </resources>

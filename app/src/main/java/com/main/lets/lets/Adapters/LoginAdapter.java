@@ -1,6 +1,7 @@
 package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.main.lets.lets.Activities.RegisterActivity;
+import com.main.lets.lets.Activities.SearchActivity;
 import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -30,7 +33,17 @@ public class LoginAdapter extends UltimateViewAdapter<LoginAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_login, parent, false);
 
-        return new ViewHolder(view);
+        ViewHolder holder = new ViewHolder(view);
+        holder.mReg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mActivity, RegisterActivity.class);
+
+                mActivity.startActivity(intent);
+            }
+        });
+
+        return holder;
     }
 
     @Override

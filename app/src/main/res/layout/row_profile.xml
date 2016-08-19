@@ -16,23 +16,17 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="330dp">
-
-            <ImageView
-                android:id="@+id/bgImage"
-                android:layout_width="575dp"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="#00aeff"
-                android:transitionName="tImage" />
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="290dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/img_profile"
                 android:layout_gravity="top|center"
-                android:adjustViewBounds="false"
-                android:scaleType="center" />
+                android:adjustViewBounds="true"
+                android:background="#00aeff"
+                android:maxHeight="500dp"
+                android:scaleType="centerCrop" />
 
             <RelativeLayout
                 android:layout_width="match_parent"

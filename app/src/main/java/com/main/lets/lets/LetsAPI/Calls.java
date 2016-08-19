@@ -117,6 +117,7 @@ public class Calls {
     public static void getCloseEvents(double latitude, double longitude, int range,
                                       JsonHttpResponseHandler jsonHttpResponseHandler) {
 
+        client.removeAllHeaders();
         RequestParams params = new RequestParams();
         params.put("latitude", latitude);
         params.put("longitude", longitude);

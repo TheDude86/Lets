@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.main.lets.lets">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.main.lets.lets">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:name="android.support.multidex.MultiDexApplication"
@@ -22,35 +21,35 @@
         tools:replace="android:icon,android:theme">
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".Activities.EventDetailActivity"
             android:label="@string/title_activity_event_detail"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".Activities.EventCreateActivity"
             android:label="Create a new Event"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_key"/>
 
         <activity
             android:name=".Activities.GroupCreateActivity"
             android:label="Create a new Group"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
         <activity
             android:name=".Activities.GroupDetailActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".Activities.UserDetailActivity" />
+            android:theme="@style/AppTheme"/>
+        <activity android:name=".Activities.UserDetailActivity"/>
         <activity
             android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -58,12 +57,14 @@
             android:theme="@style/CreateTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.main.lets.lets.Activities.MainActivity" />
+                android:value="com.main.lets.lets.Activities.MainActivity"/>
         </activity>
         <activity
             android:name=".Activities.SearchActivity"
-            android:theme="@style/SearchTheme" />
-        <activity android:name=".Activities.InviteActivity"></activity>
+            android:theme="@style/SearchTheme"/>
+        <activity android:name=".Activities.InviteActivity"/>
+        <activity android:name=".Activities.RegisterActivity">
+        </activity>
     </application>
 
 </manifest>

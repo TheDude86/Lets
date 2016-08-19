@@ -41,81 +41,10 @@ public class Login {
         //Initializing global variable
         mActivity = a;
 
-        try {
-            try {
-                //Opening the input stream and looks for the file, if it is not there, it will
-                //throw a FileNotFoundException
-                FileInputStream fis = mActivity.openFileInput(FILENAME);
-                InputStreamReader isr = new InputStreamReader(fis);
-                BufferedReader bufferedReader = new BufferedReader(isr);
-                StringBuilder sb = new StringBuilder();
-                String line;
 
-                String[] cred;
-                //Reads each line from the file and sets the line string equal to the line  then and
-                //appends it onto the string builder
-                while ((line = bufferedReader.readLine()) != null) {
-                    sb.append(line);
-                }
-
-                //If the file just reads blank, that means the app has previously tried to log in
-                // but failed so it created the new file and wrote "blank"
-
-                //If the file does not read blank, then the user's email and password have been
-                // saved so it will split the string into a string array containing a separate
-                // string for the email and password which then makes the call to log in
-                if (!sb.toString().equals("blank")) {
-                    cred = sb.toString().split(":");
-                    Calls.login(cred[0], cred[1], jsonHttpResponseHandler);
-
-                }
-
-            } catch (FileNotFoundException e) {
-                //If no file exists, this code runs creating a new file and writing "blank"
-                FileOutputStream fos;
-                String string = "blank";
-                fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                fos.write(string.getBytes());
-                fos.close();
-
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
-    /**
-     * Saves user's email and password as a string on the phone so the app can access that data if
-     * the app is closed and auto login.  The string is saved in the format: "email:password"
-     *
-     * @param email    the user's email
-     * @param password the user's password
-     * @param a        activity used to save the user's credentials to the phone
-     */
-    public static void saveInfo(String email, String password, int userID, Context a) {
-        //putting the two strings together as one
-        String string = email + ":" + password;
-        FileOutputStream fos;
-        try {
-            //Writing the string to the file
-            fos = a.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(string.getBytes());
-            fos.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a);
-        preferences.edit().putString("password", password);
-        preferences.edit().putString("email", email);
-        preferences.edit().putInt("UserID", userID);
-        preferences.edit().commit();
-
-    }
 
     /**
      * Clears the user's email and password saved on the phone, used for logging out.
@@ -124,23 +53,11 @@ public class Login {
      * @param a activity used to write to the phone's data
      */
     public static void clearInfo(Context a) {
-        String string = "blank";
-        FileOutputStream fos;
-        try {
-            fos = a.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(string.getBytes());
-            fos.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a);
-        preferences.edit().remove("password");
-        preferences.edit().remove("UserID");
-        preferences.edit().remove("email");
-        preferences.edit().remove("Token");
-        preferences.edit().commit();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
     }
 
 }

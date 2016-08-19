@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GlobalFeed;
@@ -64,7 +65,10 @@ public class MainActivity extends AppCompatActivity {
         mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
 
         //Login object used for auto login for returning users
-        mLogin = new Login(this, new JsonHttpResponseHandler() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        Calls.login(preferences.getString("email", ""), preferences.getString("password", ""),
+                    new JsonHttpResponseHandler() {
 
             /**
              * The login object will attempt to login automatically if there are saved credentials
@@ -78,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
+
                 try {
                     if (response.has("accessToken")) {
                         SharedPreferences preferences = PreferenceManager
@@ -89,14 +94,13 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("Token", "Bearer " + response.getString("accessToken"));
                         editor.commit();
 
-                        Log.println(Log.ASSERT, "MainActivity", preferences.getInt("UserID", -1) + "");
-
 
                         mMap.put("token", response.getString("accessToken"));
                         mMap.put("userID", response.getInt("user_id"));
-                        mProfileFeed.updateToken("Bearer " + response.getString("accessToken"));
                         mGlobalFeed.update(response.getInt("user_id"),
-                                "Bearer " + response.getString("accessToken"));
+                                           "Bearer " + response.getString("accessToken"));
+
+                        mProfileFeed = new ProfileFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
 
 
                     } else {
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
 
         //Checks to see if the user has granted the app permission to get the device's location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
