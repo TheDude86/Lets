@@ -269,6 +269,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (mActive.equals(mGlobalFeed.getClass().toString())) {
+            mGlobalFeed.draw(new JSONObject(mMap));
+
+        } else if (mActive.equals(mProfileFeed.getClass().toString())) {
+            mProfileFeed.draw(null);
+
+        }
+
+    }
+
     @Override
     public void onRequestPermissionsResult
             (int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {

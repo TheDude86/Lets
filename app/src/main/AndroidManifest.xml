@@ -62,11 +62,24 @@
         <activity
             android:name=".Activities.SearchActivity"
             android:theme="@style/SearchTheme" />
-        <activity android:name=".Activities.InviteActivity" />
-        <activity android:name=".Activities.RegisterActivity" />
-        <activity android:name=".Activities.DateActivity" />
-        <activity android:name=".Activities.AccountActivity"></activity>
-        <activity android:name=".Activities.CreateDetailActivity"></activity>
+        <activity android:name=".Activities.InviteActivity"/>
+
+        <activity android:name=".Activities.RegisterActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:label="@string/title_activity_register"
+            android:theme="@style/CreateTheme"/>
+        <activity android:name=".Activities.DateActivity"
+            android:parentActivityName=".Activities.RegisterActivity"
+            android:label="@string/title_activity_birthday"
+            android:theme="@style/CreateTheme"/>
+        <activity android:name=".Activities.AccountActivity"
+            android:label="@string/title_activity_account"
+            android:parentActivityName=".Activities.DateActivity"
+            android:theme="@style/CreateTheme"></activity>
+        <activity android:name=".Activities.CreateDetailActivity"
+            android:label="@string/title_activity_detail"
+            android:parentActivityName=".Activities.DateActivity"
+            android:theme="@style/CreateTheme"></activity>
     </application>
 
 </manifest>

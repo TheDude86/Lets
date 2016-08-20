@@ -1,6 +1,8 @@
 package com.main.lets.lets.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +34,15 @@ public class DateActivity extends AppCompatActivity {
                     intent.putExtra("birthday", mBirthday);
                     startActivity(intent);
 
+                } else {
+                    AlertDialog.Builder errorBuilder = new AlertDialog.Builder(DateActivity.this);
+
+                    errorBuilder.setMessage("You must select a birthday").setTitle("Error");
+
+                    errorBuilder.setPositiveButton("Okay", null);
+
+                    AlertDialog errorDialog = errorBuilder.create();
+                    errorDialog.show();
                 }
 
             }

@@ -1,8 +1,10 @@
 package com.main.lets.lets.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +35,17 @@ public class AccountActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                final AlertDialog.Builder errorBuilder = new AlertDialog.Builder(AccountActivity.this);
+
+                errorBuilder.setTitle("Error");
+
+                errorBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+
+
                 final EditText email = (EditText) findViewById(R.id.email);
                 final EditText password = (EditText) findViewById(R.id.password);
                 EditText confirm = (EditText) findViewById(R.id.confirm);
@@ -49,44 +62,79 @@ public class AccountActivity extends AppCompatActivity {
                             final String name = getIntent().getStringExtra("name");
                             final String birthday = getIntent().getStringExtra("birthday");
 
-                            Calls.createUser(email.getText().toString(), password.getText().toString(), name, birthday, new JsonHttpResponseHandler() {
+                            if (create.getText().toString().equals("Account Created!")) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(AccountActivity.this);
 
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                    try {
+                                builder.setMessage("You have already created an account, go back to see your profile")
+                                        .setTitle("Account Already Created");
 
-                                        if (response.has("accessToken")) {
-                                            create.setText("Account Created!");
+                                builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
 
-                                            SharedPreferences preferences = PreferenceManager
-                                                    .getDefaultSharedPreferences(getBaseContext());
+                                    }
+                                });
 
-                                            SharedPreferences.Editor editor = preferences.edit();
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
 
-                                            editor.putString("Token", "Bearer " + response.getString("accessToken"));
-                                            editor.putString("password", password.getText().toString());
-                                            editor.putString("email", email.getText().toString());
-                                            editor.putInt("UserID", response.getInt("user_id"));
-                                            editor.commit();
+                            } else {
+                                Calls.createUser(email.getText().toString(), password.getText().toString(), name, birthday, new JsonHttpResponseHandler() {
 
-                                            Intent intent = new Intent(AccountActivity.this, CreateDetailActivity.class);
-                                            intent.putExtra("token", "Bearer " + response.getString("accessToken"));
-                                            intent.putExtra("birthday", birthday);
-                                            intent.putExtra("name", name);
-                                            startActivity(intent);
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        try {
 
+                                            if (response.has("accessToken")) {
+                                                create.setText("Account Created!");
+
+                                                SharedPreferences preferences = PreferenceManager
+                                                        .getDefaultSharedPreferences(getBaseContext());
+
+                                                SharedPreferences.Editor editor = preferences.edit();
+
+                                                editor.putString("Token", "Bearer " + response.getString("accessToken"));
+                                                editor.putString("password", password.getText().toString());
+                                                editor.putString("email", email.getText().toString());
+                                                editor.putInt("UserID", response.getInt("user_id"));
+                                                editor.commit();
+
+                                                Intent intent = new Intent(AccountActivity.this, CreateDetailActivity.class);
+                                                intent.putExtra("token", "Bearer " + response.getString("accessToken"));
+                                                intent.putExtra("birthday", birthday);
+                                                intent.putExtra("name", name);
+                                                startActivity(intent);
+
+                                            } else {
+                                                errorBuilder.setMessage(response.getString("error"));
+                                                AlertDialog errorDialog = errorBuilder.create();
+                                                errorDialog.show();
+                                            }
+
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
 
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
                                     }
+                                });
 
-                                }
-                            });
+                            }
 
+
+                        } else {
+                            errorBuilder.setMessage("Your passwords do not match");
+                            AlertDialog errorDialog = errorBuilder.create();
+                            errorDialog.show();
                         }
+                    } else {
+                        errorBuilder.setMessage("Password must be at least six characters long");
+                        AlertDialog errorDialog = errorBuilder.create();
+                        errorDialog.show();
                     }
+                } else {
+                    errorBuilder.setMessage("Email cannot be empty");
+                    AlertDialog errorDialog = errorBuilder.create();
+                    errorDialog.show();
                 }
 
 

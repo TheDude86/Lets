@@ -1,6 +1,8 @@
 package com.main.lets.lets.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +27,19 @@ public class RegisterActivity extends AppCompatActivity {
                     Intent intent = new Intent(RegisterActivity.this, DateActivity.class);
                     intent.putExtra("name", name.getText().toString());
                     startActivity(intent);
+                } else {
+                    AlertDialog.Builder errorBuilder = new AlertDialog.Builder(RegisterActivity.this);
+
+                    errorBuilder.setMessage("You must fill in a name").setTitle("Error");
+
+                    errorBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+
+                    AlertDialog errorDialog = errorBuilder.create();
+                    errorDialog.show();
                 }
 
             }

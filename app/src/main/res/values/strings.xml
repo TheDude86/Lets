@@ -165,4 +165,8 @@
     <string name="title_activity_select_location">Map</string>
     <string name="descriptionText">Tell us why it\'s so cool</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_register">Register</string>
+    <string name="title_activity_birthday">Birthday</string>
+    <string name="title_activity_account">Account</string>
+    <string name="title_activity_detail">Profile Info</string>
 </resources>
