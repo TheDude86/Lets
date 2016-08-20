@@ -216,7 +216,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
                         //Value for the event's start date formatted for post parameters
                         mMap.put("Date",
-                                 dialog.getFormattedDate(new SimpleDateFormat("mm-dd-yyyy")));
+                                 dialog.getFormattedDate(new SimpleDateFormat("MM-dd-yyyy")));
 
                         //Updating the Calendar's information (this is important for creating the
                         //end time for the event

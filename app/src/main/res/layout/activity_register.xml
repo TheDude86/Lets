@@ -24,7 +24,7 @@
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:id="@+id/editText3"
+        android:id="@+id/name"
         android:hint="Namey McNameFace"
         android:layout_below="@+id/textView26"
         android:layout_centerHorizontal="true"/>
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="Next"
         android:id="@+id/next"
-        android:layout_below="@+id/editText3"
+        android:layout_below="@+id/name"
         android:layout_marginTop="37dp"
         android:background="#ffffff"
         android:layout_alignEnd="@+id/textView26"

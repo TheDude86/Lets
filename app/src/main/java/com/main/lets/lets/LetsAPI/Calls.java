@@ -81,6 +81,7 @@ public class Calls {
     protected static final String AddAdmin = "group/addAdmin";
     protected static final String LeaveGroup = "group/leave";
     protected static final String SearchName = "search/name";
+    protected static final String CreateUser = "user/create";
 
     protected static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -258,6 +259,16 @@ public class Calls {
         params.put("gender", mUserInfo.get("gender"));
         params.put("name", mUserInfo.get("name"));
         params.put("bio", mUserInfo.get("bio"));
+
+        Log.println(Log.ASSERT, "Calls", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("interests").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("id").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("privacy").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("picRef").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("gender").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("name").toString());
+        Log.println(Log.ASSERT, "Calls", mUserInfo.get("bio").toString());
+
         client.addHeader("Authorization", token);
         post(EditProfile, params, jsonHttpResponseHandler);
     }
@@ -426,6 +437,17 @@ public class Calls {
         post(RemoveCohost, params, jsonHttpResponseHandler);
     }
 
+    public static void createUser(String email, String password, String name, String birthday, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("email", email);
+        params.put("password", password);
+        params.put("name", name);
+        params.put("bday", birthday);
+
+        post(CreateUser, params, jsonHttpResponseHandler);
+    }
+
+
 
 
 
@@ -489,10 +511,7 @@ public class Calls {
                 // The container name must be lower case
                 CloudBlobContainer container = blobClient.getContainerReference("mycontainer");
 
-                // Create or overwrite the "myimage.jpg" blob with contents from a local file.
                 CloudBlockBlob blob = container.getBlockBlobReference(mFileName);
-
-
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 mImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);

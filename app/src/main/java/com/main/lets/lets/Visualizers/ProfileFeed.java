@@ -77,8 +77,6 @@ public class ProfileFeed extends Client {
 
         if (!ShallonCreamerIsATwat.equals("")){
 
-            Log.println(Log.ASSERT, "Proiflefeed", ShallonCreamerIsATwat);
-
             //Call made to get the user's information
             Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                 /**

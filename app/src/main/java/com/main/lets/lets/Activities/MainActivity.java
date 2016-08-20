@@ -36,14 +36,12 @@ import java.util.HashMap;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
-    public static final int SELECT_PICTURE = 2;
     public LocationManager mLocationManager;
     public static final int SETTINGS = 0;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
     HashMap<String, Object> mMap;
     public String mActive;
-    public Login mLogin;
 
 
     @Override

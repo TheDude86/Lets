@@ -718,7 +718,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
 
-        public String MapListToString(ArrayList l) {
+        public static String MapListToString(ArrayList l) {
             StringBuilder s = new StringBuilder();
 
             for (Object i : l) {
