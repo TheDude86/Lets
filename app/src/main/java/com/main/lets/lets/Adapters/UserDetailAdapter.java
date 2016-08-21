@@ -1,53 +1,28 @@
 package com.main.lets.lets.Adapters;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.Holders.UserDetailViewHolder;
-import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
-import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
-import com.rey.material.app.SimpleDialog;
-import com.rey.material.widget.EditText;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import cz.msebera.android.httpclient.Header;
+import java.util.Iterator;
 
 /**
  * Created by Joe on 6/30/2016.
@@ -116,6 +91,7 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
         mHolder = (UserDetailViewHolder) holder;
         try {
             JSONObject json = new JSONObject(mList.get(0));
+            JSONObject interests = json.getJSONObject("interests");
 
             mHolder.mScore.setText("Score: " + json.getInt("Score"));
             mHolder.mName.setText(json.getString("User_Name"));
@@ -153,7 +129,22 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
                 }
             });
 
-            mHolder.mInterests.setText("Fix this too");
+            String interestString = "";
+            Iterator<String> keys = interests.keys();
+
+            while (keys.hasNext()){
+                String key = keys.next();
+                if (interests.getBoolean(key)) {
+                    if (interestString.length() == 0)
+                        interestString = key;
+                    else
+                        interestString += ", " + key;
+
+                }
+            }
+
+            mHolder.mInterests.setText(interestString);
+
 
             Picasso.with(mActivity).load(json.getString("Profile_Picture")).into(mHolder.mPic);
 

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
     public OnCommentsClicked mCommentsClicked;
     public OnActionsClicked mActionsClicked;
     public OnEntityClicked mEntityClicked;
+    public OnJoinClicked mOnJoinedClicked;
     public ArrayList<String> mList;
     public MemberStatus mStatus;
     public int mID;
@@ -80,7 +82,7 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
         try {
             if (position == 0) {
                 mMainHolder = ((MainHolder) holder);
-                Event e = new Event(new JSONObject(mList.get(0)));
+                final Event e = new Event(new JSONObject(mList.get(0)));
 
                 ((MainHolder) holder).mTime.setText(e.getTimeSpanString());
                 ((MainHolder) holder).mLocation.setText(e.getmLocationTitle());
@@ -110,6 +112,16 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
                     public void onClick(View v) {
                         if (mAttendanceClicked != null)
                             mAttendanceClicked.onClicked();
+                    }
+                });
+
+                ((MainHolder) holder).mJoin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.println(Log.ASSERT, "EventDetailAdapter", "Test");
+
+                        if (mOnJoinedClicked != null)
+                            mOnJoinedClicked.onClicked(e.mID);
                     }
                 });
 
@@ -158,7 +170,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
     }
 
     public class MainHolder extends RecyclerView.ViewHolder {
-        public LinearLayout mJoinLayout;
         public TextView mDescription;
         public TextView mAttendance;
         public TextView mLocation;
@@ -173,7 +184,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
 
             mDescription = (TextView) itemView.findViewById(R.id.event_description);
             mAttendance = (TextView) itemView.findViewById(R.id.event_attendance);
-            mJoinLayout = (LinearLayout) itemView.findViewById(R.id.layout_join);
             mLocation = (TextView) itemView.findViewById(R.id.event_location);
             mComments = (TextView) itemView.findViewById(R.id.btn_comments);
             mActions = (TextView) itemView.findViewById(R.id.btn_actions);
@@ -216,6 +226,10 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
         mActionsClicked = a;
     }
 
+    public void setOnJoinedClicked(OnJoinClicked j) {
+        mOnJoinedClicked = j;
+    }
+
     public interface OnAttendanceClicked {
         void onClicked();
     }
@@ -230,5 +244,9 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
 
     public interface OnActionsClicked {
         void onClicked();
+    }
+
+    public interface OnJoinClicked {
+        void onClicked(int eventID);
     }
 }

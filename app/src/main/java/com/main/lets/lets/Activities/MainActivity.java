@@ -14,10 +14,12 @@ import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -25,6 +27,7 @@ import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GlobalFeed;
+import com.main.lets.lets.Visualizers.NotificationFeed;
 import com.main.lets.lets.Visualizers.ProfileFeed;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
@@ -36,6 +39,7 @@ import java.util.HashMap;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
+    public NotificationFeed mNotificationFeed;
     public LocationManager mLocationManager;
     public static final int SETTINGS = 0;
     public ProfileFeed mProfileFeed;
@@ -83,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     if (response.has("accessToken")) {
+                        new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications), "Bearer " + response.getString("accessToken")).execute();
+
+                        mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
+
                         SharedPreferences preferences = PreferenceManager
                                 .getDefaultSharedPreferences(getBaseContext());
 
@@ -240,8 +248,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_notifications).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ((ImageButton) findViewById(R.id.btn_notifications)).setImageResource(R.drawable.ic_notifications_none_black_24dp);
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
+                if (mNotificationFeed == null) {
+                    mActive = mProfileFeed.getClass().toString();
+                    mProfileFeed.draw(null);
+                }else {
+                    mActive = mNotificationFeed.getClass().toString();
+                    mNotificationFeed.draw(null);
 
+                }
             }
         });
 
@@ -274,11 +290,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
 
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext());
+
+        String ShallonCreamerIsATwat = preferences.getString("Token", "");
+
+        if (!ShallonCreamerIsATwat.equals("") && !mActive.equals(mNotificationFeed.getClass().toString()))
+            new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications), ShallonCreamerIsATwat).execute();
+
+
         if (mActive.equals(mGlobalFeed.getClass().toString())) {
             mGlobalFeed.draw(new JSONObject(mMap));
 
         } else if (mActive.equals(mProfileFeed.getClass().toString())) {
             mProfileFeed.draw(null);
+
+        }else if (mActive.equals(mNotificationFeed.getClass().toString())) {
+            mNotificationFeed.draw(null);
 
         }
 
@@ -347,6 +375,8 @@ public class MainActivity extends AppCompatActivity {
                 } else if (mActive.equals(mProfileFeed.getClass().toString())) {
                     mProfileFeed.draw(null);
 
+                } else if (mActive.equals(mNotificationFeed.getClass().toString())) {
+                    mNotificationFeed.draw(null);
                 }
             }
         }

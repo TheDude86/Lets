@@ -59,6 +59,9 @@ public class GroupActions implements View.OnClickListener {
             DialogFragment fragment;
             switch (((TextView) v).getText().toString()) {
                 case "Comment":
+
+                    Log.println(Log.ASSERT, "GroupActions", "Test");
+
                     builder = new SimpleDialog.Builder() {
 
                         @Override
@@ -139,6 +142,8 @@ public class GroupActions implements View.OnClickListener {
                                 e1.printStackTrace();
                             }
 
+
+
                             super.onPositiveActionClicked(fragment);
                         }
 
@@ -152,6 +157,9 @@ public class GroupActions implements View.OnClickListener {
                             .positiveAction("Comment")
                             .negativeAction("Cancel")
                             .contentView(R.layout.dialog_comment);
+
+                    fragment = DialogFragment.newInstance(builder);
+                    fragment.show(mFeed.mActivity.getSupportFragmentManager(), null);
 
                     break;
 
@@ -450,6 +458,9 @@ public class GroupActions implements View.OnClickListener {
                                 .negativeAction("Cancel");
                     }
 
+                    fragment = DialogFragment.newInstance(builder);
+                    fragment.show(mFeed.mActivity.getSupportFragmentManager(), null);
+
                     break;
 
                 case "Edit Group":
@@ -508,6 +519,9 @@ public class GroupActions implements View.OnClickListener {
                             .positiveAction("Delete")
                             .negativeAction("Cancel");
 
+                    fragment = DialogFragment.newInstance(builder);
+                    fragment.show(mFeed.mActivity.getSupportFragmentManager(), null);
+
                     break;
                 case "Invite Friends":
                     Intent intent = new Intent(mFeed.mActivity, InviteActivity.class);
@@ -533,6 +547,8 @@ public class GroupActions implements View.OnClickListener {
                     break;
 
             }
+
+
 
 
         } catch (JSONException e) {

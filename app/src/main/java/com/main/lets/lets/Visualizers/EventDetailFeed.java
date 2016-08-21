@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.telecom.Call;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -49,6 +48,7 @@ public class EventDetailFeed extends Client {
     ArrayList<String> mUserTags;
     RecyclerView mRecyclerView;
     JSONArray mCoHosts;
+    JSONObject mJSON;
     int mID;
 
     public EventDetailFeed(AppCompatActivity a, RecyclerView r) {
@@ -71,12 +71,14 @@ public class EventDetailFeed extends Client {
     @Override
     public void draw(final JSONObject j) {
         try {
+            mJSON = j;
+
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
             mEventAdapter = new EventDetailAdapter(mActivity, j.toString(),
-                                                   (new Event(j).getmOwnerID() == mID) ?
-                                                           EventDetailAdapter.MemberStatus.HOST :
-                                                           EventDetailAdapter.MemberStatus.GUEST);
+                    (new Event(j).getmOwnerID() == mID) ?
+                            EventDetailAdapter.MemberStatus.HOST :
+                            EventDetailAdapter.MemberStatus.GUEST);
 
             mEventAdapter.setOnAttendanceClicked(new EventDetailAdapter.OnAttendanceClicked() {
                 @Override
@@ -131,7 +133,7 @@ public class EventDetailFeed extends Client {
                         try {
 
                             intent.putExtra("UserID", (new JSONObject(mUserTags.get(position)))
-                                        .getInt("user_id"));
+                                    .getInt("user_id"));
                             intent.putExtra("token", ShallonCreamerIsATwat);
                             mActivity.startActivity(intent);
 
@@ -147,7 +149,35 @@ public class EventDetailFeed extends Client {
                 public void onClicked() {
                     try {
                         ActionDialogFragment f = new ActionDialogFragment(mActivity, new Event(j),
-                                                                          mEventAdapter.mStatus);
+                                mEventAdapter.mStatus);
+
+                        f.mOnJoin = new OnJoin() {
+                            @Override
+                            public void onJoin() {
+                                try {
+                                    Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                            draw(j);
+                                        }
+                                    });
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        };
+
+                        f.mOnLeave = new OnLeave() {
+                            @Override
+                            public void onLeave() {
+                                mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.GUEST;
+                                draw(j);
+                            }
+                        };
+
                         f.show(mActivity.getFragmentManager(), "Test");
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -169,18 +199,37 @@ public class EventDetailFeed extends Client {
 
                         for (int i = 0; i < json.length(); i++) {
 
-                            if (json.getJSONObject(i).getBoolean("status")){
+                            if (json.getJSONObject(i).getBoolean("status")) {
                                 mUserTags.add(json.getJSONObject(i).toString());
                                 mEventAdapter.addElement(new Entity(json.getJSONObject(i)).mText);
 
                                 if (new Entity(json.getJSONObject(i)).mID == mID) {
                                     mEventAdapter.getmMainHolder().mJoin.setText((new Event(j).getEnd()
                                             .before(Calendar.getInstance().getTime())) ?
-                                                                                         "You attended this event" :
-                                                                                         "You're attending!");
+                                            "You attended this event" :
+                                            "You're attending!");
 
                                     if (mEventAdapter.mStatus != EventDetailAdapter.MemberStatus.HOST)
                                         mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                }
+
+                                if (mEventAdapter.mStatus == EventDetailAdapter.MemberStatus.GUEST) {
+                                    mEventAdapter.setOnJoinedClicked(new EventDetailAdapter.OnJoinClicked() {
+                                        @Override
+                                        public void onClicked(int eventID) {
+
+                                            Calls.inviteUserToEvent(eventID, mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                                    mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                                    draw(j);
+                                                }
+                                            });
+
+                                        }
+                                    });
+                                } else {
+                                    Log.println(Log.ASSERT, "EventDetailFeed", mEventAdapter.mStatus.toString());
                                 }
 
                                 if (s.length() < 1)
@@ -232,7 +281,7 @@ public class EventDetailFeed extends Client {
 
         try {
             Calls.getProfileByID(new Entity(new JSONObject(mUserTags.get(index))).mID,
-                                 ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                    ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,
                                               JSONObject response) {
@@ -264,6 +313,8 @@ public class EventDetailFeed extends Client {
 
         EventDetailAdapter.MemberStatus mStatus;
         AppCompatActivity mActivity;
+        OnLeave mOnLeave;
+        OnJoin mOnJoin;
         Event mEvent;
 
         public ActionDialogFragment(AppCompatActivity a, Event e,
@@ -336,7 +387,7 @@ public class EventDetailFeed extends Client {
                         @Override
                         protected void onBuildDone(com.rey.material.app.Dialog dialog) {
                             dialog.layoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
                         }
 
                         @Override
@@ -345,56 +396,56 @@ public class EventDetailFeed extends Client {
                             final EditText e = (EditText) fragment.getDialog()
                                     .findViewById(R.id.text);
                             final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
-                                                                              "Loading. Please " +
-                                                                                      "wait...",
-                                                                              true);
+                                    "Loading. Please " +
+                                            "wait...",
+                                    true);
                             Calls.addComment(event.getmEventID(), ShallonCreamerIsATwat,
-                                             e.getText().toString(),
-                                             new JsonHttpResponseHandler() {
-                                                 @Override
-                                                 public void onSuccess(int statusCode,
-                                                                       Header[] headers,
-                                                                       org.json.JSONObject
-                                                                               response) {
-                                                     String comment = "";
-                                                     try {
-                                                         for (String s : mUserTags) {
-                                                             Entity entity = new Entity(
-                                                                     new JSONObject(s));
-                                                             if (mID == entity.mID)
-                                                                 comment = entity.mText + ":\n" + e
-                                                                         .getText().toString();
-                                                         }
+                                    e.getText().toString(),
+                                    new JsonHttpResponseHandler() {
+                                        @Override
+                                        public void onSuccess(int statusCode,
+                                                              Header[] headers,
+                                                              org.json.JSONObject
+                                                                      response) {
+                                            String comment = "";
+                                            try {
+                                                for (String s : mUserTags) {
+                                                    Entity entity = new Entity(
+                                                            new JSONObject(s));
+                                                    if (mID == entity.mID)
+                                                        comment = entity.mText + ":\n" + e
+                                                                .getText().toString();
+                                                }
 
-                                                         JSONObject j = new JSONObject();
-                                                         j.put("user_id", mID);
-                                                         j.put("event_id", event.getmEventID());
-                                                         j.put("text", e.getText().toString());
-                                                         j.put("timestamp",
-                                                               "/Date(" + Calendar.getInstance()
-                                                                       .getTimeInMillis() + ")/");
-                                                         mComments.add(j.toString());
-                                                     } catch (JSONException e1) {
-                                                         e1.printStackTrace();
-                                                     }
+                                                JSONObject j = new JSONObject();
+                                                j.put("user_id", mID);
+                                                j.put("event_id", event.getmEventID());
+                                                j.put("text", e.getText().toString());
+                                                j.put("timestamp",
+                                                        "/Date(" + Calendar.getInstance()
+                                                                .getTimeInMillis() + ")/");
+                                                mComments.add(j.toString());
+                                            } catch (JSONException e1) {
+                                                e1.printStackTrace();
+                                            }
 
-                                                     if (mEventAdapter.type == EventDetailAdapter
-                                                             .ViewType.COMMENTS)
-                                                         mEventAdapter.addElement(comment);
+                                            if (mEventAdapter.type == EventDetailAdapter
+                                                    .ViewType.COMMENTS)
+                                                mEventAdapter.addElement(comment);
 
-                                                     dialog.hide();
+                                            dialog.hide();
 
-                                                 }
+                                        }
 
-                                                 @Override
-                                                 public void onFailure(int statusCode,
-                                                                       Header[] headers,
-                                                                       Throwable throwable,
-                                                                       JSONObject errorResponse) {
+                                        @Override
+                                        public void onFailure(int statusCode,
+                                                              Header[] headers,
+                                                              Throwable throwable,
+                                                              JSONObject errorResponse) {
 
-                                                 }
+                                        }
 
-                                             });
+                                    });
 
                             super.onPositiveActionClicked(fragment);
                         }
@@ -452,15 +503,15 @@ public class EventDetailFeed extends Client {
                             CharSequence[] values = getSelectedValues();
                             Entity e;
 
-                            for (int i = 0; i < values.length; i++){
-                                for (int j = 0; j < mCoHosts.length(); j++){
+                            for (int i = 0; i < values.length; i++) {
+                                for (int j = 0; j < mCoHosts.length(); j++) {
                                     try {
                                         Entity user = new Entity(mCoHosts.getJSONObject(j));
-                                        if (values[i].equals(user.mText)){
+                                        if (values[i].equals(user.mText)) {
 
                                             Log.println(Log.ASSERT, "EventDetailFeed", ShallonCreamerIsATwat);
 
-                                            Calls.removeCohost(user.mID, event.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                            Calls.removeCohost(user.mID, event.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
 
                                                 @Override
@@ -501,17 +552,40 @@ public class EventDetailFeed extends Client {
                 case "Leave Event":
                     AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
 
-                    alertDialog.setTitle("Coming Soon!");
+                    alertDialog.setTitle("Are you sure?");
 
-                    alertDialog.setMessage("Woot!");
+                    alertDialog.setMessage("Are you sure you want to leave this event?");
 
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Awesome", new DialogInterface.OnClickListener() {
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Unattend", new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
+                            Calls.leaveEvent(mEvent.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    if (mOnLeave != null)
+                                        mOnLeave.onLeave();
+
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                    if (mOnLeave != null)
+                                        mOnLeave.onLeave();
+
+                                }
+                            });
+
                         }
 
+                    });
+
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                        }
                     });
 
                     alertDialog.show();
@@ -536,6 +610,13 @@ public class EventDetailFeed extends Client {
                     editDialog.show();
 
                     break;
+                case "Join Event":
+
+                    if (mOnJoin != null) {
+                        mOnJoin.onJoin();
+                    }
+
+                    break;
 
             }
 
@@ -546,6 +627,14 @@ public class EventDetailFeed extends Client {
 
         }
 
+    }
+
+    public interface OnLeave {
+        void onLeave();
+    }
+
+    public interface OnJoin {
+        void onJoin();
     }
 
 }

@@ -25,6 +25,7 @@ import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GroupDetailFeed;
 import com.rey.material.app.Dialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,7 +82,8 @@ public class GroupDetailActivity extends AppCompatActivity {
     public void loadActivity(final JSONObject j) throws JSONException {
         final GroupDetailFeed g = new GroupDetailFeed(this, ShallonCreamerIsATwat, mID);
         for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID) {
+            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID
+                    && j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")) {
                 findViewById(R.id.layout_join).setVisibility(View.GONE);
             }
         }

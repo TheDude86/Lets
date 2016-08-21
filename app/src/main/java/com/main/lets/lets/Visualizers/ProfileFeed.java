@@ -3,13 +3,16 @@ package com.main.lets.lets.Visualizers;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.Activities.CreateDetailActivity;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.Adapters.LoginAdapter;
 import com.main.lets.lets.Adapters.ProfileAdapter;
@@ -65,15 +68,12 @@ public class ProfileFeed extends Client {
 
         ShallonCreamerIsATwat = preferences.getString("Token", "");
 
-        Log.println(Log.ASSERT, "ProfileFeed", ShallonCreamerIsATwat);
-
         loadFeeds();
 
     }
 
 
     public void loadFeeds(){
-
 
         if (!ShallonCreamerIsATwat.equals("")){
 
@@ -87,7 +87,7 @@ public class ProfileFeed extends Client {
                  *
                  * @param statusCode (unused)
                  * @param headers (unused)
-                 * @param response JSON array object that contains the user's informations
+                 * @param response JSON array object that contains the user's information
                  */
                 @Override
                 public void onSuccess(int statusCode, Header[] headers,
@@ -107,9 +107,6 @@ public class ProfileFeed extends Client {
                         loadFriends();
                         loadGroups();
                         loadAttend();
-
-                        //Sets the adapter
-                        mRecyclerView.setAdapter(mProfileAdapter);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -222,7 +219,15 @@ public class ProfileFeed extends Client {
                                 draw(null);
 
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+
+                                builder.setMessage("Your password or email is incorrect")
+                                        .setTitle("Error");
+
+                                builder.setPositiveButton("Okay", null);
+
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
                             }
 
                         }
@@ -234,12 +239,14 @@ public class ProfileFeed extends Client {
 
             });
 
-            
+
 
             //Setting the adapter to be displayed to the user
             mRecyclerView.setAdapter(mLoginAdapter);
             //If the user has logged in
         } else {
+
+            Log.println(Log.ASSERT, "ProfileFeed", "Draw");
 
             //Preparing the profile adapter to be set to the recycler view
             mRecyclerView.setLayoutManager(
@@ -251,8 +258,6 @@ public class ProfileFeed extends Client {
             } else {
                 dialog = ProgressDialog.show(mActivity, "", "Loading. Please wait...", true);
             }
-
-
 
         }
 
@@ -416,6 +421,7 @@ public class ProfileFeed extends Client {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 mChecks[2] = true;
+                finishedLoadFeed();
 
                 ArrayList<String> friends = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
@@ -439,7 +445,6 @@ public class ProfileFeed extends Client {
                     e.printStackTrace();
                 }
 
-                finishedLoadFeed();
             }
 
             /**
@@ -461,7 +466,7 @@ public class ProfileFeed extends Client {
     }
 
     public void finishedLoadFeed() {
-        Log.println(Log.ASSERT, "ProfileFeed", mChecks.toString());
+        Log.println(Log.ASSERT, "ProfileFeed", "Checks " + mChecks[0] + " " + mChecks[1] + " " + mChecks[2]);
 
         if (doChecks()) {
             if (dialog != null) {

@@ -1,9 +1,12 @@
 package com.main.lets.lets.LetsAPI;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.PowerManager;
@@ -12,6 +15,8 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -19,12 +24,15 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.main.lets.lets.R;
 import com.microsoft.azure.storage.*;
 import com.microsoft.azure.storage.blob.*;
 
 import com.rey.material.app.Dialog;
 import com.rey.material.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -53,8 +61,10 @@ public class Calls {
      */
 
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+    protected static final String RespondToGroupInvite = "user/respondToGroupInvite";
     protected static final String TransferOwnership = "group/transferOwnership";
     protected static final String SendFriendRequest = "user/sendFriendRequest";
+    protected static final String GetNotifications = "user/getNotifications";
     protected static final String InviteGroupToEvent = "event/inviteGroup";
     protected static final String GetCloseEvents = "event/getCloseEvents";
     protected static final String GetProfileByID = "user/getProfileById";
@@ -72,16 +82,20 @@ public class Calls {
     protected static final String GetAttended = "user/getAttended";
     protected static final String LoginSecure = "user/loginSecure";
     protected static final String EditProfile = "user/editProfile";
+    protected static final String UnattendEvent = "event/unattend";
     protected static final String GetGroupInfo = "group/getInfo";
     protected static final String GetFriends = "user/getFriends";
     protected static final String AddCohost = "event/addCohost";
     protected static final String GetGroups = "user/getGroups";
+    protected static final String CreateGroup = "group/create";
     protected static final String CreateEvent = "event/create";
     protected static final String GroupDelete = "group/delete";
     protected static final String AddAdmin = "group/addAdmin";
     protected static final String LeaveGroup = "group/leave";
     protected static final String SearchName = "search/name";
     protected static final String CreateUser = "user/create";
+    protected static final String EditGroup = "group/edit";
+
 
     protected static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -447,16 +461,62 @@ public class Calls {
         post(CreateUser, params, jsonHttpResponseHandler);
     }
 
+    public static void getNotifications(String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        client.addHeader("Authorization", token);
 
-
-
-
-
-
-    public static void loadImage(String url, FileAsyncHttpResponseHandler fileAsyncHttpResponseHandler) {
-        client.get(url, fileAsyncHttpResponseHandler);
-
+        post(GetNotifications, params, jsonHttpResponseHandler);
     }
+
+    public static void leaveEvent(int eventID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("event_id", eventID);
+        client.addHeader("Authorization", token);
+
+        post(UnattendEvent, params, jsonHttpResponseHandler);
+    }
+
+    public static void createGroup(String title, String bio, boolean any, String picRef, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("group_name", title);
+        params.put("pic_ref", picRef);
+        params.put("public", any);
+        params.put("bio", bio);
+        client.addHeader("Authorization", token);
+
+        post(CreateGroup, params, jsonHttpResponseHandler);
+    }
+
+    public static void editGroup(int groupID, String title, String bio, boolean any, boolean hidden, String picRef, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("group_name", title);
+        params.put("group_id", groupID);
+        params.put("pic_ref", picRef);
+        params.put("hidden", hidden);
+        params.put("settings", 0);
+        params.put("public", any);
+        params.put("bio", bio);
+        client.addHeader("Authorization", token);
+
+        post(EditGroup, params, jsonHttpResponseHandler);
+    }
+
+    public static void respondToGroupInvite(int groupID, boolean status, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("group_id", groupID);
+        params.put("status", status);
+        client.addHeader("Authorization", token);
+
+        post(RespondToGroupInvite, params, jsonHttpResponseHandler);
+    }
+
+
+
+
+
+
+
+
 
     public static final String storageConnectionString = "DefaultEndpointsProtocol=http;"
             + "AccountName=let;" + "AccountKey=F+XpQRVgmHRaS9daL1/0TH8e0n6jsHU2cdmdhr4PeL5ayYOspWS5VMHgdm3OjCUnWBr9KMfz07LyjHg2iBJcjw==";
@@ -465,21 +525,6 @@ public class Calls {
         new UploadImage(context, image, s, finished).execute();
 
     }
-
-    public static Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
-    public static String getRealPathFromURI(Uri uri, Context context) {
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        return cursor.getString(idx);
-    }
-
 
     public static class UploadImage extends AsyncTask<Void, Void, Void>{
         public onFinished mOnFinished;
@@ -515,11 +560,11 @@ public class Calls {
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 mImage.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-                byte[] bitmapdata = bos.toByteArray();
-                ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
+                byte[] bitmap = bos.toByteArray();
+                ByteArrayInputStream bs = new ByteArrayInputStream(bitmap);
 
 
-                blob.upload(bs, bitmapdata.length);
+                blob.upload(bs, bitmap.length);
 
             }
             catch (Exception e)
@@ -539,6 +584,90 @@ public class Calls {
             }
 
             Log.println(Log.ASSERT, "Calls", "DONE");
+
+            super.onPostExecute(result);
+        }
+
+        public interface onFinished {
+            void onFinished();
+        }
+
+    }
+
+    public static class Notify extends AsyncTask<Void, Void, Void>{
+        String ShallonCreamerIsATwat;
+        ImageButton mImageButton;
+        boolean mNotify = false;
+        Activity mActivity;
+
+
+        public Notify(Activity a, ImageButton imageButton, String token){
+            ShallonCreamerIsATwat = token;
+            mImageButton = imageButton;
+            mActivity = a;
+
+            getNotifications(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        JSONArray friends = response.getJSONArray("friends");
+                        JSONArray events = response.getJSONArray("events");
+                        JSONArray groups = response.getJSONArray("groups");
+
+                        SharedPreferences preferences = PreferenceManager
+                                .getDefaultSharedPreferences(mActivity);
+
+                        int id = preferences.getInt("UserID", -1);
+
+                        for (int i = 0; i < friends.length(); i++) {
+                            if(!friends.getJSONObject(i).getBoolean("status") && friends.getJSONObject(i).getInt("sender") != id) {
+                                mImageButton.setImageResource(R.drawable.ic_notifications_black_24dp);
+                                mNotify = true;
+                            }
+                        }
+
+                        for (int i = 0; i < events.length(); i++){
+                            if (!events.getJSONObject(i).getBoolean("status")) {
+                                mImageButton.setImageResource(R.drawable.ic_notifications_black_24dp);
+                                mNotify = true;
+                            }
+                        }
+
+                        for (int i = 0; i < groups.length(); i++){
+                            if (!groups.getJSONObject(i).getBoolean("status")) {
+                                mImageButton.setImageResource(R.drawable.ic_notifications_black_24dp);
+                                mNotify = true;
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            if (!mNotify)
+                new Notify(mActivity, mImageButton, ShallonCreamerIsATwat).execute();
 
             super.onPostExecute(result);
         }

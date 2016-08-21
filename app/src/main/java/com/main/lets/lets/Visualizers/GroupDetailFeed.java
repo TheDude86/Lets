@@ -1,6 +1,8 @@
 package com.main.lets.lets.Visualizers;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -54,36 +56,6 @@ public class GroupDetailFeed extends Client {
 
     @Override
     public void draw(final JSONObject j) {
-        mJoinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    Calls.joinGroup(mID, j.getJSONArray("Group_info")
-                                    .getJSONObject(0).getInt("group_id"), ShallonCreamerIsATwat,
-                            new JsonHttpResponseHandler(){
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers,
-                                                      org.json.JSONObject response) {
-                                    mActivity.findViewById(R.id.layout_join)
-                                            .setVisibility(View.GONE);
-
-                                    mAdapter.mStatus = GroupDetailAdapter.Status.MEMBER;
-
-                                }
-
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                      JSONObject errorResponse) {
-
-                                }
-
-                            });
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
                 StaggeredGridLayoutManager.VERTICAL));
 
@@ -92,10 +64,19 @@ public class GroupDetailFeed extends Client {
                     j.getJSONArray("Group_info").getJSONObject(0).toString(), mID);
 
             for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-                mAdapter.addElement(j.getJSONArray("Group_users").getJSONObject(i).toString());
-                mMemberTags.add(j.getJSONArray("Group_users").getJSONObject(i));
-                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID)
-                    mAdapter.updateStatus(GroupDetailAdapter.Status.MEMBER);
+
+                if (j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")){
+                    mAdapter.addElement(j.getJSONArray("Group_users").getJSONObject(i).toString());
+                    mMemberTags.add(j.getJSONArray("Group_users").getJSONObject(i));
+
+                }
+
+                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID){
+                    if (j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status"))
+                        mAdapter.updateStatus(GroupDetailAdapter.Status.MEMBER);
+                    else
+                        mAdapter.updateStatus(GroupDetailAdapter.Status.INVITE);
+                }
             }
 
             loadUserDetails(0);
@@ -181,6 +162,85 @@ public class GroupDetailFeed extends Client {
 
                 }
             });
+
+            if (mAdapter.mStatus == GroupDetailAdapter.Status.INVITE){
+                mJoinButton.setText("Respond to Invite");
+                mJoinButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
+
+                        alertDialog.setTitle("Respond");
+
+                        alertDialog.setMessage("Respond to friend request");
+
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Reject", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int id) {
+
+
+                            } });
+
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Accept", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int id) {
+                                
+
+                            }});
+
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Cancel", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }});
+
+                        alertDialog.show();
+
+
+
+                        try {
+                            Calls.respondToGroupInvite(j.getJSONArray("Group_info")
+                                    .getJSONObject(0).getInt("group_id"), true, ShallonCreamerIsATwat, null);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+
+            } else {
+                mJoinButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            Calls.joinGroup(mID, j.getJSONArray("Group_info")
+                                            .getJSONObject(0).getInt("group_id"), ShallonCreamerIsATwat,
+                                    new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers,
+                                                              org.json.JSONObject response) {
+                                            mActivity.findViewById(R.id.layout_join)
+                                                    .setVisibility(View.GONE);
+
+                                            mAdapter.mStatus = GroupDetailAdapter.Status.MEMBER;
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                                              JSONObject errorResponse) {
+
+                                        }
+
+                                    });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
 
 
             mRecyclerView.setAdapter(mAdapter);

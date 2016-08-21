@@ -67,6 +67,8 @@ public class UserDetailActivity extends AppCompatActivity{
                             mUserInfo = (response.getJSONArray("info")
                                     .getJSONObject(0));
 
+                            mUserInfo.put("interests", response.getJSONObject("interests"));
+
                             SharedPreferences sharedPref = PreferenceManager
                                     .getDefaultSharedPreferences(getBaseContext());
                             final int userID = sharedPref.getInt("UserID", -1);
@@ -261,6 +263,7 @@ public class UserDetailActivity extends AppCompatActivity{
                                                 }
 
                                             }
+
                                         });
 
                                     }});

@@ -2,6 +2,7 @@ package com.main.lets.lets.Holders;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import com.main.lets.lets.R;
  */
 public class EntityViewHolder extends RecyclerView.ViewHolder {
     public RelativeLayout mLayout;
+    public ImageView mImage;
     public TextView mTitle;
 
     public EntityViewHolder(View itemView) {
@@ -19,6 +21,12 @@ public class EntityViewHolder extends RecyclerView.ViewHolder {
 
         mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
         mTitle = (TextView) itemView.findViewById(R.id.txt_entity_title);
+
+        try {
+            mImage = (ImageView) itemView.findViewById(R.id.image);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
     }
 }

@@ -45,7 +45,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     public OnMembersClickListener mMembersClickListener;
     public OnEntityClickListener mEntityClickListener;
 
-    public enum Status {GUEST, MEMBER, ADMIN, OWNER}
+    public enum Status {GUEST, INVITE, MEMBER, ADMIN, OWNER}
 
     public HashMap<String, TextView> mActions;
     public GroupDetailViewHolder mHolder;
