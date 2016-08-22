@@ -172,21 +172,45 @@ public class GroupDetailFeed extends Client {
 
                         AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
 
-                        alertDialog.setTitle("Respond");
+                        alertDialog.setTitle("Respond to Invite");
 
-                        alertDialog.setMessage("Respond to friend request");
+                        alertDialog.setMessage("Would you like to join this group?");
 
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Reject", new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int id) {
-
+                                try {
+                                    Calls.respondToGroupInvite(j.getJSONArray("Group_info")
+                                            .getJSONObject(0).getInt("group_id"), false, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            mAdapter.mStatus = GroupDetailAdapter.Status.GUEST;
+                                            mJoinButton.setText("Join Group");
+                                            draw(j);
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
 
                             } });
 
-                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Accept", new DialogInterface.OnClickListener() {
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Join", new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int id) {
-                                
+                                try {
+                                    Calls.respondToGroupInvite(j.getJSONArray("Group_info")
+                                            .getJSONObject(0).getInt("group_id"), true, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            mAdapter.mStatus = GroupDetailAdapter.Status.MEMBER;
+                                            mJoinButton.setVisibility(View.GONE);
+                                            draw(j);
+                                        }
+                                    });
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
 
                             }});
 
@@ -198,14 +222,6 @@ public class GroupDetailFeed extends Client {
 
                         alertDialog.show();
 
-
-
-                        try {
-                            Calls.respondToGroupInvite(j.getJSONArray("Group_info")
-                                    .getJSONObject(0).getInt("group_id"), true, ShallonCreamerIsATwat, null);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
 
                     }
                 });

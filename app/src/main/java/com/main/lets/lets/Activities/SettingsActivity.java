@@ -64,6 +64,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -553,10 +554,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         mUserInfo.put("name", response.getJSONArray("info").getJSONObject(0)
                                 .getString("User_Name"));
 
+                        boolean b = TimeZone.getDefault().inDaylightTime(new Date());
+
+                        Calendar cal = Calendar.getInstance();
+                        long milliDiff = cal.get(Calendar.ZONE_OFFSET);
+
+
                         String birthdayString = response.getJSONArray("info").getJSONObject(0)
                                 .getString("Birthday");
                         long birthday = Long.parseLong(
-                                birthdayString.substring(6, birthdayString.length() - 2));
+                                birthdayString.substring(6, birthdayString.length() - 2)) - milliDiff - (b ? 3600000 : 0);
 
                         mUserInfo.put("birthday", new Date(birthday));
 
@@ -578,6 +585,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                         ((EditText) (view.findViewById(R.id.edit_name)))
                                 .setText((CharSequence) mUserInfo.get("name"));
+
+
                         ((EditText) (view.findViewById(R.id.edit_birthday)))
                                 .setText(new SimpleDateFormat("MM-dd-yyyy")
                                                  .format(mUserInfo.get("birthday")));

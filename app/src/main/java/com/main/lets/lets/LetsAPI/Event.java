@@ -1,12 +1,16 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONException;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 /**
  * Created by Joe on 5/12/2016.
@@ -159,7 +163,16 @@ public class Event extends Entity implements Comparable<Event> {
 
 
     public String getTimeSpanString() {
-        return (new SimpleDateFormat("h:mm a")).format(mStart) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd);
+
+        boolean b = TimeZone.getDefault().inDaylightTime(new Date());
+
+        Calendar cal = Calendar.getInstance();
+        long milliDiff = cal.get(Calendar.ZONE_OFFSET);
+
+        Log.println(Log.ASSERT, "Calls", "Milliseconds " + milliDiff + " Daylight savings: " + b);
+
+        return (new SimpleDateFormat("h:mm a")).format(new Date(mStart.getTime() - milliDiff - (b ? 3600000 : 0))) +
+                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime() - milliDiff - (b ? 3600000 : 0));
     }
 
     public boolean ismIsOwner() {
