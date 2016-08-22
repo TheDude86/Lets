@@ -1,7 +1,11 @@
 package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -13,6 +17,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
+import com.main.lets.lets.Adapters.GroupDetailAdapter;
 import com.main.lets.lets.Adapters.UserDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
@@ -32,6 +37,7 @@ import cz.msebera.android.httpclient.Header;
 public class UserDetailFeed extends Client {
     ArrayList<String> mFriends, mFriendTags, mGroups, mEvents, mEventTags, mGroupTags;
     public UserDetailActivity.Relationship mRelationship;
+
     enum Viewing {EVENT, GROUP, USER}
 
     Viewing active = Viewing.USER;
@@ -41,7 +47,8 @@ public class UserDetailFeed extends Client {
     AppCompatActivity mActivity;
     JSONObject mJSON;
 
-    public UserDetailFeed(AppCompatActivity a, RecyclerView recyclerView, JSONObject j, String token, UserDetailActivity.Relationship r) {
+    public UserDetailFeed(AppCompatActivity a, RecyclerView recyclerView, JSONObject j,
+                          String token, UserDetailActivity.Relationship r) {
         mFriendTags = new ArrayList<>();
         mEventTags = new ArrayList<>();
         mGroupTags = new ArrayList<>();
@@ -53,6 +60,8 @@ public class UserDetailFeed extends Client {
         mRelationship = r;
         mActivity = a;
         mJSON = j;
+
+
 
         try {
             loadAttend();
@@ -115,16 +124,18 @@ public class UserDetailFeed extends Client {
                     Intent intent;
                     switch (active) {
                         case EVENT:
-                                intent = new Intent(mActivity, EventDetailActivity.class);
-                                intent.putExtra("EventID", new JSONObject(mEventTags.get(position)).getInt("event_id"));
-                                intent.putExtra("token", ShallonCreamerIsATwat);
-                                intent.putExtra("id", mJSON.getInt("User_ID"));
-                                mActivity.startActivity(intent);
+                            intent = new Intent(mActivity, EventDetailActivity.class);
+                            intent.putExtra("EventID", new JSONObject(mEventTags.get(position))
+                                    .getInt("event_id"));
+                            intent.putExtra("token", ShallonCreamerIsATwat);
+                            intent.putExtra("id", mJSON.getInt("User_ID"));
+                            mActivity.startActivity(intent);
 
                             break;
                         case GROUP:
                             intent = new Intent(mActivity, GroupDetailActivity.class);
-                            intent.putExtra("GroupID", (new JSONObject(mGroupTags.get(position))).getInt("group_id"));
+                            intent.putExtra("GroupID", (new JSONObject(mGroupTags.get(position)))
+                                    .getInt("group_id"));
                             intent.putExtra("token", ShallonCreamerIsATwat);
                             intent.putExtra("id", mJSON.getInt("User_ID"));
                             mActivity.startActivity(intent);

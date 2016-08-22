@@ -49,6 +49,28 @@ public class UserDetailActivity extends AppCompatActivity{
         final TextView actionText = (TextView) findViewById(R.id.add_text);
 
         try {
+
+            SharedPreferences preferences = PreferenceManager
+                    .getDefaultSharedPreferences(getBaseContext());
+
+            if (preferences.getString("Token", "").equals("")) {
+                AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+                alertDialog.setTitle("Sorry...");
+
+                alertDialog.setMessage("You must sign into an account to view user's profiles");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+
+                    } });
+
+
+                alertDialog.show();
+            }
+
+
             ShallonCreamerIsATwat = getIntent().getStringExtra("token");
             mUserID = getIntent().getIntExtra("UserID", -1);
 
