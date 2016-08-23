@@ -184,7 +184,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ShallonCreamerIsATwat = getIntent().getStringExtra("token");  //  <-- Bitch
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");  //  <-- Bitch
         // The promised method to set up the action bar, sorry for the rant but to be honest I'm
         // not that sorry...      ;)
         setupActionBar();
@@ -627,6 +630,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                         if (mUserInfo.get("privacy") == 2)
                             ((RadioButton) (view.findViewById(R.id.chk_pussy))).setChecked(true);
+
+
+                        view.findViewById(R.id.female).setOnClickListener(
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        mUserInfo.put("gender", 0);
+                                    }
+                                });
+
+                        view.findViewById(R.id.male).setOnClickListener(
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        mUserInfo.put("gender", 1);
+
+                                    }
+                                });
+
+                        view.findViewById(R.id.tranny).setOnClickListener(
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        mUserInfo.put("gender", 2);
+
+                                    }
+                                });
 
 
                     } catch (JSONException e) {

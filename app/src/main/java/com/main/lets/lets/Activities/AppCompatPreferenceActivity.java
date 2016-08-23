@@ -5,11 +5,9 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +38,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
         return getDelegate().getSupportActionBar();
     }
 
-    public void setSupportActionBar(@Nullable Toolbar toolbar) {
-        getDelegate().setSupportActionBar(toolbar);
-    }
-
+    @NonNull
     @Override
     public MenuInflater getMenuInflater() {
         return getDelegate().getMenuInflater();
@@ -102,6 +97,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CODE_LOGOUT) {
+            //noinspection StatementWithEmptyBody
             if (resultCode == RESULT_OK) {
                 //Fill Later
             }

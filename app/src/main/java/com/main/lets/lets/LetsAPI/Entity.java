@@ -34,6 +34,7 @@ public class Entity extends Client {
      * @param e
      */
     public Entity(int i, String s, EntityType e) {
+        mCategory = -1;
         mPic = "";
         mType = e;
         mText = s;

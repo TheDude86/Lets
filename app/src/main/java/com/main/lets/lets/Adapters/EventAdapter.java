@@ -2,11 +2,7 @@ package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.support.v7.graphics.Palette;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,6 +21,9 @@ import java.util.List;
 
 /**
  * Created by Joe on 5/29/2016.
+ *
+ * This class fills each event with it's specific information on the main activity feed
+ *
  */
 public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHolder> {
     private static final int DETAIL_CODE = 1;
@@ -59,15 +58,10 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
     @Override
     protected void withBindHolder(final ViewHolder holder, final String data, int position) {
         try {
-            final int[] bgColors = {mActivity.getResources().getColor(R.color.party),
-                    mActivity.getResources().getColor(R.color.eat),
-                    mActivity.getResources().getColor(R.color.study),
-                    mActivity.getResources().getColor(R.color.tv),
-                    mActivity.getResources().getColor(R.color.videogames),
-                    mActivity.getResources().getColor(R.color.sports),
-                    mActivity.getResources().getColor(R.color.music),
-                    mActivity.getResources().getColor(R.color.relax),
-                    mActivity.getResources().getColor(R.color.other)};
+
+            final int[] bgColors = mActivity.getResources().getIntArray(R.array.category_colors);
+
+            final String[] catgories = mActivity.getResources().getStringArray(R.array.categories);
 
             final org.json.JSONObject j = new org.json.JSONObject(data);
             e = new Event(j);
@@ -76,9 +70,11 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             holder.mTime.setText(e.getTimeSpanString());
             holder.mTitle.setText(e.getmTitle());
 
-            Picasso.with(mActivity).load(e.getImageResourceId(mActivity)).into((holder.mBackground));
+            Picasso.with(mActivity).load(e.getImageResourceId(mActivity))
+                    .into((holder.mBackground));
 
             holder.mTextBackground.setBackgroundColor(bgColors[j.getInt("Category")]);
+            holder.mCategory.setText(catgories[j.getInt("Category")]);
 
 
             holder.mMainViewHolder.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +91,6 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
                     }
 
 
-
                 }
             });
 
@@ -110,6 +105,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
         LinearLayout mTextBackground;
         ImageView mBackground;
         TextView mLocation;
+        TextView mCategory;
         TextView mTitle;
         TextView mTime;
 
@@ -125,6 +121,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             mMainViewHolder = (LinearLayout) itemView.findViewById(R.id.eventHolder);
             mBackground = (ImageView) itemView.findViewById(R.id.eventImage);
             mLocation = (TextView) itemView.findViewById(R.id.eventLocation);
+            mCategory = (TextView) itemView.findViewById(R.id.category);
             mTitle = (TextView) itemView.findViewById(R.id.eventTitle);
             mTime = (TextView) itemView.findViewById(R.id.eventTime);
 

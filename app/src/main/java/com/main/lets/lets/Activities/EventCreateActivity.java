@@ -1,11 +1,12 @@
 package com.main.lets.lets.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Html;
-import android.util.Log;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,10 +17,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
@@ -35,12 +33,11 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
 public class EventCreateActivity extends AppCompatActivity {
-    protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
-    protected static AsyncHttpClient client = new AsyncHttpClient();
     //HashMap only stores strings because it is used to create the post request and all params
     //must be strings
     private HashMap<String, String> mMap;
@@ -55,18 +52,29 @@ public class EventCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_create);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         final EditText description = (EditText) findViewById(R.id.description);
         final EditText category = (EditText) findViewById(R.id.category);
         mLocationLabel = (EditText) findViewById(R.id.locationLabel);
-        ShallonCreamerIsATwat = getIntent().getStringExtra("token");
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
         final EditText title = (EditText) findViewById(R.id.title);
         final EditText date = (EditText) findViewById(R.id.date);
         final EditText time = (EditText) findViewById(R.id.time);
         Slider duration = (Slider) findViewById(R.id.duration);
         mLocation = (EditText) findViewById(R.id.location);
         mCalendar = Calendar.getInstance();
+
+        assert durationLabel != null;
+        assert description != null;
+        assert duration != null;
+        assert category != null;
+        assert create != null;
+        assert title != null;
+        assert date != null;
+        assert time != null;
 
         /*
          *Initializing the HashMap that contains all of the following information:
@@ -146,6 +154,8 @@ public class EventCreateActivity extends AppCompatActivity {
                      * @param fragment the parameter from when the dialog closes containing the
                      *                 time's information
                      */
+                    //GEFN
+                    @SuppressLint("SimpleDateFormat")
                     @Override
                     public void onPositiveActionClicked(DialogFragment fragment) {
                         //Getting useful dialog from parameter
@@ -203,6 +213,8 @@ public class EventCreateActivity extends AppCompatActivity {
                      * @param fragment the parameter from when the dialog closes containing the
                      *                 date's information
                      */
+                    //GEFN
+                    @SuppressLint("SimpleDateFormat")
                     @Override
                     public void onPositiveActionClicked(DialogFragment fragment) {
                         //Get useful dialog from the parameter
@@ -362,9 +374,9 @@ public class EventCreateActivity extends AppCompatActivity {
                 mMap.put("Title", title.getText().toString());
                 mMap.put("Description", description.getText().toString());
                 mMap.put("End Time",
-                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(end.getTime()));
+                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(end.getTime()));
                 mMap.put("Start Time",
-                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mCalendar.getTime()));
+                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(mCalendar.getTime()));
 
                 mMap.put("Latitude", mCoords.latitude + "");
                 mMap.put("Longitude", mCoords.longitude + "");
@@ -391,9 +403,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
                             finish();
                             startActivity(intent);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
+                        } catch (InterruptedException | JSONException e) {
                             e.printStackTrace();
                         }
 
@@ -403,7 +413,7 @@ public class EventCreateActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                           org.json.JSONArray errorResponse) {
-                        Log.e("Aync Test Failure", errorResponse.toString());
+//                        Log.e("Aync Test Failure", errorResponse.toString());
                     }
 
                 });
@@ -422,14 +432,13 @@ public class EventCreateActivity extends AppCompatActivity {
                 && resultCode == Activity.RESULT_OK) {
 
             // The user has selected a place. Extract the name and address.
-            final Place place = PlacePicker.getPlace(data, this);
+            //GEFN
+            @SuppressWarnings("deprecation")
+            Place place = PlacePicker.getPlace(data, this);
 
             final CharSequence name = place.getName();
             final CharSequence address = place.getAddress();
-            String attributions = PlacePicker.getAttributions(data);
-            if (attributions == null) {
-                attributions = "";
-            }
+
 
             mLocationLabel.setText(name);
             mCoords = place.getLatLng();
@@ -450,19 +459,9 @@ public class EventCreateActivity extends AppCompatActivity {
             // identified by a request code.
             startActivityForResult(intent, 0);
 
-        } catch (GooglePlayServicesRepairableException e) {
-            // ...
-        } catch (GooglePlayServicesNotAvailableException e) {
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             // ...
         }
     }
 
-    public static void post(String url, RequestParams params,
-                            AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
-    }
 }

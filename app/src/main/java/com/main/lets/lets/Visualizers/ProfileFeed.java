@@ -2,34 +2,21 @@ package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.main.lets.lets.Activities.CreateDetailActivity;
-import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.Adapters.LoginAdapter;
 import com.main.lets.lets.Adapters.ProfileAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.Login;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,17 +24,21 @@ import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/30/2016.
+ * <p/>
+ * This class handles when the user clicked on the profile icon on the main activity, the user
+ * can either login to an account or register for a new account if they are not already logged in
+ * .  If they are logged it, it will show them a profile feed of their own profile.
  */
 public class ProfileFeed extends Client {
     public boolean[] mChecks = {false, false, false};
     String ShallonCreamerIsATwat = "Bearer ";
     UltimateRecyclerView mRecyclerView;
-    HashMap<String, Object> mUserInfo;
     ProfileAdapter mProfileAdapter;
     LoginAdapter mLoginAdapter;
     ProgressDialog dialog;
     Activity mActivity;
     JSONObject mUser;
+    int mID;
 
     /**
      * The profile feed is used to control the profile adapter and populate it with short hand
@@ -56,26 +47,25 @@ public class ProfileFeed extends Client {
      *
      * @param a used for inflating views and editing data on the UI
      * @param r Recycler view that is filled with the user's profile feed
-     * @param m hashmap that contains useful user info such as it's token and other useful stuff
      */
-    public ProfileFeed(Activity a, UltimateRecyclerView r, HashMap<String, Object> m) {
+    public ProfileFeed(Activity a, UltimateRecyclerView r) {
         mRecyclerView = r;
         mActivity = a;
-        mUserInfo = m;
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(a.getBaseContext());
 
         ShallonCreamerIsATwat = preferences.getString("Token", "");
+        mID = preferences.getInt("UserID", -1);
 
         loadFeeds();
 
     }
 
 
-    public void loadFeeds(){
+    public void loadFeeds() {
 
-        if (!ShallonCreamerIsATwat.equals("")){
+        if (!ShallonCreamerIsATwat.equals("")) {
 
             //Call made to get the user's information
             Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
@@ -100,8 +90,7 @@ public class ProfileFeed extends Client {
                         l.add(mUser.toString());
 
                         //Passes the user's info to the profile adapter
-                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,
-                                                             (int) mUserInfo.get("userID"));
+                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,mID);
 
                         //These functions loads the user's friends, groups, and events
                         loadFriends();
@@ -119,8 +108,8 @@ public class ProfileFeed extends Client {
         }
     }
 
-    public boolean doChecks(){
-        for (boolean b: mChecks){
+    public boolean doChecks() {
+        for (boolean b : mChecks) {
             if (!b)
                 return false;
 
@@ -140,7 +129,7 @@ public class ProfileFeed extends Client {
      * The user can search all three feeds and then visit their detail activities including the
      * user's own profile.
      *
-     * @param j
+     * @param j (unused)
      */
     @Override
     public void draw(JSONObject j) {
@@ -153,10 +142,10 @@ public class ProfileFeed extends Client {
 
         ShallonCreamerIsATwat = preferences.getString("Token", "");
 
-        if (preferences.getString("Token", "").equals("")){
+        if (preferences.getString("Token", "").equals("")) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.clear();
-            editor.commit();
+            editor.apply();
 
             //Loads the login adapter
             mRecyclerView.setLayoutManager(
@@ -193,16 +182,14 @@ public class ProfileFeed extends Client {
                                               org.json.JSONObject response) {
 
                             try {
-                                mUserInfo.put("userID", response.getInt("user_id"));
-                                mUserInfo.put("token", ShallonCreamerIsATwat);
-
                                 SharedPreferences.Editor editor = preferences.edit();
 
                                 editor.putString("password", password);
                                 editor.putString("email", email);
                                 editor.putInt("UserID", response.getInt("user_id"));
-                                editor.putString("Token", "Bearer " + response.getString("accessToken"));
-                                editor.commit();
+                                editor.putString("Token",
+                                                 "Bearer " + response.getString("accessToken"));
+                                editor.apply();
 
 
                                 loadFeeds();
@@ -230,7 +217,6 @@ public class ProfileFeed extends Client {
             });
 
 
-
             //Setting the adapter to be displayed to the user
             mRecyclerView.setAdapter(mLoginAdapter);
             //If the user has logged in
@@ -240,7 +226,7 @@ public class ProfileFeed extends Client {
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
 
-            if(doChecks()){
+            if (doChecks()) {
                 mRecyclerView.setAdapter(mProfileAdapter);
 
             } else {
@@ -368,7 +354,7 @@ public class ProfileFeed extends Client {
     public void loadFriends() throws JSONException {
         //Call to get the user's friends
 
-        Calls.getFriends((Integer) mUserInfo.get("userID"), new JsonHttpResponseHandler() {
+        Calls.getFriends(mID, new JsonHttpResponseHandler() {
             /**
              * When the call is made, it returns a JSON array object of all of
              * the friends the user attends.  The JSON objects from the array are

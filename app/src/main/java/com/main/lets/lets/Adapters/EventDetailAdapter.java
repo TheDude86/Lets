@@ -1,60 +1,38 @@
 package com.main.lets.lets.Adapters;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
-import com.rey.material.app.SimpleDialog;
-import com.rey.material.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import cz.msebera.android.httpclient.Header;
-
 /**
  * Created by Joe on 5/30/2016.
  */
-public class EventDetailAdapter extends RecyclerView.Adapter {
-    public OnAttendanceClicked mAttendanceClicked;
-    public OnCommentsClicked mCommentsClicked;
+public class EventDetailAdapter extends FeedAdapter {
     public OnActionsClicked mActionsClicked;
-    public OnEntityClicked mEntityClicked;
     public OnJoinClicked mOnJoinedClicked;
-    public ArrayList<String> mList;
     public MemberStatus mStatus;
     public int mID;
-
-    public enum ViewType {USERS, COMMENTS}
 
     public enum MemberStatus {HOST, MEMBER, GUEST}
 
     public MainHolder mMainHolder;
-    public AppCompatActivity mActivity;
-    public ViewType type;
 
     public EventDetailAdapter(AppCompatActivity a, String eventInfo, MemberStatus status) {
-        mList = new ArrayList<>();
-        type = ViewType.USERS;
+        mActive = Active.USER;
         mList.add(eventInfo);
         mStatus = status;
         mActivity = a;
@@ -70,8 +48,8 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
 
             return mMainHolder;
         }
-        ViewHolder v = new ViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_entity, parent, false));
+        PictureViewHolder v = new PictureViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_entity_with_picture, parent, false));
 
         return v;
 
@@ -98,22 +76,9 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
                     }
                 });
 
-                ((MainHolder) holder).mComments.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mCommentsClicked != null)
-                            mCommentsClicked.onClicked();
+                setComments(((MainHolder) holder).mComments);
+                setUsers(((MainHolder) holder).mAttend);
 
-                    }
-                });
-
-                ((MainHolder) holder).mAttend.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mAttendanceClicked != null)
-                            mAttendanceClicked.onClicked();
-                    }
-                });
 
                 ((MainHolder) holder).mJoin.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -125,15 +90,8 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
                 });
 
             } else {
-                ((ViewHolder) holder).mName.setText(mList.get(position));
-                ((ViewHolder) holder).mLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mEntityClicked != null) {
-                            mEntityClicked.onClicked(position - 1);
-                        }
-                    }
-                });
+                super.onBindViewHolder(holder, position);
+
             }
 
         } catch (JSONException e1) {
@@ -151,22 +109,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
         return mList.size();
     }
 
-    public void addElement(String s) {
-        mList.add(s);
-        notifyItemInserted(mList.size() - 1);
-        notifyDataSetChanged();
-    }
-
-    public void clearFeed() {
-        int end = mList.size();
-
-        for (int i = 1; i < end; i++) {
-            mList.remove(1);
-            notifyItemRemoved(1);
-            notifyItemRangeChanged(1, mList.size());
-        }
-
-    }
 
     public class MainHolder extends RecyclerView.ViewHolder {
         public TextView mDescription;
@@ -209,18 +151,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
         return mMainHolder;
     }
 
-    public void setOnAttendanceClicked(OnAttendanceClicked a) {
-        mAttendanceClicked = a;
-    }
-
-    public void setOnCommentsClicked(OnCommentsClicked c) {
-        mCommentsClicked = c;
-    }
-
-    public void setOnEntityClicked(OnEntityClicked e) {
-        mEntityClicked = e;
-    }
-
     public void setOnActionsClicked(OnActionsClicked a) {
         mActionsClicked = a;
     }
@@ -229,17 +159,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
         mOnJoinedClicked = j;
     }
 
-    public interface OnAttendanceClicked {
-        void onClicked();
-    }
-
-    public interface OnCommentsClicked {
-        void onClicked();
-    }
-
-    public interface OnEntityClicked {
-        void onClicked(int position);
-    }
 
     public interface OnActionsClicked {
         void onClicked();

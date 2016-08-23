@@ -3,7 +3,19 @@
     <color name="colorPrimary">#FFCC00</color>
     <color name="colorPrimaryDark">#FFB79200</color>
     <color name="colorAccent">#000000</color>
+    <color name="white">#FFFFFF</color>
 
+    <array name="category_colors">
+        <item>#5C4D81</item>
+        <item>#A18A4B</item>
+        <item>#B7D0A7</item>
+        <item>#B2B2B2</item>
+        <item>#999999</item>
+        <item>#73A0BA</item>
+        <item>#A7449A</item>
+        <item>#E5D480</item>
+        <item>#999999</item>
+    </array>
 
     <color name="party">#5C4D81</color>
     <color name="eat">#A18A4B</color>

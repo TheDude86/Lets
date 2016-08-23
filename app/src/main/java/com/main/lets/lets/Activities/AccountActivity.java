@@ -3,11 +3,10 @@ package com.main.lets.lets.Activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,7 +84,7 @@ public class AccountActivity extends AppCompatActivity {
                                         try {
 
                                             if (response.has("accessToken")) {
-                                                create.setText("Account Created!");
+                                                create.setText(R.string.account_created);
 
                                                 SharedPreferences preferences = PreferenceManager
                                                         .getDefaultSharedPreferences(getBaseContext());
@@ -96,7 +95,7 @@ public class AccountActivity extends AppCompatActivity {
                                                 editor.putString("password", password.getText().toString());
                                                 editor.putString("email", email.getText().toString());
                                                 editor.putInt("UserID", response.getInt("user_id"));
-                                                editor.commit();
+                                                editor.apply();
 
                                                 Intent intent = new Intent(AccountActivity.this, CreateDetailActivity.class);
                                                 intent.putExtra("token", "Bearer " + response.getString("accessToken"));

@@ -2,6 +2,8 @@ package com.main.lets.lets.Visualizers;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -29,28 +31,35 @@ import cz.msebera.android.httpclient.Header;
  * Created by jnovosel on 7/2/16.
  */
 public class GroupDetailFeed extends Client {
-    public ArrayList<JSONObject> mMemberTags;
     public ArrayList<JSONObject> mAdminTags;
-    public ArrayList<JSONObject> mComments;
     public String ShallonCreamerIsATwat;
     public GroupDetailAdapter mAdapter;
     public AppCompatActivity mActivity;
-    public ArrayList<String> mMembers;
     public RecyclerView mRecyclerView;
     public TextView mJoinButton;
+    public JSONObject mJSON;
     public int mID;
 
-    public GroupDetailFeed(AppCompatActivity a, String token, int id) {
+    public GroupDetailFeed(AppCompatActivity a, JSONObject j) {
 
         mRecyclerView = (RecyclerView) a.findViewById(R.id.feed);
         mJoinButton = (TextView) a.findViewById(R.id.btn_join);
-        mMemberTags = new ArrayList<>();
         mAdminTags = new ArrayList<>();
-        ShallonCreamerIsATwat = token;
-        mComments = new ArrayList<>();
-        mMembers = new ArrayList<>();
         mActivity = a;
-        mID = id;
+        mJSON = j;
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mActivity.getBaseContext());
+
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+        mID = preferences.getInt("UserID", -1);
+
+        try {
+            mAdapter = new GroupDetailAdapter(mActivity,
+                                              mJSON.getJSONArray("Group_info").getJSONObject(0).toString(), mID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -60,103 +69,35 @@ public class GroupDetailFeed extends Client {
                 StaggeredGridLayoutManager.VERTICAL));
 
         try {
-            mAdapter = new GroupDetailAdapter(mActivity,
-                    j.getJSONArray("Group_info").getJSONObject(0).toString(), mID);
 
-            for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
+            for (int i = 0; i < mJSON.getJSONArray("Group_users").length(); i++) {
 
-                if (j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")){
-                    mAdapter.addElement(j.getJSONArray("Group_users").getJSONObject(i).toString());
-                    mMemberTags.add(j.getJSONArray("Group_users").getJSONObject(i));
+                if (mJSON.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")){
+                    mAdapter.addElement(mJSON.getJSONArray("Group_users").getJSONObject(i).toString());
+                    mAdapter.mUsers.add(mJSON.getJSONArray("Group_users").getJSONObject(i).toString());
 
                 }
 
-                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID){
-                    if (j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status"))
+                if (mJSON.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID){
+                    if (mJSON.getJSONArray("Group_users").getJSONObject(i).getBoolean("status"))
                         mAdapter.updateStatus(GroupDetailAdapter.Status.MEMBER);
                     else
                         mAdapter.updateStatus(GroupDetailAdapter.Status.INVITE);
                 }
             }
 
-            loadUserDetails(0);
 
-            for (int i = 0; i < j.getJSONArray("Group_admins").length(); i++) {
-                mAdminTags.add(j.getJSONArray("Group_admins").getJSONObject(i));
-                if (j.getJSONArray("Group_admins").getJSONObject(i).getInt("user_id") == mID)
+            for (int i = 0; i < mJSON.getJSONArray("Group_admins").length(); i++) {
+                mAdminTags.add(mJSON.getJSONArray("Group_admins").getJSONObject(i));
+                if (mJSON.getJSONArray("Group_admins").getJSONObject(i).getInt("user_id") == mID)
                     mAdapter.updateStatus(GroupDetailAdapter.Status.ADMIN);
             }
 
-            mAdapter.setOnCommentsClickListener(new GroupDetailAdapter.OnCommentsClickListener() {
-                @Override
-                public void onClick() {
-                    mAdapter.clearFeed();
-                    try {
-
-                        for (JSONObject j : mComments) {
-                            String s = null;
-                            for (JSONObject m : mMemberTags) {
-                                if (m.getInt("user_id") == j.getInt("user_id")) {
-                                    s = m.getString("name") + ":\n";
-
-                                    break;
-                                }
-
-                            }
-
-                            if (s == null) {
-                                for (JSONObject m : mAdminTags) {
-                                    if (m.getInt("user_id") == j.getInt("user_id")) {
-                                        s = m.getString("name") + ":\n";
-
-                                        break;
-                                    }
-
-                                }
-                            }
-
-                            mAdapter.addElement(s + j.getString("text"));
-
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-            mAdapter.setOnMembersClickListener(new GroupDetailAdapter.OnMembersClickListener() {
-                @Override
-                public void onClick() {
-                    mAdapter.clearFeed();
-
-                    for (JSONObject j : mMemberTags)
-                        mAdapter.addElement(j.toString());
-
-                }
-            });
-
-            mAdapter.setOnEntityClickListener(new GroupDetailAdapter.OnEntityClickListener() {
-                @Override
-                public void onClick(int position) {
-                    Intent intent = new Intent(mActivity, UserDetailActivity.class);
-
-                    try {
-                        intent.putExtra("UserID", mMemberTags.get(position).getInt("user_id"));
-                        intent.putExtra("token", ShallonCreamerIsATwat);
-                        mActivity.startActivity(intent);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
 
             mAdapter.setOnDraw(new GroupDetailAdapter.OnDraw() {
                 @Override
                 public void draw(HashMap<String, TextView> actions) {
-                    GroupActions groupActions = new GroupActions(GroupDetailFeed.this, j, mAdapter.mStatus);
+                    GroupActions groupActions = new GroupActions(GroupDetailFeed.this, mJSON, mAdapter.mStatus);
                     groupActions.draw(actions);
 
                 }
@@ -179,13 +120,13 @@ public class GroupDetailFeed extends Client {
 
                             public void onClick(DialogInterface dialog, int id) {
                                 try {
-                                    Calls.respondToGroupInvite(j.getJSONArray("Group_info")
+                                    Calls.respondToGroupInvite(mJSON.getJSONArray("Group_info")
                                             .getJSONObject(0).getInt("group_id"), false, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                             mAdapter.mStatus = GroupDetailAdapter.Status.GUEST;
                                             mJoinButton.setText("Join Group");
-                                            draw(j);
+                                            draw(mJSON);
                                         }
                                     });
                                 } catch (JSONException e) {
@@ -198,13 +139,13 @@ public class GroupDetailFeed extends Client {
 
                             public void onClick(DialogInterface dialog, int id) {
                                 try {
-                                    Calls.respondToGroupInvite(j.getJSONArray("Group_info")
+                                    Calls.respondToGroupInvite(mJSON.getJSONArray("Group_info")
                                             .getJSONObject(0).getInt("group_id"), true, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                             mAdapter.mStatus = GroupDetailAdapter.Status.MEMBER;
                                             mJoinButton.setVisibility(View.GONE);
-                                            draw(j);
+                                            draw(mJSON);
                                         }
                                     });
                                 } catch (JSONException e) {
@@ -230,7 +171,7 @@ public class GroupDetailFeed extends Client {
                     @Override
                     public void onClick(View v) {
                         try {
-                            Calls.joinGroup(mID, j.getJSONArray("Group_info")
+                            Calls.joinGroup(mID, mJSON.getJSONArray("Group_info")
                                             .getJSONObject(0).getInt("group_id"), ShallonCreamerIsATwat,
                                     new JsonHttpResponseHandler(){
                                         @Override
@@ -265,37 +206,6 @@ public class GroupDetailFeed extends Client {
 
     }
 
-
-    public void loadUserDetails(final int position) {
-        if (position >= mMemberTags.size())
-            return;
-
-        try {
-            Calls.getProfileByID(mMemberTags.get(position).getInt("user_id"), ShallonCreamerIsATwat,
-                    new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers,
-                                              org.json.JSONObject response) {
-                            try {
-                                mMembers.add(response.getJSONArray("info").getJSONObject(0).toString());
-                                loadUserDetails(position + 1);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                              JSONObject errorResponse) {
-
-                        }
-                    });
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void editGroup() {
         if (mAdapter.toggleEditable()) {

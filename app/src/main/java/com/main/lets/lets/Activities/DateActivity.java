@@ -1,10 +1,10 @@
 package com.main.lets.lets.Activities;
 
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
@@ -13,7 +13,6 @@ import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class DateActivity extends AppCompatActivity {
     String mBirthday;
@@ -68,6 +67,8 @@ public class DateActivity extends AppCompatActivity {
                      * @param fragment the parameter from when the dialog closes containing the
                      *                 date's information
                      */
+                    //GEFN
+                    @SuppressLint("SimpleDateFormat")
                     @Override
                     public void onPositiveActionClicked(DialogFragment fragment) {
                         //Get useful dialog from the parameter

@@ -3,18 +3,15 @@ package com.main.lets.lets.Visualizers;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 
 import com.main.lets.lets.Adapters.SearchAdapter;
-import com.main.lets.lets.Holders.SearchViewHolder;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Created by jnovosel on 7/8/16.
@@ -68,7 +65,7 @@ public class SearchFeed extends Client {
             SearchAdapter s = new SearchAdapter(mActivity, activeFeed, active);
             s.setOnEntityClicked(new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder holder, int userID) {
+                public void onClicked(int position, PictureViewHolder holder, int userID) {
                     try {
                         Entity e = new Entity(activeFeed.getJSONObject(position));
                         e.loadDetailActivity(mActivity, ShallonCreamerIsATwat, userID);

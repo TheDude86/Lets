@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int SETTINGS = 0;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
-    HashMap<String, Object> mMap;
     public String mActive;
 
 
@@ -54,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Object used to store useful information about the user e.g. coordinates, access token, etc.
-        mMap = new HashMap<>();
 
         //Gets the location manager to get the phone's location
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -65,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Creates the User's profile feed if they're logged in, if they're not.  It will load a login
         //screen
-        mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
+        mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list));
 
         //Login object used for auto login for returning users
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -101,13 +98,10 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("Token", "Bearer " + response.getString("accessToken"));
                         editor.commit();
 
-
-                        mMap.put("token", response.getString("accessToken"));
-                        mMap.put("userID", response.getInt("user_id"));
                         mGlobalFeed.update(response.getInt("user_id"),
                                            "Bearer " + response.getString("accessToken"));
 
-                        mProfileFeed = new ProfileFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list), mMap);
+                        mProfileFeed = new ProfileFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
 
 
                     } else {
@@ -137,11 +131,18 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             //If the user has, create a hashmap with the coordinates stored and convert into a JSON object
-            mMap.put("latitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
-            mMap.put("longitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putFloat("latitude",
+                            (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
+
+            editor.putFloat("longitude",
+                            (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+            editor.apply();
 
             //Draw the local event feed
-            mGlobalFeed.draw(new JSONObject(mMap));
+            mGlobalFeed.draw(null);
 
             //Saving the active visualizer so the activity knows which feed to draw when
             //onResume is called
@@ -196,13 +197,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        spinner.setVisibility(View.INVISIBLE);
+
         //Set OnClickListener for the Search Icon in the top toolbar
         findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                intent.putExtra("token", "Bearer " + mMap.get("token"));
-                intent.putExtra("userID", mMap.containsKey("userID") ? (int) mMap.get("userID") : -1);
+
                 startActivity(intent);
             }
         });
@@ -212,7 +214,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                intent.putExtra("token", "Bearer " + mMap.get("token"));
                 startActivityForResult(intent, SETTINGS);
             }
         });
@@ -222,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.VISIBLE);
-                mGlobalFeed.draw(new JSONObject(mMap));
+                mGlobalFeed.draw(null);
 
                 //Saving the active visualizer so the activity knows which feed to draw when
                 //onResume is called
@@ -267,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
-                i.putExtra("token", "Bearer " + mMap.get("token"));
                 startActivity(i);
 
             }
@@ -278,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, GroupCreateActivity.class);
-                i.putExtra("token", (String) mMap.get("token"));
                 startActivity(i);
 
             }
@@ -301,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (mActive.equals(mGlobalFeed.getClass().toString())) {
-            mGlobalFeed.draw(new JSONObject(mMap));
+            mGlobalFeed.draw(null);
 
         } else if (mActive.equals(mProfileFeed.getClass().toString())) {
             mProfileFeed.draw(null);
@@ -331,11 +330,18 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //If they allow permissions then create the same hashmap as in onCreate
-                mMap.put("latitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
-                mMap.put("longitude", mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putFloat("latitude",
+                                (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
+
+                editor.putFloat("longitude",
+                                (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+                editor.apply();
 
                 //Draw the GlobalFeed just as if the user perviously accepted the permissions
-                mGlobalFeed.draw(new JSONObject(mMap));
+                mGlobalFeed.draw(null);
 
 
                 break;
@@ -371,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
                     mProfileFeed.updateToken("Bearer ");
 
                 if (mActive.equals(mGlobalFeed.getClass().toString())) {
-                    mGlobalFeed.draw(new JSONObject(mMap));
+                    mGlobalFeed.draw(null);
 
                 } else if (mActive.equals(mProfileFeed.getClass().toString())) {
                     mProfileFeed.draw(null);

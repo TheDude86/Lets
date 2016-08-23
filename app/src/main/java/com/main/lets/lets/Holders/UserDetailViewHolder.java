@@ -14,10 +14,10 @@ import com.main.lets.lets.R;
  * Created by Joe on 6/30/2016.
  */
 public class UserDetailViewHolder extends RecyclerView.ViewHolder {
-    public Button mFriendsButton;
-    public Button mGroupsButton;
+    public TextView mFriendsButton;
+    public TextView mGroupsButton;
     public ImageButton mOptions;
-    public Button mEventsButton;
+    public TextView mEventsButton;
     public TextView mInterests;
     public TextView mFriends;
     public TextView mScore;
@@ -30,10 +30,10 @@ public class UserDetailViewHolder extends RecyclerView.ViewHolder {
 
         mInterests = (TextView) itemView.findViewById(R.id.txt_interests);
         mOptions = (ImageButton) itemView.findViewById(R.id.options);
-        mFriendsButton = (Button) itemView.findViewById(R.id.friends);
+        mFriendsButton = (TextView) itemView.findViewById(R.id.friends);
         mFriends = (TextView) itemView.findViewById(R.id.txt_friends);
-        mGroupsButton = (Button) itemView.findViewById(R.id.groups);
-        mEventsButton = (Button) itemView.findViewById(R.id.events);
+        mGroupsButton = (TextView) itemView.findViewById(R.id.groups);
+        mEventsButton = (TextView) itemView.findViewById(R.id.events);
         mPic = (ImageView) itemView.findViewById(R.id.img_profile);
         mScore = (TextView) itemView.findViewById(R.id.txt_score);
         mName = (TextView) itemView.findViewById(R.id.txt_name);

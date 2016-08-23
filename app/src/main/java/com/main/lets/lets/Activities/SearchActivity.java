@@ -1,5 +1,7 @@
 package com.main.lets.lets.Activities;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -26,10 +28,12 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         mSearchResults = new JSONObject();
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
         //Creating the search feed, currently the inputted user id is -1, that needs to change if
         //the feed ends up needing the user's ID.
-        final SearchFeed search = new SearchFeed(this, getIntent().getStringExtra("token"),
-                getIntent().getIntExtra("userID",-1));
+        final SearchFeed search = new SearchFeed(this, preferences.getString("Token", ""),
+                                                 preferences.getInt("UserID", -1));
 
         //The Spinner chooses which entity to display on the search feed
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
@@ -62,6 +66,7 @@ public class SearchActivity extends AppCompatActivity {
         });
 
         //What to do when an item is chosen in the spinner
+        assert spinner != null;
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

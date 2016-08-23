@@ -2,14 +2,9 @@ package com.main.lets.lets.Actions;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.InviteActivity;
@@ -33,6 +28,9 @@ import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by jnovosel on 7/4/16.
+ * <p/>
+ * This class is for the group detail feed class and adds actions to the list of availible
+ * buttons for the user
  */
 public class GroupActions implements View.OnClickListener {
     GroupDetailAdapter.Status mStatus;
@@ -46,6 +44,8 @@ public class GroupActions implements View.OnClickListener {
 
     }
 
+    //GEFN
+    @SuppressWarnings("SuspiciousMethodCalls")
     public void draw(HashMap<String, TextView> actions) {
         for (Object o : actions.keySet().toArray())
             actions.get(o).setOnClickListener(this);
@@ -55,7 +55,7 @@ public class GroupActions implements View.OnClickListener {
     @Override
     public void onClick(final View v) {
         try {
-            Dialog.Builder builder = null;
+            Dialog.Builder builder;
             DialogFragment fragment;
             switch (((TextView) v).getText().toString()) {
                 case "Comment":
@@ -70,7 +70,7 @@ public class GroupActions implements View.OnClickListener {
 
                         @Override
                         public void onPositiveActionClicked(DialogFragment fragment) {
-                            mFeed.mComments = new ArrayList<>();
+                            mFeed.mAdapter.mComments = new ArrayList<>();
                             final ProgressDialog dialog = ProgressDialog.show(mFeed.mActivity, "",
                                                                               "Loading. Please " +
                                                                                       "wait...",
@@ -100,9 +100,9 @@ public class GroupActions implements View.OnClickListener {
                                                                     for (int i = 0; i < response
                                                                             .length(); i++) {
                                                                         try {
-                                                                            mFeed.mComments
+                                                                            mFeed.mAdapter.mComments
                                                                                     .add(response.getJSONObject(
-                                                                                            i));
+                                                                                            i).toString());
                                                                             dialog.hide();
                                                                         } catch (JSONException e) {
                                                                             e.printStackTrace();
@@ -141,7 +141,6 @@ public class GroupActions implements View.OnClickListener {
                             }
 
 
-
                             super.onPositiveActionClicked(fragment);
                         }
 
@@ -164,7 +163,8 @@ public class GroupActions implements View.OnClickListener {
                 case "Add Admins":
                     ArrayList<String> members = new ArrayList<>();
 
-                    for (JSONObject j : mFeed.mMemberTags) {
+                    for (String s : mFeed.mAdapter.mUsers) {
+                        JSONObject j = new JSONObject(s);
                         for (JSONObject j2 : mFeed.mAdminTags) {
                             if (j.getInt("user_id") != j2.getInt("user_id"))
                                 members.add(j.getString("name"));
@@ -183,39 +183,45 @@ public class GroupActions implements View.OnClickListener {
                             CharSequence[] values = getSelectedValues();
                             Entity e;
                             for (CharSequence c : values) {
-                                for (JSONObject j : mFeed.mMemberTags) {
-                                    e = new Entity(j);
-                                    if (e.mText.equals(c)) {
-                                        try {
-                                            Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info")
-                                                                   .getJSONObject(0)
-                                                                   .getInt("group_id"),
-                                                           mFeed.ShallonCreamerIsATwat,
-                                                           new JsonHttpResponseHandler() {
-                                                               @Override
-                                                               public void onSuccess(int statusCode,
-                                                                                     Header[]
-                                                                                             headers,
-                                                                                     JSONObject
-                                                                                             response) {
+                                for (String s : mFeed.mAdapter.mUsers) {
+                                    try {
+                                        JSONObject j = new JSONObject(s);
+                                        e = new Entity(j);
+                                        if (e.mText.equals(c)) {
+                                            try {
+                                                Calls.addAdmin(e.mID, mJSON.getJSONArray("Group_info")
+                                                                       .getJSONObject(0)
+                                                                       .getInt("group_id"),
+                                                               mFeed.ShallonCreamerIsATwat,
+                                                               new JsonHttpResponseHandler() {
+                                                                   @Override
+                                                                   public void onSuccess(int statusCode,
+                                                                                         Header[]
+                                                                                                 headers,
+                                                                                         JSONObject
+                                                                                                 response) {
 
 
-                                                               }
+                                                                   }
 
-                                                               @Override
-                                                               public void onFailure(int statusCode,
-                                                                                     Header[]
-                                                                                             headers,
-                                                                                     Throwable
-                                                                                             throwable,
-                                                                                     JSONObject
-                                                                                             errorResponse) {
+                                                                   @Override
+                                                                   public void onFailure(int statusCode,
+                                                                                         Header[]
+                                                                                                 headers,
+                                                                                         Throwable
+                                                                                                 throwable,
+                                                                                         JSONObject
+                                                                                                 errorResponse) {
 
-                                                               }
-                                                           });
-                                        } catch (JSONException e1) {
-                                            e1.printStackTrace();
+                                                                   }
+                                                               });
+                                            } catch (JSONException e1) {
+                                                e1.printStackTrace();
+                                            }
                                         }
+
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
                                     }
                                 }
                             }
@@ -239,9 +245,9 @@ public class GroupActions implements View.OnClickListener {
 
                     break;
                 case "Remove Members":
-                    String[] membersList = new String[mFeed.mMemberTags.size()];
+                    String[] membersList = new String[mFeed.mAdapter.mUsers.size()];
                     for (int i = 0; i < membersList.length; i++)
-                        membersList[i] = mFeed.mMemberTags.get(i).getString("name");
+                        membersList[i] = new JSONObject(mFeed.mAdapter.mUsers.get(i)).getString("name");
 
                     builder = new SimpleDialog.Builder() {
                         @Override
@@ -250,40 +256,47 @@ public class GroupActions implements View.OnClickListener {
                             CharSequence[] values = getSelectedValues();
 
                             for (CharSequence s : values) {
-                                for (int i = 0; i < mFeed.mMemberTags.size(); i++) {
-                                    Entity e = new Entity(mFeed.mMemberTags.get(i));
-                                    if (s.toString().equals(e.mText)) {
-                                        try {
-                                            Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray(
-                                                    "Group_info").getJSONObject(0)
-                                                                              .getInt("group_id"),
-                                                                      mFeed.ShallonCreamerIsATwat,
-                                                                      new JsonHttpResponseHandler
-                                                                              () {
-                                                                          @Override
-                                                                          public void onSuccess(
-                                                                                  int statusCode,
-                                                                                  Header[] headers,
-                                                                                  org.json.JSONObject response) {
+                                for (int i = 0; i < mFeed.mAdapter.mUsers.size(); i++) {
+                                    Entity e = null;
+                                    try {
+                                        e = new Entity(new JSONObject(mFeed.mAdapter.mUsers.get
+                                                    (i)));
+
+                                        if (s.toString().equals(e.mText)) {
+                                            try {
+                                                Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray(
+                                                        "Group_info").getJSONObject(0)
+                                                                                  .getInt("group_id"),
+                                                                          mFeed.ShallonCreamerIsATwat,
+                                                                          new JsonHttpResponseHandler
+                                                                                  () {
+                                                                              @Override
+                                                                              public void onSuccess(
+                                                                                      int statusCode,
+                                                                                      Header[] headers,
+                                                                                      org.json.JSONObject response) {
 
 
-                                                                          }
+                                                                              }
 
-                                                                          @Override
-                                                                          public void onFailure(
-                                                                                  int statusCode,
-                                                                                  Header[] headers,
-                                                                                  Throwable
-                                                                                          throwable,
-                                                                                  JSONObject
-                                                                                          errorResponse) {
+                                                                              @Override
+                                                                              public void onFailure(
+                                                                                      int statusCode,
+                                                                                      Header[] headers,
+                                                                                      Throwable
+                                                                                              throwable,
+                                                                                      JSONObject
+                                                                                              errorResponse) {
 
-                                                                          }
-                                                                      });
-                                        } catch (JSONException e1) {
-                                            e1.printStackTrace();
+                                                                              }
+                                                                          });
+                                            } catch (JSONException e1) {
+                                                e1.printStackTrace();
+                                            }
+
                                         }
-
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
                                     }
 
                                 }
@@ -309,7 +322,7 @@ public class GroupActions implements View.OnClickListener {
                 case "Remove Admins":
                     String[] adminsList = new String[mFeed.mAdminTags.size()];
                     for (int i = 0; i < adminsList.length; i++)
-                        adminsList[i] = mFeed.mMemberTags.get(i).getString("name");
+                        adminsList[i] = new JSONObject(mFeed.mAdapter.mUsers.get(i)).getString("name");
 
                     builder = new SimpleDialog.Builder() {
                         @Override
@@ -335,7 +348,7 @@ public class GroupActions implements View.OnClickListener {
                 case "Transfer Ownership":
                     String[] newOwnerList = new String[mFeed.mAdminTags.size()];
                     for (int i = 0; i < newOwnerList.length; i++)
-                        newOwnerList[i] = mFeed.mMemberTags.get(i).getString("name");
+                        newOwnerList[i] = new JSONObject(mFeed.mAdapter.mUsers.get(i)).getString("name");
 
                     builder = new SimpleDialog.Builder() {
                         @Override
@@ -481,7 +494,8 @@ public class GroupActions implements View.OnClickListener {
                                                       @Override
                                                       public void onSuccess(int statusCode,
                                                                             Header[] headers,
-                                                                            org.json.JSONObject response) {
+                                                                            org.json.JSONObject
+                                                                                    response) {
                                                           dialog.hide();
                                                           mFeed.mActivity.finish();
 
@@ -491,7 +505,8 @@ public class GroupActions implements View.OnClickListener {
                                                       public void onFailure(int statusCode,
                                                                             Header[] headers,
                                                                             Throwable throwable,
-                                                                            JSONObject errorResponse) {
+                                                                            JSONObject
+                                                                                    errorResponse) {
 
                                                       }
                                                   });
@@ -543,8 +558,6 @@ public class GroupActions implements View.OnClickListener {
                     break;
 
             }
-
-
 
 
         } catch (JSONException e) {

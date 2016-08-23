@@ -20,6 +20,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
+import com.main.lets.lets.Adapters.FeedAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
@@ -44,8 +45,6 @@ public class EventDetailFeed extends Client {
     ArrayList<JSONObject> mUsers;
     String ShallonCreamerIsATwat;
     AppCompatActivity mActivity;
-    ArrayList<String> mComments;
-    ArrayList<String> mUserTags;
     RecyclerView mRecyclerView;
     JSONArray mCoHosts;
     JSONObject mJSON;
@@ -59,8 +58,6 @@ public class EventDetailFeed extends Client {
         ShallonCreamerIsATwat = preferences.getString("Token", "");
         mID = preferences.getInt("UserID", -1);
 
-        mComments = new ArrayList<>();
-        mUserTags = new ArrayList<>();
         mUsers = new ArrayList<>();
         mRecyclerView = r;
         mActivity = a;
@@ -79,70 +76,6 @@ public class EventDetailFeed extends Client {
                     (new Event(j).getmOwnerID() == mID) ?
                             EventDetailAdapter.MemberStatus.HOST :
                             EventDetailAdapter.MemberStatus.GUEST);
-
-            mEventAdapter.setOnAttendanceClicked(new EventDetailAdapter.OnAttendanceClicked() {
-                @Override
-                public void onClicked() {
-                    mEventAdapter.type = EventDetailAdapter.ViewType.USERS;
-                    mEventAdapter.clearFeed();
-
-                    try {
-                        for (String s : mUserTags)
-                            mEventAdapter.addElement(new Entity(new JSONObject(s)).mText);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            mEventAdapter.setOnCommentsClicked(new EventDetailAdapter.OnCommentsClicked() {
-                @Override
-                public void onClicked() {
-                    mEventAdapter.type = EventDetailAdapter.ViewType.COMMENTS;
-                    mEventAdapter.clearFeed();
-
-                    try {
-                        for (String s : mComments) {
-                            Entity comment = new Entity(new JSONObject(s));
-
-                            for (String u : mUserTags) {
-                                Entity user = new Entity(new JSONObject(u));
-                                if (comment.mID == user.mID) {
-                                    mEventAdapter.addElement(user.mText + ":\n" + comment.mText);
-
-                                }
-
-                            }
-
-                        }
-
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
-
-
-                }
-            });
-
-            mEventAdapter.setOnEntityClicked(new EventDetailAdapter.OnEntityClicked() {
-                @Override
-                public void onClicked(int position) {
-                    if (mEventAdapter.type == EventDetailAdapter.ViewType.USERS) {
-                        Intent intent = new Intent(mActivity, UserDetailActivity.class);
-
-                        try {
-
-                            intent.putExtra("UserID", (new JSONObject(mUserTags.get(position)))
-                                    .getInt("user_id"));
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            mActivity.startActivity(intent);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
 
             mEventAdapter.setOnActionsClicked(new EventDetailAdapter.OnActionsClicked() {
                 @Override
@@ -200,8 +133,8 @@ public class EventDetailFeed extends Client {
                         for (int i = 0; i < json.length(); i++) {
 
                             if (json.getJSONObject(i).getBoolean("status")) {
-                                mUserTags.add(json.getJSONObject(i).toString());
-                                mEventAdapter.addElement(new Entity(json.getJSONObject(i)).mText);
+                                mEventAdapter.mUsers.add(json.getJSONObject(i).toString());
+                                mEventAdapter.addElement(json.getJSONObject(i).toString());
 
                                 if (new Entity(json.getJSONObject(i)).mID == mID) {
                                     mEventAdapter.getmMainHolder().mJoin.setText((new Event(j).getEnd()
@@ -239,14 +172,12 @@ public class EventDetailFeed extends Client {
 
                         }
 
-                        loadUserDetails(0);
-
                         mEventAdapter.getmMainHolder().mAttendance.setText(s);
 
                         json = response.getJSONArray("Comments");
 
                         for (int i = 0; i < json.length(); i++) {
-                            mComments.add(json.getJSONObject(i).toString());
+                            mEventAdapter.mComments.add(json.getJSONObject(i).toString());
 
                         }
 
@@ -263,34 +194,6 @@ public class EventDetailFeed extends Client {
                 }
 
             });
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void loadUserDetails(final int index) {
-        if (index >= mUserTags.size())
-            return;
-
-        try {
-            Calls.getProfileByID(new Entity(new JSONObject(mUserTags.get(index))).mID,
-                    ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers,
-                                              JSONObject response) {
-                            try {
-                                mUsers.add(response.getJSONArray("info").getJSONObject(0));
-                                loadUserDetails(index + 1);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    });
 
 
         } catch (JSONException e) {
@@ -366,14 +269,16 @@ public class EventDetailFeed extends Client {
             com.rey.material.app.Dialog.Builder builder = null;
             com.rey.material.app.DialogFragment fragment;
 
+            final SharedPreferences preferences = PreferenceManager
+                    .getDefaultSharedPreferences(mActivity.getBaseContext());
+
             switch (s) {
                 case "Invite":
                     Intent intent = new Intent(mActivity, InviteActivity.class);
                     intent.putExtra("invite_id", event.getmEventID());
-                    intent.putExtra("token", ShallonCreamerIsATwat);
                     intent.putExtra("entities", "Friends:Groups");
+                    intent.putExtra("id", mEvent.getmEventID());
                     intent.putExtra("mode", "UG2EFE");
-                    intent.putExtra("id", mID);
                     mActivity.startActivity(intent);
 
                     break;
@@ -395,7 +300,7 @@ public class EventDetailFeed extends Client {
                                     "Loading. Please " +
                                             "wait...",
                                     true);
-                            Calls.addComment(event.getmEventID(), ShallonCreamerIsATwat,
+                            Calls.addComment(event.getmEventID(), preferences.getString("Token", ""),
                                     e.getText().toString(),
                                     new JsonHttpResponseHandler() {
                                         @Override
@@ -405,7 +310,7 @@ public class EventDetailFeed extends Client {
                                                                       response) {
                                             String comment = "";
                                             try {
-                                                for (String s : mUserTags) {
+                                                for (String s : mEventAdapter.mUsers) {
                                                     Entity entity = new Entity(
                                                             new JSONObject(s));
                                                     if (mID == entity.mID)
@@ -420,13 +325,13 @@ public class EventDetailFeed extends Client {
                                                 j.put("timestamp",
                                                         "/Date(" + Calendar.getInstance()
                                                                 .getTimeInMillis() + ")/");
-                                                mComments.add(j.toString());
+
+                                                mEventAdapter.mComments.add(j.toString());
                                             } catch (JSONException e1) {
                                                 e1.printStackTrace();
                                             }
 
-                                            if (mEventAdapter.type == EventDetailAdapter
-                                                    .ViewType.COMMENTS)
+                                            if (mEventAdapter.mActive == FeedAdapter.Active.COMMENT)
                                                 mEventAdapter.addElement(comment);
 
                                             dialog.hide();

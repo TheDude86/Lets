@@ -7,6 +7,19 @@
         <item>Newly Created</item>
     </string-array>
 
+    <string-array name="categories">
+        <item>Party</item>
+        <item>Eating &amp; Drinking</item>
+        <item>Studying</item>
+        <item>TV &amp; Movies</item>
+        <item>Video games</item>
+        <item>Sports</item>
+        <item>Music</item>
+        <item>Relax</item>
+        <item>Other</item>
+
+    </string-array>
+
     <string-array name="entities_array">
         <item>Events</item>
         <item>People</item>
@@ -169,4 +182,5 @@
     <string name="title_activity_birthday">Birthday</string>
     <string name="title_activity_account">Account</string>
     <string name="title_activity_detail">Profile Info</string>
+    <string name="account_created">Account Created!</string>
 </resources>

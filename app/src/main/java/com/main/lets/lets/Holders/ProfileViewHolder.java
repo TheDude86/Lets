@@ -50,10 +50,10 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public ImageView mProPic;
     public TextView mName;
     public TextView mBio;
-    public Button bFriends;
+    public TextView bFriends;
     public String mSearch;
-    public Button bGroups;
-    public Button bEvents;
+    public TextView bGroups;
+    public TextView bEvents;
     public TextView name;
     public int mID;
 
@@ -89,9 +89,9 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
 
         //The buttons for the user to select which feed to view
-        bFriends = (Button) itemView.findViewById(R.id.friends);
-        bGroups = (Button) itemView.findViewById(R.id.groups);
-        bEvents = (Button) itemView.findViewById(R.id.events);
+        bFriends = (TextView) itemView.findViewById(R.id.friends);
+        bGroups = (TextView) itemView.findViewById(R.id.groups);
+        bEvents = (TextView) itemView.findViewById(R.id.events);
 
         //Initializing the search string and default viewing feed
         mSearch = "";

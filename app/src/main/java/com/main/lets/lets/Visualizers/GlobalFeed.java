@@ -2,6 +2,8 @@ package com.main.lets.lets.Visualizers;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
@@ -41,69 +43,74 @@ public class GlobalFeed extends Client {
 
     }
 
-    public void draw(org.json.JSONObject j){
+    public void draw(org.json.JSONObject j1) {
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mActivity.getBaseContext());
+
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
-                StaggeredGridLayoutManager.VERTICAL));
+                                                                      StaggeredGridLayoutManager
+                                                                              .VERTICAL));
         mEventAdapter = new EventAdapter(mActivity, new LinkedList<String>(), ShallonCreamerIsATwat,
-                mID);
+                                         mID);
         mRecyclerView.setAdapter(mEventAdapter);
 
-        try {
 
-            final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
-                    "Loading. Please wait...", true);
+        final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
+                                                          "Loading. Please wait...", true);
 
-            int RANGE = 9980000;
+        int RANGE = 32000;
 
-            Calls.getCloseEvents(j.getDouble("latitude"), j.getDouble("longitude"), RANGE, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, org.json.JSONArray response) {
+        Calls.getCloseEvents(preferences.getFloat("latitude", 0),
+                             preferences.getFloat("longitude", 0),
+                             RANGE, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers,
+                                          org.json.JSONArray response) {
 
 
-                    for (int i = 0; i < response.length(); i++) {
-                        try {
-                            mEventAdapter.insertLast(response.getJSONObject(i).toString());
-                        } catch (org.json.JSONException e) {
-                            e.printStackTrace();
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                mEventAdapter.insertLast(response.getJSONObject(i).toString());
+                            } catch (org.json.JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
+
+                        dialog.hide();
+
                     }
 
-                    dialog.hide();
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                          JSONObject errorResponse) {
 
-                }
+                        dialog.hide();
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                      JSONObject errorResponse) {
-
-                    dialog.hide();
-
-                    TextView t = new TextView(mActivity);
-                    t.setText("Something went wrong and we're not saying it's you, but...");
-                    final Dialog errorMsg = new Dialog(mActivity);
-                    errorMsg.title("Network Error")
-                            .positiveAction("OK")
-                            .contentView(t)
-                            .cancelable(true)
-                            .positiveActionClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    errorMsg.hide();
-                                }
-                            })
-                            .show();
+                        TextView t = new TextView(mActivity);
+                        t.setText("Something went wrong and we're not saying it's you, but...");
+                        final Dialog errorMsg = new Dialog(mActivity);
+                        errorMsg.title("Network Error")
+                                .positiveAction("OK")
+                                .contentView(t)
+                                .cancelable(true)
+                                .positiveActionClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        errorMsg.hide();
+                                    }
+                                })
+                                .show();
 
 
-                }
+                    }
 
-            });
+                });
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    public void update(int id, String token){
+    public void update(int id, String token) {
         ShallonCreamerIsATwat = token;
         mID = id;
     }

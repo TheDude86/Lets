@@ -5,30 +5,25 @@
 
     <TextView
         android:id="@+id/btn_attend"
-        style="@style/TextButtonToolBar"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/settings"
         android:layout_weight="1"
         android:gravity="center"
         android:text="Attendance"
-        android:textSize="14dp" />
+        android:background="#ffcc00"/>
+
+
 
     <TextView
-        style="@style/TextButtonToolBar"
         android:id="@+id/btn_comments"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Comments"
-        android:textSize="14dp" />
+        android:text="Comments"/>
 
     <TextView
-        style="@style/TextButtonToolBar"
         android:id="@+id/btn_actions"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -36,7 +31,6 @@
         android:layout_alignParentEnd="true"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Actions"
-        android:textSize="14dp" />
+        android:text="Actions"/>
 
 </LinearLayout>

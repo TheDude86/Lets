@@ -42,22 +42,45 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/white" />
 
-        <TextView
-            android:id="@+id/eventTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:text="12/31/15   10:00PM - 2:00AM"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/eventLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:text="D Sig House"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/eventTime"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="12/31/15   10:00PM - 2:00AM"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/eventLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:paddingLeft="10dp"
+                android:text="D Sig House"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_weight="1"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Category"
+                android:id="@+id/category"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 

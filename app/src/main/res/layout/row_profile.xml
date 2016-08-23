@@ -25,7 +25,8 @@
                 android:layout_gravity="top|center"
                 android:adjustViewBounds="true"
                 android:maxHeight="500dp"
-                android:background="#00aeff"
+                android:minHeight="100dp"
+                android:background="#f6ebc1"
                 android:scaleType="centerCrop" />
 
             <RelativeLayout

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.Holders.UserDetailViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
@@ -27,15 +28,9 @@ import java.util.Iterator;
 /**
  * Created by Joe on 6/30/2016.
  */
-public class UserDetailAdapter extends RecyclerView.Adapter {
+public class UserDetailAdapter extends FeedAdapter {
     public UserDetailActivity.Relationship mRelationship;
-    ArrayList<String> mList = new ArrayList<>();
-    OnEntityClickListener mEntityClickListener;
-    OnFriendClickListener mFriendClickListener;
-    OnGroupClickListener mGroupClickListener;
-    OnEventClickListener mEventClickListener;
     public UserDetailViewHolder mHolder;
-    private AppCompatActivity mActivity;
 
     public UserDetailAdapter(AppCompatActivity a, JSONObject j, UserDetailActivity.Relationship r) {
         mList.add(j.toString());
@@ -55,8 +50,8 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
             return new UserDetailViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_profile, parent, false));
 
-        return new EntityViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_entity_with_space, parent, false));
+        return new PictureViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_entity_with_picture, parent, false));
     }
 
     @Override
@@ -64,28 +59,11 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
         if (position == 0)
             loadProfile(holder);
         else
-            loadEntity(holder, position);
+            super.onBindViewHolder(holder, position);
 
 
     }
 
-    private void loadEntity(RecyclerView.ViewHolder holder, final int position) {
-        EntityViewHolder h = (EntityViewHolder) holder;
-        try {
-            h.mTitle.setText(new Entity(new JSONObject(mList.get(position))).mText);
-            h.mLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mEntityClickListener != null)
-                        mEntityClickListener.OnClick(position - 1);
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-    }
 
     private void loadProfile(RecyclerView.ViewHolder holder) {
         mHolder = (UserDetailViewHolder) holder;
@@ -96,28 +74,10 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
             mHolder.mScore.setText("Score: " + json.getInt("Score"));
             mHolder.mName.setText(json.getString("User_Name"));
             mHolder.mBio.setText(json.getString("Biography"));
-            mHolder.mFriendsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mFriendClickListener != null)
-                        mFriendClickListener.OnClick();
-                }
-            });
-            mHolder.mEventsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mEventClickListener != null)
-                        mEventClickListener.OnClick();
-                }
-            });
 
-            mHolder.mGroupsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mGroupClickListener != null)
-                        mGroupClickListener.OnClick();
-                }
-            });
+            setUsers(mHolder.mFriendsButton);
+            setEvents(mHolder.mEventsButton);
+            setGroups(mHolder.mGroupsButton);
 
             mHolder.mOptions.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -182,39 +142,6 @@ public class UserDetailAdapter extends RecyclerView.Adapter {
         }
 
     }
-
-    public interface OnEntityClickListener {
-        void OnClick(int position);
-    }
-
-    public interface OnFriendClickListener {
-        void OnClick();
-    }
-
-    public interface OnEventClickListener {
-        void OnClick();
-    }
-
-    public interface OnGroupClickListener {
-        void OnClick();
-    }
-
-    public void setOnEntityClickListener(OnEntityClickListener e){
-        mEntityClickListener = e;
-    }
-
-    public void setOnFriendClickListener(OnFriendClickListener f) {
-        mFriendClickListener = f;
-    }
-
-    public void setOnEventClickListener(OnEventClickListener e){
-        mEventClickListener = e;
-    }
-
-    public void setOnGroupClickListener(OnGroupClickListener g){
-        mGroupClickListener = g;
-    }
-
 
 
     public class ActionDialogFragment extends DialogFragment {

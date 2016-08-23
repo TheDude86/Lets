@@ -1,19 +1,16 @@
 package com.main.lets.lets.Visualizers;
 
-import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.View;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.SearchAdapter;
-import com.main.lets.lets.Holders.SearchViewHolder;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
-import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.rey.material.app.Dialog;
 import com.rey.material.app.DialogFragment;
@@ -154,7 +151,7 @@ public class InviteFeed extends Client {
 
             mEventClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(final int position, SearchViewHolder holder, int userID) {
+                public void onClicked(final int position, PictureViewHolder holder, int userID) {
                     holder.mLayout.setBackgroundColor(Color.WHITE);
                     Dialog.Builder builder = new SimpleDialog.Builder() {
                         @Override
@@ -201,7 +198,7 @@ public class InviteFeed extends Client {
 
             mUserClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder holder, int userID) {
+                public void onClicked(int position, PictureViewHolder holder, int userID) {
                     try {
                         mSelectedUsers.add(new Entity(list.getJSONObject(position)).mID);
                     } catch (JSONException e) {
@@ -213,7 +210,7 @@ public class InviteFeed extends Client {
 
             mGroupClickHandler = new SearchAdapter.OnEntityClickListener() {
                 @Override
-                public void onClicked(int position, SearchViewHolder holder, int userID) {
+                public void onClicked(int position, PictureViewHolder holder, int userID) {
                     try {
                         mSelectedGroups.add(new Entity(list.getJSONObject(position)).mID);
                     } catch (JSONException e) {

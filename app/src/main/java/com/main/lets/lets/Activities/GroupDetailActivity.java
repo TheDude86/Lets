@@ -80,7 +80,6 @@ public class GroupDetailActivity extends AppCompatActivity {
     }
 
     public void loadActivity(final JSONObject j) throws JSONException {
-        final GroupDetailFeed g = new GroupDetailFeed(this, ShallonCreamerIsATwat, mID);
         for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
             if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID
                     && j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")) {
@@ -93,14 +92,17 @@ public class GroupDetailActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers,
                                           org.json.JSONArray response) {
+
+                        GroupDetailFeed g = new GroupDetailFeed(GroupDetailActivity.this, j);
+
                         for (int i = 0; i < response.length(); i++) {
                             try {
-                                g.mComments.add(response.getJSONObject(i));
+                                g.mAdapter.mComments.add(response.getJSONObject(i).toString());
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        g.draw(j);
+                        g.draw(null);
 
                     }
 

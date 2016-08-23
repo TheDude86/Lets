@@ -35,12 +35,8 @@ import cz.msebera.android.httpclient.Header;
  * Created by jnovosel on 6/24/16.
  */
 public class UserDetailFeed extends Client {
-    ArrayList<String> mFriends, mFriendTags, mGroups, mEvents, mEventTags, mGroupTags;
     public UserDetailActivity.Relationship mRelationship;
 
-    enum Viewing {EVENT, GROUP, USER}
-
-    Viewing active = Viewing.USER;
     String ShallonCreamerIsATwat;
     UserDetailAdapter mAdapter;
     RecyclerView mRecyclerView;
@@ -49,18 +45,15 @@ public class UserDetailFeed extends Client {
 
     public UserDetailFeed(AppCompatActivity a, RecyclerView recyclerView, JSONObject j,
                           String token, UserDetailActivity.Relationship r) {
-        mFriendTags = new ArrayList<>();
-        mEventTags = new ArrayList<>();
-        mGroupTags = new ArrayList<>();
+
         ShallonCreamerIsATwat = token;
         mRecyclerView = recyclerView;
-        mFriends = new ArrayList<>();
-        mGroups = new ArrayList<>();
-        mEvents = new ArrayList<>();
+
         mRelationship = r;
         mActivity = a;
         mJSON = j;
 
+        mAdapter = new UserDetailAdapter(mActivity, mJSON, mRelationship);
 
 
         try {
@@ -78,85 +71,6 @@ public class UserDetailFeed extends Client {
 
         mRecyclerView.setLayoutManager(
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-        mAdapter = new UserDetailAdapter(mActivity, mJSON, mRelationship);
-
-        mAdapter.setOnFriendClickListener(new UserDetailAdapter.OnFriendClickListener() {
-            @Override
-            public void OnClick() {
-                mAdapter.clearFeed();
-
-                for (String l : mFriendTags)
-                    mAdapter.addElement(l);
-
-                active = Viewing.USER;
-
-            }
-        });
-
-        mAdapter.setOnEventClickListener(new UserDetailAdapter.OnEventClickListener() {
-            @Override
-            public void OnClick() {
-                mAdapter.clearFeed();
-                for (String l : mEventTags)
-                    mAdapter.addElement(l);
-
-                active = Viewing.EVENT;
-            }
-        });
-
-        mAdapter.setOnGroupClickListener(new UserDetailAdapter.OnGroupClickListener() {
-            @Override
-            public void OnClick() {
-                mAdapter.clearFeed();
-
-                for (String l : mGroupTags)
-                    mAdapter.addElement(l);
-
-                active = Viewing.GROUP;
-            }
-        });
-
-        mAdapter.setOnEntityClickListener(new UserDetailAdapter.OnEntityClickListener() {
-            @Override
-            public void OnClick(int position) {
-                try {
-
-                    Intent intent;
-                    switch (active) {
-                        case EVENT:
-                            intent = new Intent(mActivity, EventDetailActivity.class);
-                            intent.putExtra("EventID", new JSONObject(mEventTags.get(position))
-                                    .getInt("event_id"));
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            intent.putExtra("id", mJSON.getInt("User_ID"));
-                            mActivity.startActivity(intent);
-
-                            break;
-                        case GROUP:
-                            intent = new Intent(mActivity, GroupDetailActivity.class);
-                            intent.putExtra("GroupID", (new JSONObject(mGroupTags.get(position)))
-                                    .getInt("group_id"));
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            intent.putExtra("id", mJSON.getInt("User_ID"));
-                            mActivity.startActivity(intent);
-
-                            break;
-                        case USER:
-                            intent = new Intent(mActivity, UserDetailActivity.class);
-                            intent.putExtra("UserID", (new JSONObject(mFriendTags.get(position))
-                                    .getInt("user_id")));
-                            intent.putExtra("token", ShallonCreamerIsATwat);
-                            intent.putExtra("id", mJSON.getInt("User_ID"));
-                            mActivity.startActivity(intent);
-
-                            break;
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -189,11 +103,10 @@ public class UserDetailFeed extends Client {
                                     for (int i = 0; i < response.length(); i++) {
                                         //Takes all of the JSON object out of the array and
                                         // placed in a temporary array list
-                                        mGroupTags.add(response.getJSONObject(i).toString());
+                                        mAdapter.mGroups.add(response.getJSONObject(i).toString());
 
                                     }
 
-                                    loadGroupDetails(0);
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -207,26 +120,6 @@ public class UserDetailFeed extends Client {
 
     }
 
-    public void loadGroupDetails(final int index) {
-        if (index >= mGroupTags.size())
-            return;
-
-        try {
-            Entity e = new Entity(new JSONObject(mGroupTags.get(index)));
-            Calls.getGroupInfo(e.mID, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers,
-                                      org.json.JSONObject response) {
-                    mGroups.add(response.toString());
-                    loadGroupDetails(index + 1);
-
-                }
-
-            });
-        } catch (JSONException e1) {
-            e1.printStackTrace();
-        }
-    }
 
     /**
      * Network call to get the logged in user's events and then passes the group list to the
@@ -253,10 +146,9 @@ public class UserDetailFeed extends Client {
                                   try {
                                       for (int i = 0; i < response.length(); i++) {
                                           //Loads the events in the temporary array list
-                                          mEventTags.add(response.getJSONObject(i).toString());
+                                          mAdapter.mEvents.add(response.getJSONObject(i).toString());
 
                                       }
-                                      loadEventDetails(0);
 
                                   } catch (org.json.JSONException e) {
                                       e.printStackTrace();
@@ -264,29 +156,6 @@ public class UserDetailFeed extends Client {
                               }
 
                           });
-
-    }
-
-    public void loadEventDetails(final int index) {
-        if (index >= mEventTags.size())
-            return;
-
-        try {
-            Entity e = new Entity(new JSONObject(mEventTags.get(index)));
-            Calls.getEvent(e.mID, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers,
-                                      org.json.JSONObject response) {
-                    mEvents.add(response.toString());
-                    loadEventDetails(index + 1);
-
-                }
-
-
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -316,7 +185,7 @@ public class UserDetailFeed extends Client {
 
                         if (response.getJSONObject(i).getBoolean("status")) {
                             //Loads the friends into a temporary array list
-                            mFriendTags.add(response.getJSONObject(i).toString());
+                            mAdapter.mUsers.add(response.getJSONObject(i).toString());
 
 
                         }
@@ -328,40 +197,16 @@ public class UserDetailFeed extends Client {
 
                 }
 
-                mAdapter.mHolder.mFriends.setText(mFriendTags.size() +
-                                                          ((mFriendTags.size() > 1) ? " Friends" :
+                mAdapter.mHolder.mFriends.setText(mAdapter.mUsers.size() +
+                                                          ((mAdapter.mUsers.size() > 1) ? " Friends" :
                                                                   " Friend"));
-                loadFriendDetails(0);
-                for (String l : mFriendTags)
+
+                for (String l : mAdapter.mUsers)
                     mAdapter.addElement(l);
 
             }
 
         });
-
-    }
-
-    public void loadFriendDetails(final int index) {
-        if (index >= mFriendTags.size())
-            return;
-
-        try {
-            Entity e = new Entity(new JSONObject(mFriendTags.get(index)));
-            Calls.getProfileByID(e.mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    try {
-                        mFriends.add(response.getJSONArray("info").getJSONObject(0).toString());
-                        loadFriendDetails(index + 1);
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
     }
 

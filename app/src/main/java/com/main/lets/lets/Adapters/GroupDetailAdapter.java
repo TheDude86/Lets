@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.Holders.GroupDetailViewHolder;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Group;
@@ -40,7 +41,7 @@ import cz.msebera.android.httpclient.Header;
 /**
  * Created by jnovosel on 7/2/16.
  */
-public class GroupDetailAdapter extends RecyclerView.Adapter {
+public class GroupDetailAdapter extends FeedAdapter {
     public OnCommentsClickListener mCommentsClickListener;
     public OnMembersClickListener mMembersClickListener;
     public OnEntityClickListener mEntityClickListener;
@@ -50,8 +51,6 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
     public HashMap<String, TextView> mActions;
     public GroupDetailViewHolder mHolder;
     public Status mStatus = Status.GUEST;
-    public AppCompatActivity mActivity;
-    public ArrayList<String> mList;
     public OnDraw mDraw;
 
     public GroupDetailAdapter(AppCompatActivity a, String s, int id) {
@@ -80,8 +79,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             return new GroupDetailViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_group_detail, parent, false));
 
-        return new EntityViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_entity, parent, false));
+        return new PictureViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_entity_with_picture, parent, false));
     }
 
     @Override
@@ -94,7 +93,7 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
         if (position == 0)
             loadGroupInfo((GroupDetailViewHolder) holder);
         else
-            loadEntityInfo((EntityViewHolder) holder, position);
+            super.onBindViewHolder(holder, position);
 
 
     }
@@ -144,21 +143,8 @@ public class GroupDetailAdapter extends RecyclerView.Adapter {
             holder.mName.setText(j.getString("group_name"));
             holder.mBio.setText(j.getString("bio"));
 
-            holder.mMembers.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mMembersClickListener != null)
-                        mMembersClickListener.onClick();
-                }
-            });
-
-            holder.mComments.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mCommentsClickListener != null)
-                        mCommentsClickListener.onClick();
-                }
-            });
+            setComments(holder.mComments);
+            setUsers(holder.mMembers);
 
             switch (mStatus) {
                 case GUEST:

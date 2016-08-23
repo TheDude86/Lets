@@ -11,13 +11,13 @@ import com.main.lets.lets.R;
 /**
  * Created by jnovosel on 7/8/16.
  */
-public class SearchViewHolder extends RecyclerView.ViewHolder {
+public class PictureViewHolder extends RecyclerView.ViewHolder {
     public RelativeLayout mLayout;
     public ImageView mImage;
     public boolean clicked;
     public TextView mText;
 
-    public SearchViewHolder(View itemView) {
+    public PictureViewHolder(View itemView) {
         super(itemView);
 
         mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);

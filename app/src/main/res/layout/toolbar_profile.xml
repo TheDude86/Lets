@@ -4,29 +4,35 @@
     android:layout_height="match_parent">
 
 
-    <Button
+    <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:text="Events"
         android:id="@+id/events"
         android:background="#00ffffff"
-        android:layout_weight="1" />
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:gravity="center" />
 
-    <Button
+    <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:text="Friends"
         android:id="@+id/friends"
-        android:background="#00ffffff"
+        android:background="#ffcc00"
         android:layout_gravity="center_vertical"
-        android:layout_weight="1" />
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:gravity="center" />
 
-    <Button
+    <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:text="Groups"
         android:id="@+id/groups"
         android:background="#00ffffff"
         android:layout_gravity="center_vertical"
-        android:layout_weight="1" />
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"
+        android:gravity="center" />
 </LinearLayout>
