@@ -81,6 +81,7 @@ public class InviteFeed extends Client {
         mRecyclerView = (RecyclerView) mActivity.findViewById(R.id.feed);
 
 
+        //noinspection ConstantConditions
         mActivity.findViewById(R.id.invite).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +100,6 @@ public class InviteFeed extends Client {
                 } else if (mActive == Mode.UG2EFE) {
 
                     for (final Integer i : mSelectedGroups) {
-                        Log.println(Log.ASSERT, "InviteFeed", " event ID: " + inviteID + " Group ID: " + i);
                         Calls.inviteGroupToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -114,7 +114,6 @@ public class InviteFeed extends Client {
                         Calls.inviteUserToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                Log.println(Log.ASSERT, "InviteFeed", response.toString());
 
                             }
                         });
@@ -125,14 +124,13 @@ public class InviteFeed extends Client {
                 } else if (mActive == Mode.U2CFE){
 
                     for (final Integer i : mSelectedUsers) {
-                        Log.println(Log.ASSERT, "InviteFeed","Token: " + ShallonCreamerIsATwat);
 
                         Calls.addCohost(mInviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
 
                             @Override
                             public void onSuccess(int statusCode, Header[] headers,
                                                   JSONObject response) {
-                                Log.println(Log.ASSERT, "InviteFeed", response.toString());
+//                                Log.println(Log.ASSERT, "InviteFeed", response.toString());
 
                             }
                         });
@@ -167,7 +165,6 @@ public class InviteFeed extends Client {
                                         mInviteID, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                        Log.println(Log.ASSERT, "InviteFeed", response.toString());
                                         mActivity.finish();
                                     }
                                 });

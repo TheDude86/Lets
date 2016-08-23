@@ -60,8 +60,6 @@ public class SearchAdapter extends RecyclerView.Adapter {
         try {
             final SearchViewHolder h = (SearchViewHolder) holder;
             final Entity e = new Entity(mList.getJSONObject(h.getAdapterPosition()));
-            Log.println(Log.ASSERT, "SearchAdapter",
-                        mList.getJSONObject(h.getAdapterPosition()).toString());
             if (mActive == SearchFeed.Viewing.EVENT) {
             } else if (e.mPic != null) {
 
@@ -69,8 +67,7 @@ public class SearchAdapter extends RecyclerView.Adapter {
                     Picasso.with(mActivity).load(e.mPic).into(h.mImage);
 
                 } catch (IllegalArgumentException e1) {
-                    Log.println(Log.ASSERT, "SearchAdapter", "Illegal URL: " + e.mPic);
-
+                    e1.printStackTrace();
                 }
                 
             }
@@ -82,7 +79,6 @@ public class SearchAdapter extends RecyclerView.Adapter {
                     if (mOnEntityClicked != null) {
                         if (mSelectable) {
                             if (!mSelected.contains(e.mID)) {
-                                Log.println(Log.ASSERT, "SearchAdapter", e.mID + "");
                                 mSelected.add(e.mID);
                                 h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
 

@@ -169,8 +169,6 @@ public class Event extends Entity implements Comparable<Event> {
         Calendar cal = Calendar.getInstance();
         long milliDiff = cal.get(Calendar.ZONE_OFFSET);
 
-        Log.println(Log.ASSERT, "Calls", "Milliseconds " + milliDiff + " Daylight savings: " + b);
-
         return (new SimpleDateFormat("h:mm a")).format(new Date(mStart.getTime() - milliDiff - (b ? 3600000 : 0))) +
                 " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime() - milliDiff - (b ? 3600000 : 0));
     }

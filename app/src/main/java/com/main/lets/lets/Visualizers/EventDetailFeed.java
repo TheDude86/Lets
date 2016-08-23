@@ -228,8 +228,6 @@ public class EventDetailFeed extends Client {
 
                                         }
                                     });
-                                } else {
-                                    Log.println(Log.ASSERT, "EventDetailFeed", mEventAdapter.mStatus.toString());
                                 }
 
                                 if (s.length() < 1)
@@ -261,7 +259,7 @@ public class EventDetailFeed extends Client {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                       org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
+//                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });
@@ -276,8 +274,6 @@ public class EventDetailFeed extends Client {
     public void loadUserDetails(final int index) {
         if (index >= mUserTags.size())
             return;
-
-        Log.println(Log.ASSERT, "EventDetailFeed", "Test");
 
         try {
             Calls.getProfileByID(new Entity(new JSONObject(mUserTags.get(index))).mID,
@@ -509,7 +505,6 @@ public class EventDetailFeed extends Client {
                                         Entity user = new Entity(mCoHosts.getJSONObject(j));
                                         if (values[i].equals(user.mText)) {
 
-                                            Log.println(Log.ASSERT, "EventDetailFeed", ShallonCreamerIsATwat);
 
                                             Calls.removeCohost(user.mID, event.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
@@ -518,7 +513,7 @@ public class EventDetailFeed extends Client {
                                                 public void onSuccess(int statusCode,
                                                                       Header[] headers,
                                                                       JSONObject response) {
-                                                    Log.println(Log.ASSERT, "EventDetailFeed", response.toString());
+                                                    draw(mJSON);
                                                 }
                                             });
 

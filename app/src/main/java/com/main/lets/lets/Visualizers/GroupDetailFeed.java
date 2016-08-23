@@ -120,7 +120,6 @@ public class GroupDetailFeed extends Client {
                         }
 
                     } catch (JSONException e) {
-                        Log.println(Log.ASSERT, "GroupDetailFeed", "Test Git");
                         e.printStackTrace();
                     }
 

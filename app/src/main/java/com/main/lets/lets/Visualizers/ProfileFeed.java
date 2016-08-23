@@ -114,19 +114,6 @@ public class ProfileFeed extends Client {
 
                 }
 
-                /**
-                 * If something goes wrong with the call handle it here.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param throwable (unused)
-                 * @param errorResponse (unused)
-                 */
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                      org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
-                }
 
             });
         }
@@ -161,10 +148,16 @@ public class ProfileFeed extends Client {
 
         //This is where the profile feed determines whether the user has logged it, the user will
         // have an access token
-        SharedPreferences preferences = PreferenceManager
+        final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(mActivity.getBaseContext());
 
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+
         if (preferences.getString("Token", "").equals("")){
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.commit();
+
             //Loads the login adapter
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
@@ -200,11 +193,8 @@ public class ProfileFeed extends Client {
                                               org.json.JSONObject response) {
 
                             try {
-                                ShallonCreamerIsATwat += response.getString("accessToken");
                                 mUserInfo.put("userID", response.getInt("user_id"));
                                 mUserInfo.put("token", ShallonCreamerIsATwat);
-
-                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext());
 
                                 SharedPreferences.Editor editor = preferences.edit();
 
@@ -245,8 +235,6 @@ public class ProfileFeed extends Client {
             mRecyclerView.setAdapter(mLoginAdapter);
             //If the user has logged in
         } else {
-
-            Log.println(Log.ASSERT, "ProfileFeed", "Draw");
 
             //Preparing the profile adapter to be set to the recycler view
             mRecyclerView.setLayoutManager(
@@ -319,21 +307,6 @@ public class ProfileFeed extends Client {
                                 finishedLoadFeed();
                             }
 
-                            /**
-                             * Called when an error occurs somewhere with the call.
-                             *
-                             * @param statusCode (unused)
-                             * @param headers (unused)
-                             * @param throwable (unused)
-                             * @param errorResponse (unused)
-                             */
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers,
-                                                  Throwable throwable,
-                                                  org.json.JSONArray errorResponse) {
-                                Log.e("Async Test Failure", errorResponse.toString());
-                            }
-
                         });
 
 
@@ -381,19 +354,6 @@ public class ProfileFeed extends Client {
                                   finishedLoadFeed();
                               }
 
-                              /**
-                               * Called when an error occurs somewhere with the call.
-                               *
-                               * @param statusCode (unused)
-                               * @param headers (unused)
-                               * @param throwable (unused)
-                               * @param errorResponse (unused)
-                               */
-                              @Override
-                              public void onFailure(int statusCode, Header[] headers,
-                                                    String errorResponse, Throwable throwable) {
-                                  Log.e("Async Test Failure", errorResponse);
-                              }
 
                           });
 
@@ -447,26 +407,11 @@ public class ProfileFeed extends Client {
 
             }
 
-            /**
-             * Called when an error occurs somewhere with the call.
-             *
-             * @param statusCode (unused)
-             * @param headers (unused)
-             * @param throwable (unused)
-             * @param errorResponse (unused)
-             */
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                  org.json.JSONArray errorResponse) {
-                Log.e("Async Test Failure", errorResponse.toString());
-            }
-
         });
 
     }
 
     public void finishedLoadFeed() {
-        Log.println(Log.ASSERT, "ProfileFeed", "Checks " + mChecks[0] + " " + mChecks[1] + " " + mChecks[2]);
 
         if (doChecks()) {
             if (dialog != null) {

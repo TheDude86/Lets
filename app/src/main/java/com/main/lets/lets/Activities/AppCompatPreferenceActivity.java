@@ -101,11 +101,9 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.println(Log.ASSERT, "Result 1", requestCode + "");
-        Log.println(Log.ASSERT, "Result 2", resultCode + "");
         if (requestCode == CODE_LOGOUT) {
             if (resultCode == RESULT_OK) {
-                Log.println(Log.ASSERT, "Result", "Here");
+                //Fill Later
             }
         }
     }

@@ -66,7 +66,7 @@ public class GroupCreateActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                        Log.println(Log.ASSERT, "GroupCreateActivity", response.toString());
+//                                        Log.println(Log.ASSERT, "GroupCreateActivity", response.toString());
                                     }
 
                                     @Override
@@ -89,8 +89,6 @@ public class GroupCreateActivity extends AppCompatActivity {
 
                                                                     @Override
                                                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-                                                                        Log.println(Log.ASSERT, "GroupCreateActivity", response.toString());
 
                                                                         Intent intent = new Intent(GroupCreateActivity.this, GroupDetailActivity.class);
                                                                         intent.putExtra("GroupID", id);

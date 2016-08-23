@@ -201,20 +201,6 @@ public class UserDetailFeed extends Client {
 
                             }
 
-                            /**
-                             * Called when an error occurs somewhere with the call.
-                             *
-                             * @param statusCode (unused)
-                             * @param headers (unused)
-                             * @param throwable (unused)
-                             * @param errorResponse (unused)
-                             */
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers,
-                                                  Throwable throwable,
-                                                  org.json.JSONArray errorResponse) {
-                                Log.e("Async Test Failure", errorResponse.toString());
-                            }
 
                         });
 
@@ -234,21 +220,6 @@ public class UserDetailFeed extends Client {
                     mGroups.add(response.toString());
                     loadGroupDetails(index + 1);
 
-                }
-
-                /**
-                 * Called when an error occurs somewhere with the call.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param throwable (unused)
-                 * @param errorResponse (unused)
-                 */
-                @Override
-                public void onFailure(int statusCode, Header[] headers,
-                                      Throwable throwable,
-                                      org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });
@@ -292,20 +263,6 @@ public class UserDetailFeed extends Client {
                                   }
                               }
 
-                              /**
-                               * Called when an error occurs somewhere with the call.
-                               *
-                               * @param statusCode (unused)
-                               * @param headers (unused)
-                               * @param throwable (unused)
-                               * @param errorResponse (unused)
-                               */
-                              @Override
-                              public void onFailure(int statusCode, Header[] headers,
-                                                    String errorResponse, Throwable throwable) {
-                                  Log.e("Async Test Failure", errorResponse);
-                              }
-
                           });
 
     }
@@ -325,19 +282,6 @@ public class UserDetailFeed extends Client {
 
                 }
 
-                /**
-                 * Called when an error occurs somewhere with the call.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param throwable (unused)
-                 * @param errorResponse (unused)
-                 */
-                @Override
-                public void onFailure(int statusCode, Header[] headers,
-                                      String errorResponse, Throwable throwable) {
-                    Log.e("Async Test Failure", errorResponse);
-                }
 
             });
         } catch (JSONException e) {
@@ -393,20 +337,6 @@ public class UserDetailFeed extends Client {
 
             }
 
-            /**
-             * Called when an error occurs somewhere with the call.
-             *
-             * @param statusCode (unused)
-             * @param headers (unused)
-             * @param throwable (unused)
-             * @param errorResponse (unused)
-             */
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                  org.json.JSONArray errorResponse) {
-                Log.e("Async Test Failure", errorResponse.toString());
-            }
-
         });
 
     }
@@ -426,20 +356,6 @@ public class UserDetailFeed extends Client {
                     } catch (JSONException e1) {
                         e1.printStackTrace();
                     }
-                }
-
-                /**
-                 * Called when an error occurs somewhere with the call.
-                 *
-                 * @param statusCode (unused)
-                 * @param headers (unused)
-                 * @param throwable (unused)
-                 * @param errorResponse (unused)
-                 */
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                      org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });

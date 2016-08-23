@@ -73,13 +73,6 @@ public class GlobalFeed extends Client {
                 }
 
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-                    Log.println(Log.ASSERT, "GlobalFeed Get Close", response.toString());
-
-                }
-
-                @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable,
                                       JSONObject errorResponse) {
 

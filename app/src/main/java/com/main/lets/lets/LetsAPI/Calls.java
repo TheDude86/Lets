@@ -274,15 +274,6 @@ public class Calls {
         params.put("name", mUserInfo.get("name"));
         params.put("bio", mUserInfo.get("bio"));
 
-        Log.println(Log.ASSERT, "Calls", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("interests").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("id").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("privacy").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("picRef").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("gender").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("name").toString());
-        Log.println(Log.ASSERT, "Calls", mUserInfo.get("bio").toString());
-
         client.addHeader("Authorization", token);
         post(EditProfile, params, jsonHttpResponseHandler);
     }
@@ -583,8 +574,6 @@ public class Calls {
                 mOnFinished.onFinished();
             }
 
-            Log.println(Log.ASSERT, "Calls", "DONE");
-
             super.onPostExecute(result);
         }
 
@@ -601,10 +590,15 @@ public class Calls {
         Activity mActivity;
 
 
-        public Notify(Activity a, ImageButton imageButton, String token){
-            ShallonCreamerIsATwat = token;
+        public Notify(Activity a, ImageButton imageButton){
             mImageButton = imageButton;
             mActivity = a;
+
+            final SharedPreferences preferences = PreferenceManager
+                    .getDefaultSharedPreferences(mActivity);
+
+
+            ShallonCreamerIsATwat = preferences.getString("Token", "");
 
             getNotifications(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
@@ -615,8 +609,7 @@ public class Calls {
                         JSONArray events = response.getJSONArray("events");
                         JSONArray groups = response.getJSONArray("groups");
 
-                        SharedPreferences preferences = PreferenceManager
-                                .getDefaultSharedPreferences(mActivity);
+
 
                         int id = preferences.getInt("UserID", -1);
 
@@ -667,7 +660,7 @@ public class Calls {
         protected void onPostExecute(Void result) {
 
             if (!mNotify)
-                new Notify(mActivity, mImageButton, ShallonCreamerIsATwat).execute();
+                new Notify(mActivity, mImageButton).execute();
 
             super.onPostExecute(result);
         }

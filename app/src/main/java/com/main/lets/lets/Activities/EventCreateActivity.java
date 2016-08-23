@@ -374,12 +374,11 @@ public class EventCreateActivity extends AppCompatActivity {
                 Calls.createEvent(mMap, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        Log.println(Log.ASSERT, "EventCreateActivity", response.toString());
+//                        Log.println(Log.ASSERT, "EventCreateActivity", response.toString());
                     }
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                        Log.println(Log.ASSERT, "Success", response.toString());
                         create.setProgress(100);
 
                         try {

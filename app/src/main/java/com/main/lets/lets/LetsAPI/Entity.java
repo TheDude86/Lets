@@ -83,7 +83,6 @@ public class Entity extends Client {
 
     @Override
     public void draw(JSONObject j) {
-        Log.println(Log.ASSERT, "Asshat", "Don't use this method");
         int x = 3 / 0;
 
     }
@@ -95,7 +94,6 @@ public class Entity extends Client {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
                     Intent intent;
-                    Log.println(Log.ASSERT, "Entity", "ID: " + id);
                     switch (mType) {
                         case USER:
                             intent = new Intent(mActivity, UserDetailActivity.class);

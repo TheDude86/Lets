@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public String mActive;
 
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     if (response.has("accessToken")) {
-                        new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications), "Bearer " + response.getString("accessToken")).execute();
+                        new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
 
                         mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
 
@@ -296,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
         String ShallonCreamerIsATwat = preferences.getString("Token", "");
 
         if (!ShallonCreamerIsATwat.equals("") && !mActive.equals(mNotificationFeed.getClass().toString()))
-            new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications), ShallonCreamerIsATwat).execute();
+            new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
 
 
         if (mActive.equals(mGlobalFeed.getClass().toString())) {

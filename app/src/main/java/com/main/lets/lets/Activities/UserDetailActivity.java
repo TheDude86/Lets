@@ -1,34 +1,24 @@
 package com.main.lets.lets.Activities;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.main.lets.lets.Adapters.EventDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.UserDetailFeed;
-import com.rey.material.app.SimpleDialog;
-import com.rey.material.widget.EditText;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Calendar;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -95,8 +85,6 @@ public class UserDetailActivity extends AppCompatActivity{
                                     .getDefaultSharedPreferences(getBaseContext());
                             final int userID = sharedPref.getInt("UserID", -1);
 
-                            Log.println(Log.ASSERT, " UserDetailActivity", String.valueOf(userID));
-
                             if (mUserInfo.getInt("User_ID") == userID) {
                                 mRelationship = Relationship.OWNER;
                             }
@@ -158,8 +146,6 @@ public class UserDetailActivity extends AppCompatActivity{
 
     public void loadAction(final RelativeLayout r, final TextView t) {
 
-        Log.println(Log.ASSERT, "UserDetailActivity", mRelationship.toString());
-
         switch (mRelationship) {
             case NONE:
                 t.setText("Add Friend");
@@ -171,9 +157,6 @@ public class UserDetailActivity extends AppCompatActivity{
                             @Override
                             public void onSuccess(int statusCode, Header[] headers,
                                                   JSONObject response) {
-
-                                Log.println(Log.ASSERT, "UserDetailActivity", response.toString());
-
 
                                 mRelationship = Relationship.SENT;
                                 loadAction(r, t);
@@ -206,8 +189,6 @@ public class UserDetailActivity extends AppCompatActivity{
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers,
                                                           JSONObject response) {
-
-                                        Log.println(Log.ASSERT, "UserDetailActivity", response.toString());
 
                                         mRelationship = Relationship.NONE;
                                         loadAction(r, t);
@@ -273,8 +254,6 @@ public class UserDetailActivity extends AppCompatActivity{
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers,
                                                                   JSONObject response) {
-
-                                                Log.println(Log.ASSERT, "UserDetailActivity", response.toString());
 
                                                 try {
                                                     mRelationship = Relationship.FRIEND;

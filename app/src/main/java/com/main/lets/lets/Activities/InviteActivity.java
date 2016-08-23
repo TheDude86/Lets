@@ -51,8 +51,6 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         ShallonCreamerIsATwat = preferences.getString("Token", "");
         mID = preferences.getInt("UserID", -1);
 
-        Log.println(Log.ASSERT, "InviteActivity", "ID: " + mID + " Token: " + ShallonCreamerIsATwat);
-
         loadFeed(buttons);
 
         mMode = getIntent().getStringExtra("mode");
@@ -127,8 +125,6 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
                                               JSONArray response) {
 
                             try {
-                                Log.println(Log.ASSERT, "InviteActivity", "Members: " + response.toString());
-
                                 for (int i = 0; i < response.length(); i++){
                                     if (response.getJSONObject(i) != null) {
                                         if (!response.getJSONObject(i).getBoolean("status")){

@@ -118,7 +118,6 @@ public class EventDetailAdapter extends RecyclerView.Adapter {
                 ((MainHolder) holder).mJoin.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.println(Log.ASSERT, "EventDetailAdapter", "Test");
 
                         if (mOnJoinedClicked != null)
                             mOnJoinedClicked.onClicked(e.mID);

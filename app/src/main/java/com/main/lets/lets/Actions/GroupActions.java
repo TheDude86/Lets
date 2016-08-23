@@ -60,8 +60,6 @@ public class GroupActions implements View.OnClickListener {
             switch (((TextView) v).getText().toString()) {
                 case "Comment":
 
-                    Log.println(Log.ASSERT, "GroupActions", "Test");
-
                     builder = new SimpleDialog.Builder() {
 
                         @Override
@@ -255,7 +253,6 @@ public class GroupActions implements View.OnClickListener {
                                 for (int i = 0; i < mFeed.mMemberTags.size(); i++) {
                                     Entity e = new Entity(mFeed.mMemberTags.get(i));
                                     if (s.toString().equals(e.mText)) {
-                                        Log.println(Log.ASSERT, "GroupActions", s.toString());
                                         try {
                                             Calls.removeUserFromGroup(e.mID, mJSON.getJSONArray(
                                                     "Group_info").getJSONObject(0)
@@ -347,8 +344,7 @@ public class GroupActions implements View.OnClickListener {
 
                             for (JSONObject j : mFeed.mAdminTags) {
                                 Entity e = new Entity(j);
-                                Log.println(Log.ASSERT, "GroupActions",
-                                            e.mText + " == " + getSelectedValue());
+
                                 if (e.mText.equals(getSelectedValue())) {
                                     try {
                                         Calls.transferOwner(

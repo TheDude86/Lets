@@ -28,6 +28,8 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 
 public class EventDetailActivity extends AppCompatActivity {
+    EventDetailFeed mFeed;
+    JSONObject mJSON;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +39,11 @@ public class EventDetailActivity extends AppCompatActivity {
         try {
             if (getIntent().getStringExtra("JSON") != null){
 
-                JSONObject j = new JSONObject(getIntent().getStringExtra("JSON"));
+                mJSON = new JSONObject(getIntent().getStringExtra("JSON"));
 
-                EventDetailFeed f = new EventDetailFeed(this, (RecyclerView)
+                mFeed = new EventDetailFeed(this, (RecyclerView)
                         findViewById(R.id.event_detail_list));
-                Event e = new Event(j);
+                Event e = new Event(mJSON);
 
                 final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
                 ImageView background = (ImageView) findViewById(R.id.event_detail_background);
@@ -59,7 +61,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
                 collapsingToolbarLayout.setTitle(e.getmTitle());
 
-                f.draw(j);
+                mFeed.draw(mJSON);
 
             } else {
 
@@ -73,17 +75,11 @@ public class EventDetailActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         try {
-                            JSONObject j = response.getJSONArray("Event_info").getJSONObject(0);
+                            mJSON = response.getJSONArray("Event_info").getJSONObject(0);
 
-                            SharedPreferences preferences = PreferenceManager
-                                    .getDefaultSharedPreferences(getBaseContext());
-
-                            Log.println(Log.ASSERT, "EventDetailActivity", preferences.getInt("UserID", -2) + "");
-
-
-                            EventDetailFeed f = new EventDetailFeed(EventDetailActivity.this, (RecyclerView)
+                            mFeed = new EventDetailFeed(EventDetailActivity.this, (RecyclerView)
                                     findViewById(R.id.event_detail_list));
-                            Event e = new Event(j);
+                            Event e = new Event(mJSON);
 
                             final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
                             ImageView background = (ImageView) findViewById(R.id.event_detail_background);
@@ -101,7 +97,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
                             collapsingToolbarLayout.setTitle(e.getmTitle());
 
-                            f.draw(j);
+                            mFeed.draw(mJSON);
                             dialog.hide();
 
                         } catch (JSONException e) {
@@ -118,6 +114,14 @@ public class EventDetailActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        mFeed.draw(mJSON);
 
     }
 }

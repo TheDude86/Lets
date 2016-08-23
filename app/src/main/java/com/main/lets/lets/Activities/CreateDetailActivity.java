@@ -289,8 +289,6 @@ public class CreateDetailActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.println(Log.ASSERT, "CreateDetailActivity", response.toString());
-                Log.println(Log.ASSERT, "CreateDetailActivity", getIntent().getStringExtra("token"));
 
                 d.hide();
 

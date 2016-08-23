@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.NotificationAdapter;
@@ -47,6 +48,7 @@ public class NotificationFeed extends Client {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 dialog.hide();
+
 
                 mRecyclerView.setLayoutManager(
                         new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));

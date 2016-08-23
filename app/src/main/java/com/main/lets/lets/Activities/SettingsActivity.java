@@ -363,7 +363,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                                 .Header[] headers,
                                                         Throwable throwable,
                                                         org.json.JSONArray errorResponse) {
-                                      Log.e("Async Test Failure", errorResponse.toString());
                                       dialog.hide();
 
                                   }
@@ -374,7 +373,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                                 .Header[] headers,
                                                         String s, Throwable throwable) {
                                       getActivity().finish();
-                                      Log.e("SettingsActivity", "Async Test Failure");
 
                                       dialog.hide();
 
@@ -385,8 +383,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                                         cz.msebera.android.httpclient
                                                                 .Header[] headers,
                                                         JSONObject json) {
-                                      Log.println(Log.ASSERT, "SettingsActivity:",
-                                                  json.toString());
                                       dialog.hide();
                                       getActivity().finish();
 
@@ -646,7 +642,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                       cz.msebera.android.httpclient.Header[] headers,
                                       Throwable throwable,
                                       org.json.JSONArray errorResponse) {
-                    Log.e("Async Test Failure", errorResponse.toString());
                 }
 
             });
@@ -707,7 +702,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         e.printStackTrace();
                     }
 
-                    Log.println(Log.ASSERT, "SettingsActivity", "Okay");
 
                 }
             }
