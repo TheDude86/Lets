@@ -47,6 +47,7 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
         try {
             final Entity e = new Entity(new JSONObject(mList.get(position)));
             ((PictureViewHolder) holder).mText.setText(e.mText);
+            ((PictureViewHolder) holder).mDetail.setText(e.mDetail);
 
             if (e.mPic != null) {
                 Picasso.with(mActivity).load(e.mPic).into(((PictureViewHolder) holder).mImage);
@@ -110,9 +111,10 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
                             if (comment.mID == user.mID) {
 
                                 JSONObject j = new JSONObject();
-                                j.put("user_id", user.mID);
                                 j.put("user_name", user.mText);
-                                j.put("text", user.mText + ":\n" + comment.mText);
+                                j.put("text", comment.mDetail);
+                                j.put("pic_ref", user.mPic);
+                                j.put("user_id", user.mID);
 
                                 addElement(j.toString());
 

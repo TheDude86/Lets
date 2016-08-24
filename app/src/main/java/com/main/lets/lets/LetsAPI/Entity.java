@@ -23,6 +23,7 @@ public class Entity extends Client {
     enum EntityType {EVENT, USER, GROUP, COMMENT}
 
     public EntityType mType;
+    public String mDetail;
     public int mCategory;
     public String mText;
     public String mPic;
@@ -45,11 +46,15 @@ public class Entity extends Client {
     public Entity(JSONObject j) {
         try {
             if (j.has("Sender")) {
+                mDetail = "";
                 mType = EntityType.USER;
                 mID = j.getInt("Sender");
                 mText = j.getString("User_Name");
+                if (j.has("pic_ref"))
+                    mPic = j.getString("pic_ref");
 
             } else if (j.has("user_id") && !j.has("text")) {
+                mDetail = "";
                 mType = EntityType.USER;
                 mID = j.getInt("user_id");
                 mText = j.getString("name");
@@ -57,21 +62,33 @@ public class Entity extends Client {
                     mPic = j.getString("pic_ref");
 
             } else if (j.has("event_id") && !j.has("text")) {
+                int i = j.getInt("attendance_count");
                 mType = EntityType.EVENT;
                 mID = j.getInt("event_id");
                 mText = j.getString("event_name");
+                mDetail = i + (i > 1 ? " People " : " Person ") + "attending";
                 if (j.has("category"))
                     mCategory = j.getInt("category");
 
             } else if (j.has("text")) {
+                if (j.has("pic_ref"))
+                    mPic = j.getString("pic_ref");
+
+                if (j.has("user_name"))
+                    mText = j.getString("user_name");
+
                 mType = EntityType.COMMENT;
                 mID = j.getInt("user_id");
-                mText = j.getString("text");
+                mDetail = j.getString("text");
 
             } else if (j.has("group_name")) {
                 mType = EntityType.GROUP;
                 mID = j.getInt("group_id");
                 mText = j.getString("group_name");
+
+                int i = j.getInt("member_count");
+                mDetail = i + (i > 1 ? " Members" : " Member");
+
                 if (j.has("pic_ref"))
                     mPic = j.getString("pic_ref");
             }

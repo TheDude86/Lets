@@ -2,17 +2,17 @@ package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.ProfileViewHolder;
-import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.quickAdapter.easyRegularAdapter;
@@ -23,23 +23,21 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import cz.msebera.android.httpclient.Header;
-
 /**
  * Created by Joe on 12/13/2015.
  */
 public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerviewViewHolder> {
-    private String ShallonCreamerIsATwat;
     public ProfileViewHolder mDemoHolder;
     public ArrayList<String> mFriendTags;
+    public String ShallonCreamerIsATwat;
     public ArrayList<String> mEventTags;
     public ArrayList<String> mGroupTags;
     public ArrayList<String> mFriends;
-    private boolean mLoadFeed = false;
-    public ArrayList<String> mGroups;
     public ArrayList<String> mEvents;
-    private Activity mActivity;
-    public JSONObject mUser;
+    public ArrayList<String> mGroups;
+    private boolean mLoadFeed = false;
+    public JSONObject mUserJSON;
+    public Activity mActivity;
     private int mID;
 
 
@@ -50,16 +48,14 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
      *
      * @param context used for various fuctions throughout
      * @param a
-     * @param token
      */
-    public ProfileAdapter(Activity context, ArrayList<String> a, String token, int id) {
+    public ProfileAdapter(Activity context, ArrayList<String> a) {
         super(a);
         mActivity = context;
-        mID = id;
 
         if (a.size() > 0) {
             try {
-                mUser = new JSONObject(a.get(0));
+                mUserJSON = new JSONObject(a.get(0));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -70,8 +66,13 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mEvents = new ArrayList<>();
         mFriends = new ArrayList<>();
 
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mActivity.getBaseContext());
+
         //This bitch again...
-        ShallonCreamerIsATwat = token;
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
+
+        mID = preferences.getInt("UserID", -1);
 
         /**
          *These hold the entity's short hand:
@@ -163,8 +164,8 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         }
 
         try {
-            loadUserInfo(mUser.getString("Profile_Picture"), mUser.getString("User_Name"),
-                         mUser.getString("Biography"), mUser.getInt("User_ID"));
+            loadUserInfo(mUserJSON.getString("Profile_Picture"), mUserJSON.getString("User_Name"),
+                         mUserJSON.getString("Biography"), mUserJSON.getInt("User_ID"));
 
 
         } catch (JSONException e) {
@@ -178,7 +179,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setFriendsClicked(new ProfileViewHolder.OnFriendsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mFriendTags, mFriendTags, EntityAdapter.Viewing.FRIENDS);
+                mDemoHolder.loadFeed(mFriendTags, EntityAdapter.Viewing.FRIENDS);
             }
 
         });
@@ -186,7 +187,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setGroupsClicked(new ProfileViewHolder.OnGroupsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mGroupTags, mGroupTags, EntityAdapter.Viewing.GROUPS);
+                mDemoHolder.loadFeed(mGroupTags, EntityAdapter.Viewing.GROUPS);
             }
 
         });
@@ -194,7 +195,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
         mDemoHolder.setEventsClicked(new ProfileViewHolder.OnEventsClickListener() {
             @Override
             public void onItemClick(RecyclerView r) {
-                mDemoHolder.loadFeed(mEventTags, mEventTags, EntityAdapter.Viewing.EVENTS);
+                mDemoHolder.loadFeed(mEventTags, EntityAdapter.Viewing.EVENTS);
             }
         });
 
@@ -203,7 +204,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     public void loadInitial() {
         try {
-            mDemoHolder.loadFeed(mFriendTags, mFriendTags, EntityAdapter.Viewing.FRIENDS);
+            mDemoHolder.loadFeed(mFriendTags, EntityAdapter.Viewing.FRIENDS);
 
         } catch (NullPointerException e) {
             mLoadFeed = true;

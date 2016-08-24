@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -34,9 +35,9 @@ public class ProfileFeed extends Client {
     String ShallonCreamerIsATwat = "Bearer ";
     UltimateRecyclerView mRecyclerView;
     ProfileAdapter mProfileAdapter;
+    AppCompatActivity mActivity;
     LoginAdapter mLoginAdapter;
     ProgressDialog dialog;
-    Activity mActivity;
     JSONObject mUser;
     int mID;
 
@@ -48,7 +49,7 @@ public class ProfileFeed extends Client {
      * @param a used for inflating views and editing data on the UI
      * @param r Recycler view that is filled with the user's profile feed
      */
-    public ProfileFeed(Activity a, UltimateRecyclerView r) {
+    public ProfileFeed(AppCompatActivity a, UltimateRecyclerView r) {
         mRecyclerView = r;
         mActivity = a;
 
@@ -70,7 +71,7 @@ public class ProfileFeed extends Client {
             //Call made to get the user's information
             Calls.getMyProfile(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                 /**
-                 * When the call returns, the user's information is saved locally to mUser and
+                 * When the call returns, the user's information is saved locally to mUserJSON and
                  * passed along the the mProfileAdapter.  It then makes three more calls to get
                  * the user's friends, events attended/ attending, and groups and finally sets
                  * the profile adapter as the active adapter.
@@ -90,7 +91,7 @@ public class ProfileFeed extends Client {
                         l.add(mUser.toString());
 
                         //Passes the user's info to the profile adapter
-                        mProfileAdapter = new ProfileAdapter(mActivity, l, ShallonCreamerIsATwat,mID);
+                        mProfileAdapter = new ProfileAdapter(mActivity, l);
 
                         //These functions loads the user's friends, groups, and events
                         loadFriends();

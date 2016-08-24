@@ -185,6 +185,7 @@ public class Calls {
 
         RequestParams params = new RequestParams();
         params.put("user_id", id);
+        params.put("include_counts", true);
         client.addHeader("Authorization", token);
         post(GetGroups, params, jsonHttpResponseHandler);
 
@@ -202,6 +203,7 @@ public class Calls {
 
         RequestParams params = new RequestParams();
         params.put("get_user_id", id);
+        params.put("include_counts", true);
         client.addHeader("Authorization", token);
         post(GetAttended, params, jsonHttpResponseHandler);
 

@@ -14,7 +14,7 @@ import com.main.lets.lets.R;
 public class PictureViewHolder extends RecyclerView.ViewHolder {
     public RelativeLayout mLayout;
     public ImageView mImage;
-    public boolean clicked;
+    public TextView mDetail;
     public TextView mText;
 
     public PictureViewHolder(View itemView) {
@@ -23,6 +23,7 @@ public class PictureViewHolder extends RecyclerView.ViewHolder {
         mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
         mText = (TextView) itemView.findViewById(R.id.txt_entity_title);
         mImage = (ImageView) itemView.findViewById(R.id.image);
+        mDetail = (TextView) itemView.findViewById(R.id.txt_entity_detail);
 
     }
 }

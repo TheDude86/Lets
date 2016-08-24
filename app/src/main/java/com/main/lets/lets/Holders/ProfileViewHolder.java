@@ -2,13 +2,10 @@ package com.main.lets.lets.Holders;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,13 +15,9 @@ import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EntityAdapter;
 import com.main.lets.lets.LetsAPI.Entity;
-import com.main.lets.lets.LetsAPI.Event;
-import com.main.lets.lets.LetsAPI.Group;
-import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,10 +43,10 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public ImageView mProPic;
     public TextView mName;
     public TextView mBio;
-    public TextView bFriends;
+    public TextView mUser;
     public String mSearch;
-    public TextView bGroups;
-    public TextView bEvents;
+    public TextView mGroup;
+    public TextView mEvent;
     public TextView name;
     public int mID;
 
@@ -89,9 +82,9 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         mRecyclerView = (RecyclerView) itemView.findViewById(R.id.entities);
 
         //The buttons for the user to select which feed to view
-        bFriends = (TextView) itemView.findViewById(R.id.friends);
-        bGroups = (TextView) itemView.findViewById(R.id.groups);
-        bEvents = (TextView) itemView.findViewById(R.id.events);
+        mUser = (TextView) itemView.findViewById(R.id.friends);
+        mGroup = (TextView) itemView.findViewById(R.id.groups);
+        mEvent = (TextView) itemView.findViewById(R.id.events);
 
         //Initializing the search string and default viewing feed
         mSearch = "";
@@ -109,16 +102,16 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         mSearch = newText;
-                        loadFeed(mList, mDetailList, mActive);
+                        loadFeed(mList, mActive);
 
                         return false;
                     }
                 });
 
         //Setting the buttons' click listeners
-        bFriends.setOnClickListener(this);
-        bEvents.setOnClickListener(this);
-        bGroups.setOnClickListener(this);
+        mUser.setOnClickListener(this);
+        mEvent.setOnClickListener(this);
+        mGroup.setOnClickListener(this);
 
     }
 
@@ -132,18 +125,21 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         switch (view.getId()) {
             case R.id.friends:
                 if (mFriendsClicked != null) {
+                    setActiveButton(mUser);
                     mFriendsClicked.onItemClick(mRecyclerView);
                 }
 
                 break;
             case R.id.groups:
                 if (mGroupsClicked != null) {
+                    setActiveButton(mGroup);
                     mGroupsClicked.onItemClick(mRecyclerView);
                 }
 
                 break;
             case R.id.events:
                 if (mEventsClicked != null) {
+                    setActiveButton(mEvent);
                     mEventsClicked.onItemClick(mRecyclerView);
                 }
 
@@ -186,14 +182,12 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
      * the entity's details
      *
      * @param list         list of entity short hands
-     * @param detailedList list of entities with their full descriptions
      * @param view         which type of list the array list (friends/events/groups)
      */
-    public void loadFeed(ArrayList<String> list, ArrayList<String> detailedList,
+    public void loadFeed(ArrayList<String> list,
                          final EntityAdapter.Viewing view) {
         ArrayList<String> searchedList = new ArrayList<>();
         //Saves the active feed locally so when the search widget updates, it can reload the feed
-        mDetailList = detailedList;
         mActive = view;
         mList = list;
 
@@ -211,7 +205,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         }
 
         //Creating the entity adapter and setting the on click listener
-        EntityAdapter e = new EntityAdapter(mActivity, searchedList, view, ShallonCreamerIsATwat);
+        EntityAdapter e = new EntityAdapter(mActivity, searchedList, view);
         e.setOnEntityClickListener(new EntityAdapter.OnEntityClickListener() {
             @Override
             public void onClicked(int id) {
@@ -252,6 +246,20 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
         mRecyclerView.setLayoutManager(
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         mRecyclerView.setAdapter(e);
+
+    }
+
+    public void setActiveButton(TextView t) {
+        t.setBackgroundColor(mActivity.getResources().getColor(R.color.colorPrimary));
+        if (mEvent != null && !t.equals(mEvent))
+            mEvent.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+
+        if (mUser != null && !t.equals(mUser))
+            mUser.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+
+        if (mGroup != null && !t.equals(mGroup))
+            mGroup.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+
 
     }
 }

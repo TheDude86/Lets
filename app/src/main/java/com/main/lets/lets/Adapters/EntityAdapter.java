@@ -1,10 +1,12 @@
 package com.main.lets.lets.Adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +22,7 @@ import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
+import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
@@ -40,13 +43,11 @@ public class EntityAdapter extends RecyclerView.Adapter {
     public enum Viewing {EVENTS, GROUPS, FRIENDS}
 
     private static final int DETAIL_CODE = 1;
-    private String ShallonCreamerIsATwat;
     private ArrayList<String> mList;
     private Activity mActivity;
     private Viewing active;
 
-    public EntityAdapter(Activity a, ArrayList<String> list, Viewing v, String token) {
-        ShallonCreamerIsATwat = token;
+    public EntityAdapter(Activity a, ArrayList<String> list, Viewing v) {
         mActivity = a;
         mList = list;
         active = v;
@@ -59,17 +60,17 @@ public class EntityAdapter extends RecyclerView.Adapter {
         switch (active) {
             case EVENTS:
                 view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_entity_with_space, parent, false);
+                        .inflate(R.layout.row_entity_with_picture, parent, false);
 
                 return new EntityViewHolder(view);
             case FRIENDS:
                 view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_entity_with_space, parent, false);
+                        .inflate(R.layout.row_entity_with_picture, parent, false);
 
                 return new EntityViewHolder(view);
             case GROUPS:
                 view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.row_entity_with_space, parent, false);
+                        .inflate(R.layout.row_entity_with_picture, parent, false);
 
                 return new EntityViewHolder(view);
 
@@ -109,6 +110,12 @@ public class EntityAdapter extends RecyclerView.Adapter {
             throws JSONException {
         final Entity e = new Entity(new JSONObject(data));
         holder.mTitle.setText(e.mText);
+        holder.mDetail.setText(e.mDetail);
+
+        if (e.mPic != null)
+            Picasso.with(mActivity).load(e.mPic).into((holder).mImage);
+
+
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,6 +131,11 @@ public class EntityAdapter extends RecyclerView.Adapter {
             throws JSONException {
         final Entity e = new Entity(new JSONObject(data));
         holder.mTitle.setText(e.mText);
+        holder.mDetail.setText(e.mDetail);
+
+        if (e.mPic != null)
+            Picasso.with(mActivity).load(e.mPic).into((holder).mImage);
+
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,6 +150,14 @@ public class EntityAdapter extends RecyclerView.Adapter {
             throws JSONException {
         final Entity e = new Entity(new JSONObject(data));
         holder.mTitle.setText(e.mText);
+        holder.mDetail.setText(e.mDetail);
+
+        if (e.mCategory != -1)
+            Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory))
+                    .into((holder).mImage);
+
+
+
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,6 +181,12 @@ public class EntityAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+
+    public int getImageResourceId(Context context, int category) {
+        return context.getResources().getIdentifier(("j" + Integer.toString(category))
+                                                            .replaceAll("\\s+", "").toLowerCase(), "drawable", context.getPackageName());
     }
 
 }

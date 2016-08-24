@@ -24,9 +24,10 @@
             android:text="Title"
             android:id="@+id/txt_entity_title"
             android:paddingLeft="5dp"
-            android:textSize="30dp"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/image" />
+            android:textSize="20dp"
+            android:layout_alignTop="@+id/image"
+            android:layout_toEndOf="@+id/image"
+            android:layout_marginTop="15dp"/>
 
         <ImageView
             android:layout_width="70dp"
@@ -34,6 +35,16 @@
             android:id="@+id/image"
             android:layout_centerVertical="true"
             android:padding="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Line 2"
+            android:id="@+id/txt_entity_detail"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/image"
+            android:paddingLeft="5dp"/>
 
 
     </RelativeLayout>

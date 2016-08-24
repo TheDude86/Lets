@@ -169,8 +169,10 @@ public class Event extends Entity implements Comparable<Event> {
         Calendar cal = Calendar.getInstance();
         long milliDiff = cal.get(Calendar.ZONE_OFFSET);
 
-        return (new SimpleDateFormat("h:mm a")).format(new Date(mStart.getTime() - milliDiff - (b ? 3600000 : 0))) +
-                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime() - milliDiff - (b ? 3600000 : 0));
+        Date start = new Date(mStart.getTime() - milliDiff - (b ? 3600000 : 0));
+
+        return (new SimpleDateFormat("MMM dd").format(start) + " from " + new SimpleDateFormat("h:mm a").format(start) +
+                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime() - milliDiff - (b ? 3600000 : 0)));
     }
 
     public boolean ismIsOwner() {

@@ -14,12 +14,14 @@ import com.main.lets.lets.R;
 public class EntityViewHolder extends RecyclerView.ViewHolder {
     public RelativeLayout mLayout;
     public ImageView mImage;
+    public TextView mDetail;
     public TextView mTitle;
 
     public EntityViewHolder(View itemView) {
         super(itemView);
 
         mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
+        mDetail = (TextView) itemView.findViewById(R.id.txt_entity_detail);
         mTitle = (TextView) itemView.findViewById(R.id.txt_entity_title);
 
         try {
