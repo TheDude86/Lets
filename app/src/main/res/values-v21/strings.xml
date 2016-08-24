@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="account_created">Account Created!</string>
+    <string name="respond_to_friend">Respond to friend request</string>
+    <string name="friend_sent">Friend request sent</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="join_group">Join Group</string>
 </resources>

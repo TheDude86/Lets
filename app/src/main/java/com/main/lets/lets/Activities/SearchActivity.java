@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -40,6 +39,8 @@ public class SearchActivity extends AppCompatActivity {
 
         //The Search bar is for users to input strings and search for users, events, and groups
         SearchView searchView = (SearchView) findViewById(R.id.search);
+        assert searchView != null;
+
         searchView.setIconifiedByDefault(false);
         searchView.requestFocus();
 

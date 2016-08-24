@@ -148,7 +148,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
         switch (mRelationship) {
             case NONE:
-                t.setText("Add Friend");
+                t.setText(R.string.add_friend);
                 r.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -168,7 +168,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
                 break;
             case SENT:
-                t.setText("Friend request sent");
+                t.setText(R.string.friend_sent);
 
                 r.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -212,7 +212,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
                 break;
             case RECIEVED:
-                t.setText("Respond to friend request");
+                t.setText(R.string.respond_to_friend);
 
                 r.setOnClickListener(new View.OnClickListener() {
                     @Override

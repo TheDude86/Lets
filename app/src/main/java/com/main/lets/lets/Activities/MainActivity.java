@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.telecom.Call;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,9 +29,6 @@ import com.main.lets.lets.Visualizers.ProfileFeed;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -96,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
                         editor.putInt("UserID", response.getInt("user_id"));
                         editor.putString("Token", "Bearer " + response.getString("accessToken"));
-                        editor.commit();
+                        editor.apply();
 
                         mGlobalFeed.update(response.getInt("user_id"),
                                            "Bearer " + response.getString("accessToken"));

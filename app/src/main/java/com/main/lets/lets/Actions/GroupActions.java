@@ -257,7 +257,7 @@ public class GroupActions implements View.OnClickListener {
 
                             for (CharSequence s : values) {
                                 for (int i = 0; i < mFeed.mAdapter.mUsers.size(); i++) {
-                                    Entity e = null;
+                                    Entity e;
                                     try {
                                         e = new Entity(new JSONObject(mFeed.mAdapter.mUsers.get
                                                     (i)));

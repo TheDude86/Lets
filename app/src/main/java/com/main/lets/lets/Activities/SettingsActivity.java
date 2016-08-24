@@ -17,7 +17,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -26,20 +25,18 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.provider.SyncStateContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -65,6 +62,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -252,7 +250,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      *
      * @param featureId It is used for stuff and things
      * @param item      item clicked in the toolbar
-     * @return
+     * @return a boolean value obviously but beyond that, I have no clue
      */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -588,7 +586,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
                         ((EditText) (view.findViewById(R.id.edit_birthday)))
-                                .setText(new SimpleDateFormat("MM-dd-yyyy")
+                                .setText(new SimpleDateFormat("MM-dd-yyyy", Locale.US)
                                                  .format(mUserInfo.get("birthday")));
 
                         ((EditText) (view.findViewById(R.id.edit_bio)))
@@ -941,7 +939,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             c.set(Calendar.DAY_OF_MONTH, day);
             mUserInfo.put("birthday", c.getTime());
 
-            mBirthday.setText(new SimpleDateFormat("MM-dd-yyyy")
+            mBirthday.setText(new SimpleDateFormat("MM-dd-yyyy", Locale.US)
                                       .format(mUserInfo.get("birthday")));
 
         }

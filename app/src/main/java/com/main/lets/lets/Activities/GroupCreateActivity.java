@@ -7,18 +7,16 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
@@ -60,9 +58,11 @@ public class GroupCreateActivity extends AppCompatActivity {
                 assert bio != null;
                 if (title.getText().toString().length() > 0) {
                     if (bio.getText().toString().length() > 0) {
+
+                        assert any != null;
                         Calls.createGroup(title.getText().toString(), bio.getText().toString(), any.isChecked(),
-                                "https://www.hsjaa.com/images/joomlart/demo/default.jpg",
-                                ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                          "https://www.hsjaa.com/images/joomlart/demo/default.jpg",
+                                          ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

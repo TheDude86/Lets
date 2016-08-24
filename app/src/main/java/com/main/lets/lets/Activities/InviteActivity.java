@@ -1,30 +1,20 @@
 package com.main.lets.lets.Activities;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.main.lets.lets.Adapters.SearchAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.InviteFeed;
-import com.main.lets.lets.Visualizers.SearchFeed;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -81,6 +71,9 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         TextView right = (TextView) findViewById(R.id.entity_right);
         TextView left = (TextView) findViewById(R.id.entity_left);
 
+        assert right != null;
+        assert left != null;
+
         right.setOnClickListener(this);
         left.setOnClickListener(this);
 
@@ -88,6 +81,7 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         if (buttons.length > 1)
             right.setText(buttons[1]);
         else
+            //noinspection ConstantConditions
             findViewById(R.id.toolbar_entities).setVisibility(View.GONE);
 
 

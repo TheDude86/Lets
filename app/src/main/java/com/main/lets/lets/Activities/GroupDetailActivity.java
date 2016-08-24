@@ -2,30 +2,17 @@ package com.main.lets.lets.Activities;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.github.florent37.materialviewpager.MaterialViewPager;
-import com.github.florent37.materialviewpager.header.HeaderDesign;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GroupDetailFeed;
-import com.rey.material.app.Dialog;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +26,12 @@ public class GroupDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_detail);
-        ((TextView) findViewById(R.id.btn_join)).setText("Join Group");
+
+        TextView textView = (TextView) findViewById(R.id.btn_join);
+
+        assert (textView) != null;
+        textView.setText(R.string.join_group);
+
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
@@ -55,20 +47,22 @@ public class GroupDetailActivity extends AppCompatActivity {
             } else {
                 final ProgressDialog dialog = ProgressDialog.show(this, "",
                                                                   "Loading. Please wait...", true);
-                Calls.getGroupInfo(getIntent().getIntExtra("GroupID", -1), new JsonHttpResponseHandler() {
+                Calls.getGroupInfo(getIntent().getIntExtra("GroupID", -1),
+                                   new JsonHttpResponseHandler() {
 
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        try {
-                            loadActivity(response);
-                            dialog.hide();
+                                       @Override
+                                       public void onSuccess(int statusCode, Header[] headers,
+                                                             JSONObject response) {
+                                           try {
+                                               loadActivity(response);
+                                               dialog.hide();
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                                           } catch (JSONException e) {
+                                               e.printStackTrace();
+                                           }
 
-                    }
-                });
+                                       }
+                                   });
 
             }
 
@@ -83,6 +77,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
             if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID
                     && j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")) {
+                //noinspection ConstantConditions
                 findViewById(R.id.layout_join).setVisibility(View.GONE);
             }
         }
