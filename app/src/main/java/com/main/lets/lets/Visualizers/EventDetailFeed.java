@@ -1,5 +1,6 @@
 package com.main.lets.lets.Visualizers;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
@@ -202,6 +203,7 @@ public class EventDetailFeed extends Client {
 
     }
 
+    @SuppressLint("ValidFragment")
     public class ActionDialogFragment extends DialogFragment {
         CharSequence[] memberActions = {"Invite", "Comment", "Show on Map",
                 "Leave Event"};

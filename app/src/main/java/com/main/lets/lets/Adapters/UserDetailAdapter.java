@@ -1,5 +1,6 @@
 package com.main.lets.lets.Adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -143,7 +144,7 @@ public class UserDetailAdapter extends FeedAdapter {
 
     }
 
-
+    @SuppressLint("ValidFragment")
     public class ActionDialogFragment extends DialogFragment {
         CharSequence[] mList = {"Report", "Block"};
         CharSequence[] mFriendList = {"Report", "Block", "Unfriend"};

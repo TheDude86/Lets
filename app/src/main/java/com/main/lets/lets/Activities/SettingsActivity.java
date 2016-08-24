@@ -2,6 +2,7 @@ package com.main.lets.lets.Activities;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -908,11 +909,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         private HashMap<String, Object> mUserInfo;
         private EditText mBirthday;
 
+        @SuppressLint("ValidFragment")
         public DatePickerFragment(Date d, HashMap<String, Object> m, EditText day) {
             mStart = Calendar.getInstance();
             mUserInfo = m;
             mBirthday = day;
             mStart.setTime(d);
+
+        }
+
+        public DatePickerFragment() {
+            super();
 
         }
 
