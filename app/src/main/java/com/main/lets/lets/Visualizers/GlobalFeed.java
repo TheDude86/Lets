@@ -11,6 +11,8 @@ import android.view.View;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.EventAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.L;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.rey.material.app.Dialog;
 import com.rey.material.widget.TextView;
@@ -18,6 +20,9 @@ import com.rey.material.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import cz.msebera.android.httpclient.Header;
@@ -68,13 +73,20 @@ public class GlobalFeed extends Client {
                     public void onSuccess(int statusCode, Header[] headers,
                                           org.json.JSONArray response) {
 
+                        ArrayList<Event> events = new ArrayList<>();
 
                         for (int i = 0; i < response.length(); i++) {
                             try {
-                                mEventAdapter.insertLast(response.getJSONObject(i).toString());
+                                events.add(new Event(response.getJSONObject(i)));
                             } catch (org.json.JSONException e) {
                                 e.printStackTrace();
                             }
+                        }
+
+                        Collections.sort(events);
+
+                        for (Event e: events){
+                            mEventAdapter.insertLast(e.getmJSON().toString());
                         }
 
                         dialog.hide();

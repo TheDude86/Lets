@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
@@ -25,6 +26,7 @@ public class Event extends Entity implements Comparable<Event> {
     private int mRestrictions;
     private boolean mIsInvite;
     private boolean mIsActive;
+    private JSONObject mJSON;
     private boolean mIsOwner;
     private double mDistance;
     private int mAttendance;
@@ -50,6 +52,7 @@ public class Event extends Entity implements Comparable<Event> {
         mOwnerID = j.getInt("Creator_ID");
         mCategory = j.getInt("Category");
         mEventID = j.getInt("Event_ID");
+        mJSON = j;
 
         if(j.has("Distance"))
             mDistance = j.getDouble("Distance");
@@ -242,5 +245,13 @@ public class Event extends Entity implements Comparable<Event> {
 
     public void setmDistance(double mDistance) {
         this.mDistance = mDistance;
+    }
+
+    public JSONObject getmJSON() {
+        return mJSON;
+    }
+
+    public void setmJSON(JSONObject mJSON) {
+        this.mJSON = mJSON;
     }
 }

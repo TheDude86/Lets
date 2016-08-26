@@ -26,7 +26,8 @@
     <LinearLayout
         android:id="@+id/eventNameHolder"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
+        android:minHeight="100dp"
         android:layout_gravity="top"
         android:orientation="vertical"
         android:transitionName="tNameHolder">
@@ -68,7 +69,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="15dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"/>
 

@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +22,7 @@ import android.widget.Spinner;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GlobalFeed;
@@ -47,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         //Gets the location manager to get the phone's location
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //Creates the GlobalFeed object which handles the main event feed and adjusts sorting and
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         mProfileFeed = new ProfileFeed(this, (UltimateRecyclerView) findViewById(R.id.list));
 
         //Login object used for auto login for returning users
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         Calls.login(preferences.getString("email", ""), preferences.getString("password", ""),
                     new JsonHttpResponseHandler() {
@@ -80,8 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (response.has("accessToken")) {
                         new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
-
-                        mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
 
                         SharedPreferences preferences = PreferenceManager
                                 .getDefaultSharedPreferences(getBaseContext());
@@ -198,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-
                 startActivity(intent);
             }
         });
@@ -217,11 +215,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.VISIBLE);
-                mGlobalFeed.draw(null);
 
                 //Saving the active visualizer so the activity knows which feed to draw when
                 //onResume is called
                 mActive = mGlobalFeed.getClass().toString();
+
+                mGlobalFeed.draw(null);
 
             }
         });
@@ -246,10 +245,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 ((ImageButton) findViewById(R.id.btn_notifications)).setImageResource(R.drawable.ic_notifications_none_black_24dp);
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
-                if (mNotificationFeed == null) {
+
+                if (preferences.getString("Token", "").equals("")) {
                     mActive = mProfileFeed.getClass().toString();
                     mProfileFeed.draw(null);
                 }else {
+                    mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
                     mActive = mNotificationFeed.getClass().toString();
                     mNotificationFeed.draw(null);
 

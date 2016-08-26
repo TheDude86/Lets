@@ -7,11 +7,13 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.LoginAdapter;
 import com.main.lets.lets.Adapters.ProfileAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.L;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONArray;
@@ -192,6 +194,7 @@ public class ProfileFeed extends Client {
                                                  "Bearer " + response.getString("accessToken"));
                                 editor.apply();
 
+                                ShallonCreamerIsATwat = preferences.getString("Token", "");
 
                                 loadFeeds();
                                 draw(null);
