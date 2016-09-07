@@ -1,35 +1,22 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.PowerManager;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.main.lets.lets.R;
-import com.microsoft.azure.storage.*;
-import com.microsoft.azure.storage.blob.*;
-
-import com.rey.material.app.Dialog;
-import com.rey.material.widget.TextView;
+import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,16 +24,12 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -267,7 +250,7 @@ public class Calls {
     public static void editProfile(HashMap<String, Object> mUserInfo, String token,
                                    JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
-        params.put("bday", new SimpleDateFormat("MM-dd-yyyy").format(mUserInfo.get("birthday")));
+        params.put("bday", new SimpleDateFormat("MM-dd-yyyy", Locale.US).format(mUserInfo.get("birthday")));
         params.put("interests", mUserInfo.get("interests"));
         params.put("edit_user_id", mUserInfo.get("id"));
         params.put("privacy", mUserInfo.get("privacy"));
@@ -282,6 +265,15 @@ public class Calls {
 
     public static void createEvent(HashMap<String, String> mMap, String token,
                                    JsonHttpResponseHandler jsonHttpResponseHandler) {
+
+        TimeZone tz = TimeZone.getTimeZone("GMT");
+        Calendar GMT =  Calendar.getInstance(tz);
+        Calendar Phone = Calendar.getInstance();
+        long timeDiff = (GMT.getTimeInMillis() - Phone.getTimeInMillis());
+
+        Date start = new Date(Long.parseLong(mMap.get("Start Time")) + timeDiff);
+        Date end = new Date(Long.parseLong(mMap.get("End Time")) + timeDiff);
+
         RequestParams params = new RequestParams();
         params.put("category", mMap.get("Category"));
         params.put("latitude", mMap.get("Latitude"));
@@ -289,8 +281,8 @@ public class Calls {
         params.put("location_title", mMap.get("Map Title"));
         params.put("event_name", mMap.get("Title"));
         params.put("description", mMap.get("Description"));
-        params.put("end_time", mMap.get("End Time"));
-        params.put("start_time", mMap.get("Start Time"));
+        params.put("end_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(end));
+        params.put("start_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(start));
         client.addHeader("Authorization", token);
 
         post(CreateEvent, params, jsonHttpResponseHandler);

@@ -2,6 +2,7 @@ package com.main.lets.lets.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -19,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Joe on 8/23/2016.
@@ -202,19 +202,19 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
     }
 
     public void setActiveButton(TextView t) {
-        t.setBackgroundColor(mActivity.getResources().getColor(R.color.colorPrimary));
+        t.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.colorPrimary));
 
         if (mComment != null && !t.equals(mComment))
-            mComment.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+            mComment.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
         if (mEvent != null && !t.equals(mEvent))
-            mEvent.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+            mEvent.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
         if (mUser != null && !t.equals(mUser))
-            mUser.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+            mUser.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
         if (mGroup != null && !t.equals(mGroup))
-            mGroup.setBackgroundColor(mActivity.getResources().getColor(R.color.white));
+            mGroup.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
 
     }

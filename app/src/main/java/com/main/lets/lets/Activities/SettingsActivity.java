@@ -404,20 +404,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             mProfile = (ImageView) view.findViewById(R.id.pro_pic);
             mProfile.setOnClickListener(new View.OnClickListener() {
-
                 @Override
-                public void onClick(View view) {
+                public void onClick(View view1) {
 
-                    int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    int permissionCheck = ContextCompat.checkSelfPermission(UserPreferenceFragment.this.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
                     if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(
-                                getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                                UserPreferenceFragment.this.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                     } else {
 
                         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                         photoPickerIntent.setType("image/*");
-                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                        UserPreferenceFragment.this.startActivityForResult(photoPickerIntent, SELECT_PHOTO);
 
                     }
 
@@ -433,12 +432,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     mUserInfo.put("bio", ((EditText) view.findViewById(R.id.edit_bio)).getText()
                             .toString());
 
-                    final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
-                                                                      "Saving. Please wait...", true);
+                    final ProgressDialog dialog1 = ProgressDialog.show(UserPreferenceFragment.this.getActivity(), "",
+                            "Saving. Please wait...", true);
 
                     if (mPhotoChanged) {
                         SharedPreferences preferences = PreferenceManager
-                                .getDefaultSharedPreferences(getActivity().getBaseContext());
+                                .getDefaultSharedPreferences(UserPreferenceFragment.this.getActivity().getBaseContext());
 
                         ShallonCreamerIsATwat = preferences.getString("Token", "");
                         int id = preferences.getInt("UserID", -1);
@@ -446,44 +445,32 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         long millis = System.currentTimeMillis();
                         String name = "user" + id + "-" + millis;
 
-                        mUserInfo.put("picRef",  "https://let.blob.core.windows.net/mycontainer/" + name);
+                        mUserInfo.put("picRef", "https://let.blob.core.windows.net/mycontainer/" + name);
 
-                        Calls.uploadImage(mImage, getActivity(), name,
-                                          new Calls.UploadImage.onFinished() {
-                                              @Override
-                                              public void onFinished() {
-
-                                                  editProfile(dialog);
-
-                                              }
-                                          });
+                        Calls.uploadImage(mImage, UserPreferenceFragment.this.getActivity(), name, new Calls.UploadImage.onFinished() {
+                            @Override
+                            public void onFinished() {
+                                UserPreferenceFragment.this.editProfile(dialog1);
+                            }
+                        });
                     } else {
-                        editProfile(dialog);
+                        UserPreferenceFragment.this.editProfile(dialog1);
                     }
 
 
-
-
                 }
-
             });
 
             (view.findViewById(R.id.edit_birthday)).setOnClickListener(new View.OnClickListener() {
-                /**
-                 * When tue user confirm's the start date of the event, update the HashMap
-                 * values and the EditText
-                 * @param v (Unused)
-                 */
                 @Override
                 public void onClick(View v) {
                     DialogFragment newFragment =
                             new DatePickerFragment((Date) mUserInfo.get("birthday"), mUserInfo,
-                                                   (EditText) view
-                                                           .findViewById(R.id.edit_birthday));
-                    newFragment.show(getFragmentManager(), "datePicker");
+                                    (EditText) view
+                                            .findViewById(R.id.edit_birthday));
+                    newFragment.show(UserPreferenceFragment.this.getFragmentManager(), "datePicker");
 
                 }
-
             });
 
             view.findViewById(R.id.edit_interests).setOnClickListener(new View.OnClickListener() {
@@ -495,45 +482,43 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     // arraylist to keep the selected items
                     final ArrayList<Integer> seletedItems = new ArrayList<>();
 
-                    AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    AlertDialog mainDialog = new AlertDialog.Builder(UserPreferenceFragment.this.getActivity())
                             .setTitle("Select Interests")
                             .setCancelable(true)
                             .setMultiChoiceItems(items, null,
-                                                 new DialogInterface.OnMultiChoiceClickListener() {
-                                                     @Override
-                                                     public void onClick(DialogInterface dialog,
-                                                                         int indexSelected,
-                                                                         boolean isChecked) {
-                                                         if (isChecked) {
-                                                             // If the user checked the item, add
-                                                             // it to the selected items
-                                                             seletedItems.add(indexSelected);
-                                                         } else if (seletedItems
-                                                                 .contains(indexSelected)) {
-                                                             // Else, if the item is already in
-                                                             // the array, remove it
-                                                             seletedItems.remove(Integer.valueOf(
-                                                                     indexSelected));
-                                                         }
-                                                     }
-                                                 })
+                                    new DialogInterface.OnMultiChoiceClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog1, int indexSelected, boolean isChecked) {
+                                            if (isChecked) {
+                                                // If the user checked the item, add
+                                                // it to the selected items
+                                                seletedItems.add(indexSelected);
+                                            } else if (seletedItems
+                                                    .contains(indexSelected)) {
+                                                // Else, if the item is already in
+                                                // the array, remove it
+                                                seletedItems.remove(Integer.valueOf(
+                                                        indexSelected));
+                                            }
+                                        }
+                                    })
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(DialogInterface dialog1, int id) {
                                     String rawString = MapListToString(seletedItems);
 
                                     ((EditText) view.findViewById(R.id.edit_interests)).setText(rawString);
 
-                                    mUserInfo.put("interests",toInterestDataString(rawString));
+                                    mUserInfo.put("interests", UserPreferenceFragment.this.toInterestDataString(rawString));
 
                                 }
                             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int id) {
+                                public void onClick(DialogInterface dialog1, int id) {
                                     //  Your code when user clicked on Cancel
                                 }
                             }).create();
-                    dialog.show();
+                    mainDialog.show();
                 }
             });
 
@@ -611,30 +596,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         mUserInfo.put("interests", toInterestDataString(interestString));
 
 
-                        if (mUserInfo.get("gender") == 0)
+                        if ((int)mUserInfo.get("gender") == 0)
                             ((RadioButton) (view.findViewById(R.id.female))).setChecked(true);
 
-                        if (mUserInfo.get("gender") == 1)
+                        if ((int)mUserInfo.get("gender") == 1)
                             ((RadioButton) (view.findViewById(R.id.male))).setChecked(true);
 
-                        if (mUserInfo.get("gender") == 2)
+                        if ((int)mUserInfo.get("gender") == 2)
                             ((RadioButton) (view.findViewById(R.id.tranny))).setChecked(true);
 
-                        if (mUserInfo.get("privacy") == 0)
+                        if ((int)mUserInfo.get("privacy") == 0)
                             ((RadioButton) (view.findViewById(R.id.chk_public))).setChecked(true);
 
-                        if (mUserInfo.get("privacy") == 1)
+                        if ((int)mUserInfo.get("privacy") == 1)
                             ((RadioButton) (view.findViewById(R.id.chk_restricted)))
                                     .setChecked(true);
 
-                        if (mUserInfo.get("privacy") == 2)
+                        if ((int)mUserInfo.get("privacy") == 2)
                             ((RadioButton) (view.findViewById(R.id.chk_pussy))).setChecked(true);
 
 
                         view.findViewById(R.id.female).setOnClickListener(
                                 new View.OnClickListener() {
                                     @Override
-                                    public void onClick(View view) {
+                                    public void onClick(View view1) {
                                         mUserInfo.put("gender", 0);
                                     }
                                 });
@@ -642,18 +627,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         view.findViewById(R.id.male).setOnClickListener(
                                 new View.OnClickListener() {
                                     @Override
-                                    public void onClick(View view) {
+                                    public void onClick(View view1) {
                                         mUserInfo.put("gender", 1);
-
                                     }
                                 });
 
                         view.findViewById(R.id.tranny).setOnClickListener(
                                 new View.OnClickListener() {
                                     @Override
-                                    public void onClick(View view) {
+                                    public void onClick(View view1) {
                                         mUserInfo.put("gender", 2);
-
                                     }
                                 });
 

@@ -24,20 +24,27 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/name"
-        android:hint="Namey McNameFace"
+        android:hint="First Name"
         android:layout_below="@+id/textView26"
         android:layout_centerHorizontal="true"/>
 
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/last"
+        android:hint="Last Name"
+        android:layout_below="@+id/name"
+        android:layout_centerHorizontal="true"/>
+
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:text="Next"
         android:id="@+id/next"
-        android:layout_below="@+id/name"
+        android:layout_below="@+id/last"
         android:layout_marginTop="37dp"
         android:background="#ffffff"
-        android:layout_alignEnd="@+id/textView26"
-        android:layout_alignStart="@+id/textView26"/>
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:layout_width="wrap_content"

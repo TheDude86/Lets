@@ -2,7 +2,6 @@ package com.main.lets.lets.LetsAPI;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
@@ -18,6 +17,8 @@ import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/30/2016.
+ *
+ * Class used to turn json objects into entity short hands and then retrieve their full details.
  */
 public class Entity extends Client {
     enum EntityType {EVENT, USER, GROUP, COMMENT}
@@ -30,9 +31,11 @@ public class Entity extends Client {
     public int mID;
 
     /**
-     * @param i
-     * @param s
-     * @param e
+     * Create an entity manually
+     *
+     * @param i entity ID
+     * @param s entity detail String
+     * @param e entity type (Event, User, Group, or Comment)
      */
     public Entity(int i, String s, EntityType e) {
         mCategory = -1;
@@ -62,13 +65,22 @@ public class Entity extends Client {
                     mPic = j.getString("pic_ref");
 
             } else if (j.has("event_id") && !j.has("text")) {
-                int i = j.getInt("attendance_count");
                 mType = EntityType.EVENT;
                 mID = j.getInt("event_id");
                 mText = j.getString("event_name");
-                mDetail = i + (i > 1 ? " People " : " Person ") + "attending";
-                if (j.has("category"))
+
+                if (j.has("category")) {
                     mCategory = j.getInt("category");
+                }
+
+                if (j.has("attendance_count")){
+                    int i = j.getInt("attendance_count");
+                    mDetail = i + (i > 1 ? " People " : " Person ") + "attending";
+
+                } else {
+                    mDetail = "";
+
+                }
 
             } else if (j.has("text")) {
                 if (j.has("pic_ref"))
@@ -86,8 +98,14 @@ public class Entity extends Client {
                 mID = j.getInt("group_id");
                 mText = j.getString("group_name");
 
-                int i = j.getInt("member_count");
-                mDetail = i + (i > 1 ? " Members" : " Member");
+                if (j.has("member_count")){
+                    int i = j.getInt("member_count");
+                    mDetail = i + (i > 1 ? " Members" : " Member");
+
+                } else {
+                    mDetail = "";
+
+                }
 
                 if (j.has("pic_ref"))
                     mPic = j.getString("pic_ref");
@@ -101,6 +119,7 @@ public class Entity extends Client {
 
     @Override
     public void draw(JSONObject j) {
+        //noinspection NumericOverflow
         int x = 3 / 0;
 
     }

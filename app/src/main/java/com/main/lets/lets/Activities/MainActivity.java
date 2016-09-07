@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,7 +21,6 @@ import android.widget.Spinner;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
-import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GlobalFeed;
@@ -290,8 +288,8 @@ public class MainActivity extends AppCompatActivity {
 
         String ShallonCreamerIsATwat = preferences.getString("Token", "");
 
-        if (!ShallonCreamerIsATwat.equals("") && !mActive.equals(mNotificationFeed.getClass().toString()))
-            new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
+        if (!ShallonCreamerIsATwat.equals("") && !mActive.equals(NotificationFeed.class.toString()))
+            new Calls.Notify(this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
 
 
         if (mActive.equals(mGlobalFeed.getClass().toString())) {

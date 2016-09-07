@@ -121,6 +121,7 @@ public class NotificationAdapter extends UltimateViewAdapter {
             try {
                 final Entity e = new Entity(mNotifications.getJSONObject(position));
                 ((EntityViewHolder) holder).mTitle.setText(e.mText);
+                ((EntityViewHolder) holder).mDetail.setText("");
                 ((EntityViewHolder) holder).mLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

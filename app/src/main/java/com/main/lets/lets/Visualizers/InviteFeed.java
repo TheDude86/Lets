@@ -26,6 +26,11 @@ import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by jnovosel on 7/10/16.
+ *
+ * Feed to display the entities eligible to be invited to the previous specified entity.
+ *
+ * That's kinda vague so if a user chooses to invite their friends and groups to an event, it will
+ * display the user's friends and the groups they are allowed to invite to events.
  */
 public class InviteFeed extends Client {
     SearchAdapter.OnEntityClickListener mEventClickHandler;

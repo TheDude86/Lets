@@ -187,4 +187,7 @@
     <string name="friend_sent">Friend request sent</string>
     <string name="add_friend">Add Friend</string>
     <string name="join_group">Join Group</string>
+    <string name="title">Title</string>
+    <string name="image_desc">Display the entity\'s profile picture here</string>
+    <string name="line_2">Line 2</string>
 </resources>

@@ -56,8 +56,16 @@ public class Login {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a);
         SharedPreferences.Editor editor = preferences.edit();
+
+        float lat = preferences.getFloat("latitude", 0);
+        float lng = preferences.getFloat("longitude", 0);
+
         editor.clear();
-        editor.commit();
+
+        editor.putFloat("latitude", lat);
+        editor.putFloat("longitude", lng);
+
+        editor.apply();
     }
 
 }

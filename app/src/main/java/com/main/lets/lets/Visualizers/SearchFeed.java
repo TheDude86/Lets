@@ -15,6 +15,8 @@ import org.json.JSONObject;
 
 /**
  * Created by jnovosel on 7/8/16.
+ *
+ * Feed for users to search for events, other users, and groups
  */
 public class SearchFeed extends Client {
     public enum Viewing {USER, EVENT, GROUP}
@@ -78,6 +80,8 @@ public class SearchFeed extends Client {
             });
 
             RecyclerView recyclerView = (RecyclerView) mActivity.findViewById(R.id.feed);
+
+            assert recyclerView != null;
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
                     StaggeredGridLayoutManager.VERTICAL));
             recyclerView.setAdapter(s);

@@ -50,7 +50,7 @@ public class GlobalFeed extends Client {
 
     public void draw(org.json.JSONObject j1) {
 
-        SharedPreferences preferences = PreferenceManager
+        final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(mActivity.getBaseContext());
 
         mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(1,
@@ -72,6 +72,8 @@ public class GlobalFeed extends Client {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers,
                                           org.json.JSONArray response) {
+
+                        L.println(GlobalFeed.class, "lat: " );
 
                         ArrayList<Event> events = new ArrayList<>();
 

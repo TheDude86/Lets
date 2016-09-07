@@ -12,30 +12,38 @@ import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.SearchFeed;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 
 /**
  * Created by jnovosel on 7/8/16.
+ *
+ * This class is used to display all of the entities for when a user searches for something or
+ * wants to invite a friend, or group to an event or group
  */
-public class SearchAdapter extends RecyclerView.Adapter {
+public class SearchAdapter extends FeedAdapter {
     public OnEntityClickListener mOnEntityClicked;
     public ArrayList<Integer> mSelected;
-    public AppCompatActivity mActivity;
     public SearchFeed.Viewing mActive;
     public boolean mSelectable;
-    public JSONArray mList;
 
     public SearchAdapter(AppCompatActivity a, JSONArray l, SearchFeed.Viewing active) {
         mSelected = new ArrayList<>();
         mActive = active;
         mActivity = a;
-        mList = l;
+
+        for (int i = 0; i < l.length(); i++){
+            try {
+                mList.add(l.getJSONObject(i).toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -48,59 +56,48 @@ public class SearchAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        try {
-            final PictureViewHolder h = (PictureViewHolder) holder;
-            final Entity e = new Entity(mList.getJSONObject(h.getAdapterPosition()));
-            if (mActive == SearchFeed.Viewing.EVENT) {
-            } else if (e.mPic != null) {
+        super.onBindViewHolder(holder, position);
+            try {
+                final PictureViewHolder h = (PictureViewHolder) holder;
+                final Entity e = new Entity(new JSONObject(mList.get(h.getAdapterPosition())));
 
-                try {
-                    Picasso.with(mActivity).load(e.mPic).into(h.mImage);
+                h.mLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mOnEntityClicked != null) {
+                            if (mSelectable) {
+                                if (!mSelected.contains(e.mID)) {
+                                    mSelected.add(e.mID);
+                                    h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
 
-                } catch (IllegalArgumentException e1) {
-                    e1.printStackTrace();
-                }
-                
-            }
+                                } else {
+                                    mSelected.remove(Integer.valueOf(e.mID));
+                                    h.mLayout.setBackgroundColor(Color.WHITE);
 
-            h.mText.setText(e.mText);
-            h.mLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mOnEntityClicked != null) {
-                        if (mSelectable) {
-                            if (!mSelected.contains(e.mID)) {
-                                mSelected.add(e.mID);
-                                h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
-
-                            } else {
-                                mSelected.remove(Integer.valueOf(e.mID));
-                                h.mLayout.setBackgroundColor(Color.WHITE);
+                                }
 
                             }
 
+                            mOnEntityClicked.onClicked(h.getAdapterPosition(), h, e.mID);
                         }
-
-                        mOnEntityClicked.onClicked(h.getAdapterPosition(), h, e.mID);
                     }
-                }
-            });
+                });
 
-            if (mSelected.contains(e.mID))
-                h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
-            else
-                h.mLayout.setBackgroundColor(Color.WHITE);
+                if (mSelected.contains(e.mID))
+                    h.mLayout.setBackgroundColor(Color.rgb(255, 255, 204));
+                else
+                    h.mLayout.setBackgroundColor(Color.WHITE);
 
 
-        } catch (JSONException e1) {
-            e1.printStackTrace();
-        }
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
 
     }
 
     @Override
     public int getItemCount() {
-        return mList.length();
+        return mList.size();
     }
 
     public int getImageResourceId(Context context, int category) {
@@ -110,7 +107,8 @@ public class SearchAdapter extends RecyclerView.Adapter {
     }
 
     public void setSelected(ArrayList<Integer> s) {
-        mSelected = (ArrayList) s.clone();
+        for (Integer i: s)
+            mSelected.add(i);
     }
 
     public void setOnEntityClicked(OnEntityClickListener e) {

@@ -14,7 +14,7 @@ public class L {
      * @param s Message to display in the log
      */
     public static void println(Class c, String s) {
-//        Log.println(Log.ASSERT, c.toString(), s);
+        Log.println(Log.ASSERT, c.toString(), s);
     }
 
 }

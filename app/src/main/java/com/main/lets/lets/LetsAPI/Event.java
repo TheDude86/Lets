@@ -167,15 +167,8 @@ public class Event extends Entity implements Comparable<Event> {
 
     public String getTimeSpanString() {
 
-        boolean b = TimeZone.getDefault().inDaylightTime(new Date());
-
-        Calendar cal = Calendar.getInstance();
-        long milliDiff = cal.get(Calendar.ZONE_OFFSET);
-
-        Date start = new Date(mStart.getTime() - milliDiff - (b ? 3600000 : 0));
-
-        return (new SimpleDateFormat("MMM dd").format(start) + " from " + new SimpleDateFormat("h:mm a").format(start) +
-                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime() - milliDiff - (b ? 3600000 : 0)));
+        return (new SimpleDateFormat("MMM dd").format(mStart.getTime()) + " from " + new SimpleDateFormat("h:mm a").format(mStart.getTime()) +
+                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime()));
     }
 
     public boolean ismIsOwner() {

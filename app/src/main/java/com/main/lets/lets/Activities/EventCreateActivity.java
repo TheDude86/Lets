@@ -19,6 +19,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.R;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.DialogFragment;
@@ -32,6 +33,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -373,10 +375,9 @@ public class EventCreateActivity extends AppCompatActivity {
 
                 mMap.put("Title", title.getText().toString());
                 mMap.put("Description", description.getText().toString());
-                mMap.put("End Time",
-                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(end.getTime()));
-                mMap.put("Start Time",
-                         new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(mCalendar.getTime()));
+
+                mMap.put("End Time", end.getTimeInMillis() + "");
+                mMap.put("Start Time", mCalendar.getTimeInMillis() + "");
 
                 mMap.put("Latitude", mCoords.latitude + "");
                 mMap.put("Longitude", mCoords.longitude + "");

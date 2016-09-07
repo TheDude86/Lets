@@ -66,11 +66,7 @@ public class CreateDetailActivity extends AppCompatActivity {
         builder.setMessage("You have successfully created an account!  Fill out this last bit of information to complete registration")
                 .setTitle("Congratulations!");
 
-        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
-        });
+        builder.setPositiveButton("Okay", null);
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -86,29 +82,30 @@ public class CreateDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(CreateDetailActivity.this);
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(CreateDetailActivity.this);
 
-                builder.setTitle("Error");
+                builder1.setTitle("Error");
 
-                builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                builder1.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog1, int id) {
 
                     }
                 });
 
-                if (female.isChecked() || male.isChecked() || freak.isChecked()){
+                if (female.isChecked() || male.isChecked() || freak.isChecked()) {
 
                     try {
 
-                        final ProgressDialog dialog = ProgressDialog.show(CreateDetailActivity.this, "",
+                        final ProgressDialog dialog1 = ProgressDialog.show(CreateDetailActivity.this, "",
                                 "Loading. Please wait...", true);
 
                         if (mImage == null) {
-                            updateProfile("http://4.bp.blogspot.com/-cDeYCsNL-ZQ/UozsUJ7EqfI/AAAAAAAAGSk/EtuzOVpHoS0/s1600/andy.png", dialog);
+                            CreateDetailActivity.this.updateProfile("http://www.wondare.com/icon/profile-icon.png", dialog1);
 
                         } else {
                             SharedPreferences preferences = PreferenceManager
-                                    .getDefaultSharedPreferences(getBaseContext());
+                                    .getDefaultSharedPreferences(CreateDetailActivity.this.getBaseContext());
 
                             int id = preferences.getInt("UserID", -1);
 
@@ -120,7 +117,7 @@ public class CreateDetailActivity extends AppCompatActivity {
                                 public void onFinished() {
 
                                     try {
-                                        updateProfile("https://let.blob.core.windows.net/mycontainer/" + name, dialog);
+                                        CreateDetailActivity.this.updateProfile("https://let.blob.core.windows.net/mycontainer/" + name, dialog1);
                                     } catch (ParseException e) {
                                         e.printStackTrace();
                                     }
@@ -136,10 +133,10 @@ public class CreateDetailActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    builder.setMessage("You must select a gender");
+                    builder1.setMessage("You must select a gender");
 
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    AlertDialog dialog1 = builder1.create();
+                    dialog1.show();
                 }
 
             }
@@ -158,7 +155,7 @@ public class CreateDetailActivity extends AppCompatActivity {
 
                     Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                     photoPickerIntent.setType("image/*");
-                    startActivityForResult(photoPickerIntent, 0);
+                    CreateDetailActivity.this.startActivityForResult(photoPickerIntent, 0);
 
                 }
 
@@ -172,46 +169,43 @@ public class CreateDetailActivity extends AppCompatActivity {
                         " TV & Movies ", " Video Games ", " Sports ", " Music ", " Relax ",
                         " Other "};
                 // arraylist to keep the selected items
-                final ArrayList<Integer> seletedItems = new ArrayList<>();
+                final ArrayList<Integer> selectedItems = new ArrayList<>();
 
-                AlertDialog dialog = new AlertDialog.Builder(CreateDetailActivity.this)
+                AlertDialog dialog1 = new AlertDialog.Builder(CreateDetailActivity.this)
                         .setTitle("Select Interests")
                         .setCancelable(true)
-                        .setMultiChoiceItems(items, null,
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog,
-                                                        int indexSelected,
-                                                        boolean isChecked) {
-                                        if (isChecked) {
-                                            // If the user checked the item, add
-                                            // it to the selected items
-                                            seletedItems.add(indexSelected);
-                                        } else if (seletedItems
-                                                .contains(indexSelected)) {
-                                            // Else, if the item is already in
-                                            // the array, remove it
-                                            seletedItems.remove(Integer.valueOf(
-                                                    indexSelected));
-                                        }
-                                    }
-                                })
+                        .setMultiChoiceItems(items, null, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog11, int indexSelected, boolean isChecked) {
+                                if (isChecked) {
+                                    // If the user checked the item, add
+                                    // it to the selected items
+                                    selectedItems.add(indexSelected);
+                                } else if (selectedItems
+                                        .contains(indexSelected)) {
+                                    // Else, if the item is already in
+                                    // the array, remove it
+                                    selectedItems.remove(Integer.valueOf(
+                                            indexSelected));
+                                }
+                            }
+                        })
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                String rawString = MapListToString(seletedItems);
+                            public void onClick(DialogInterface dialog11, int id) {
+                                String rawString = MapListToString(selectedItems);
 
                                 interests.setText(rawString);
-                                CreateDetailActivity.this.mInterests = toInterestDataString(rawString);
+                                CreateDetailActivity.this.mInterests = CreateDetailActivity.this.toInterestDataString(rawString);
 
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(DialogInterface dialog11, int id) {
                                 //  Your code when user clicked on Cancel
                             }
                         }).create();
-                dialog.show();
+                dialog1.show();
             }
         });
 
@@ -300,6 +294,7 @@ public class CreateDetailActivity extends AppCompatActivity {
                         .setTitle("Profile Updated");
 
                 builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
 

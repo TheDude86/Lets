@@ -89,13 +89,20 @@ public class EventDetailFeed extends Client {
                             @Override
                             public void onJoin() {
                                 try {
-                                    Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                        @Override
-                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                            mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
-                                            draw(j);
-                                        }
-                                    });
+                                    if (ShallonCreamerIsATwat.equals("")) {
+
+
+                                    } else {
+                                        Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                            @Override
+                                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                                mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                                draw(j);
+                                            }
+                                        });
+
+                                    }
+
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
