@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -59,6 +60,7 @@ public class EventCreateActivity extends AppCompatActivity {
         final CircularProgressButton create = (CircularProgressButton) findViewById(R.id.create);
         final TextView durationLabel = (TextView) findViewById(R.id.duration_label);
         final EditText description = (EditText) findViewById(R.id.description);
+        final CheckBox isPrivate = (CheckBox) findViewById(R.id.isPrivate);
         final EditText category = (EditText) findViewById(R.id.category);
         mLocationLabel = (EditText) findViewById(R.id.locationLabel);
         ShallonCreamerIsATwat = preferences.getString("Token", "");
@@ -71,6 +73,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
         assert durationLabel != null;
         assert description != null;
+        assert isPrivate != null;
         assert duration != null;
         assert category != null;
         assert create != null;
@@ -96,6 +99,18 @@ public class EventCreateActivity extends AppCompatActivity {
         //Slider's initial position is 2 so the map is also set to 2 so the user doesn't need
         // to move the slider
         mMap.put("Duration", "2");
+
+        //By default, the event is public unless the user check the private checkbox, stating they want the event to be private
+        mMap.put("Public", "true");
+
+        isPrivate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.put("Hidden", (isPrivate.isChecked()) ? "false" : "true");
+                L.println(Calls.class, mMap.get("Public"));
+
+            }
+        });
 
         //The listener for the slider when the position of the slider changes
         duration.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
@@ -395,8 +410,6 @@ public class EventCreateActivity extends AppCompatActivity {
                         create.setProgress(100);
 
                         try {
-                            Thread.sleep(200);
-
                             Intent intent = new Intent(EventCreateActivity.this,
                                                        EventDetailActivity.class);
                             intent.putExtra("JSON", response.getJSONObject(0)
@@ -404,7 +417,7 @@ public class EventCreateActivity extends AppCompatActivity {
 
                             finish();
                             startActivity(intent);
-                        } catch (InterruptedException | JSONException e) {
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
 

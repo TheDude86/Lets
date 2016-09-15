@@ -74,40 +74,49 @@ public class GroupDetailActivity extends AppCompatActivity {
     }
 
     public void loadActivity(final JSONObject j) throws JSONException {
-        for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
-            if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID
-                    && j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")) {
-                //noinspection ConstantConditions
-                findViewById(R.id.layout_join).setVisibility(View.GONE);
+
+        if (j.has("Group_users")) {
+
+            for (int i = 0; i < j.getJSONArray("Group_users").length(); i++) {
+                if (j.getJSONArray("Group_users").getJSONObject(i).getInt("user_id") == mID
+                        && j.getJSONArray("Group_users").getJSONObject(i).getBoolean("status")) {
+                    //noinspection ConstantConditions
+                    findViewById(R.id.layout_join).setVisibility(View.GONE);
+                }
             }
+
         }
 
-        Calls.getGroupComments(j.getJSONArray("Group_info").getJSONObject(0).getInt("group_id"),
-                               ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers,
-                                          org.json.JSONArray response) {
+        if (j.has("Group_info")) {
 
-                        GroupDetailFeed g = new GroupDetailFeed(GroupDetailActivity.this, j);
+            Calls.getGroupComments(j.getJSONArray("Group_info").getJSONObject(0).getInt("group_id"),
+                    ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers,
+                                              org.json.JSONArray response) {
 
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                g.mAdapter.mComments.add(response.getJSONObject(i).toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            GroupDetailFeed g = new GroupDetailFeed(GroupDetailActivity.this, j);
+
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    g.mAdapter.mComments.add(response.getJSONObject(i).toString());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
+                            g.draw(null);
+
                         }
-                        g.draw(null);
 
-                    }
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                              JSONObject errorResponse) {
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                          JSONObject errorResponse) {
+                        }
 
-                    }
+                    });
 
-                });
+        }
     }
 
 }

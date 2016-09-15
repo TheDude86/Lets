@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public String mActive;
 
 
+
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +189,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        spinner.setVisibility(View.INVISIBLE);
+        spinner.setVisibility(View.GONE);
+
+        //Set OnClickListener for the Share Icon in the top toolbar, opens a share intent
+        findViewById(R.id.share).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "Hey you with the phone, you should download this app and here's the link:\n iOS: goo.gl/xH9AGr \n\n Android: goo.gl/Bevgh0";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Check out \"Lets\"!");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Invite your friends to Lets!"));
+
+            }
+        });
 
         //Set OnClickListener for the Search Icon in the top toolbar
         findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {

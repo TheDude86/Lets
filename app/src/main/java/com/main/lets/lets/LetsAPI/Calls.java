@@ -267,12 +267,9 @@ public class Calls {
                                    JsonHttpResponseHandler jsonHttpResponseHandler) {
 
         TimeZone tz = TimeZone.getTimeZone("GMT");
-        Calendar GMT =  Calendar.getInstance(tz);
-        Calendar Phone = Calendar.getInstance();
-        long timeDiff = (GMT.getTimeInMillis() - Phone.getTimeInMillis());
 
-        Date start = new Date(Long.parseLong(mMap.get("Start Time")) + timeDiff);
-        Date end = new Date(Long.parseLong(mMap.get("End Time")) + timeDiff);
+        SimpleDateFormat s = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US);
+        s.setTimeZone(tz);
 
         RequestParams params = new RequestParams();
         params.put("category", mMap.get("Category"));
@@ -281,8 +278,10 @@ public class Calls {
         params.put("location_title", mMap.get("Map Title"));
         params.put("event_name", mMap.get("Title"));
         params.put("description", mMap.get("Description"));
-        params.put("end_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(end));
-        params.put("start_time", new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US).format(start));
+        params.put("end_time", s.format(new Date(Long.parseLong(mMap.get("End Time")))));
+        params.put("start_time", s.format(new Date(Long.parseLong(mMap.get("Start Time")))));
+        params.put("hidden", mMap.get("Hidden"));
+
         client.addHeader("Authorization", token);
 
         post(CreateEvent, params, jsonHttpResponseHandler);
