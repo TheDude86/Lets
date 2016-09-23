@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "940438566370",
+    "firebase_url": "https://lets-push-notifications.firebaseio.com",
+    "project_id": "lets-push-notifications",
+    "storage_bucket": "lets-push-notifications.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940438566370:android:866b48bd386c43bf",
+        "android_client_info": {
+          "package_name": "com.lets.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "940438566370-6bt76v3hkjst1u8lg27fq8al4d8lvlb2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy0Do8WwDcVUg5O0zzYCxTqs3LSy_bnWY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

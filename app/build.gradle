@@ -36,6 +36,7 @@ android {
         sourceCompatibility 1.7
         targetCompatibility 1.7
     }
+
 }
 repositories {
     flatDir {
@@ -67,3 +68,5 @@ dependencies {
     compile 'com.github.rey5137:material:1.2.2'
     compile 'com.github.clans:fab:1.6.4'
 }
+
+apply plugin: 'com.google.gms.google-services'

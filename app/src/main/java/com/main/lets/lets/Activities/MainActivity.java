@@ -1,6 +1,7 @@
 package com.main.lets.lets.Activities;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,6 +25,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.R;
+import com.main.lets.lets.Services.EventReminders;
 import com.main.lets.lets.Visualizers.GlobalFeed;
 import com.main.lets.lets.Visualizers.NotificationFeed;
 import com.main.lets.lets.Visualizers.ProfileFeed;
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent intent = new Intent(this, EventReminders.class);
+        startService(intent);
 
         //Gets the location manager to get the phone's location
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

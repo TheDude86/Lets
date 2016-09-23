@@ -20,6 +20,8 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
         <activity android:name=".Activities.MainActivity">
+            <service android:name=".ExampleService" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,24 +64,32 @@
         <activity
             android:name=".Activities.SearchActivity"
             android:theme="@style/SearchTheme" />
-        <activity android:name=".Activities.InviteActivity"/>
-
-        <activity android:name=".Activities.RegisterActivity"
-            android:parentActivityName=".Activities.MainActivity"
+        <activity android:name=".Activities.InviteActivity" />
+        <activity
+            android:name=".Activities.RegisterActivity"
             android:label="@string/title_activity_register"
-            android:theme="@style/CreateTheme"/>
-        <activity android:name=".Activities.DateActivity"
-            android:parentActivityName=".Activities.RegisterActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/CreateTheme" />
+        <activity
+            android:name=".Activities.DateActivity"
             android:label="@string/title_activity_birthday"
-            android:theme="@style/CreateTheme"/>
-        <activity android:name=".Activities.AccountActivity"
+            android:parentActivityName=".Activities.RegisterActivity"
+            android:theme="@style/CreateTheme" />
+        <activity
+            android:name=".Activities.AccountActivity"
             android:label="@string/title_activity_account"
             android:parentActivityName=".Activities.DateActivity"
-            android:theme="@style/CreateTheme"></activity>
-        <activity android:name=".Activities.CreateDetailActivity"
+            android:theme="@style/CreateTheme" />
+        <activity
+            android:name=".Activities.CreateDetailActivity"
             android:label="@string/title_activity_detail"
             android:parentActivityName=".Activities.DateActivity"
-            android:theme="@style/CreateTheme"></activity>
+            android:theme="@style/CreateTheme" />
+
+        <service
+            android:name=".Services.EventReminders"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
