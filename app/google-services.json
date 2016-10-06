@@ -1,27 +1,58 @@
 {
   "project_info": {
-    "project_number": "940438566370",
-    "firebase_url": "https://lets-push-notifications.firebaseio.com",
-    "project_id": "lets-push-notifications",
-    "storage_bucket": "lets-push-notifications.appspot.com"
+    "project_number": "933033662987",
+    "firebase_url": "https://lets-push-notifications-829d7.firebaseio.com",
+    "project_id": "lets-push-notifications-829d7",
+    "storage_bucket": "lets-push-notifications-829d7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:940438566370:android:866b48bd386c43bf",
+        "mobilesdk_app_id": "1:933033662987:android:022ece1f7b728f24",
         "android_client_info": {
-          "package_name": "com.lets.android"
+          "package_name": "uno.lets.firebasecloudmessager"
         }
       },
       "oauth_client": [
         {
-          "client_id": "940438566370-6bt76v3hkjst1u8lg27fq8al4d8lvlb2.apps.googleusercontent.com",
+          "client_id": "933033662987-5df0d25vk4jli1ufdlr60vvfdgnjukkp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCy0Do8WwDcVUg5O0zzYCxTqs3LSy_bnWY"
+          "current_key": "AIzaSyC5gsJbQMChvSPRt5JiO41olCJB2B2ScbM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933033662987:android:aead1f52c5c09d90",
+        "android_client_info": {
+          "package_name": "com.main.lets.lets"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933033662987-5df0d25vk4jli1ufdlr60vvfdgnjukkp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5gsJbQMChvSPRt5JiO41olCJB2B2ScbM"
         }
       ],
       "services": {
