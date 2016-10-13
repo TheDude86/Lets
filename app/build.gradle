@@ -37,6 +37,8 @@ android {
         targetCompatibility 1.7
     }
 
+    useLibrary 'org.apache.http.legacy'
+
 }
 repositories {
     flatDir {

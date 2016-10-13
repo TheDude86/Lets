@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,12 +16,15 @@ import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
@@ -41,9 +45,32 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
+import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+
 import cz.msebera.android.httpclient.Header;
+import android.widget.Button;
+import java.io.UnsupportedEncodingException;
+import android.content.Context;
+import java.util.HashSet;
+import android.widget.Toast;
+import org.apache.http.client.ClientProtocolException;
+import java.io.IOException;
+import org.apache.http.HttpStatus;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.gcm.*;
+import com.microsoft.windowsazure.notifications.NotificationsManager;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
     public NotificationFeed mNotificationFeed;
@@ -57,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
     public static Boolean isVisible = false;
     private static final String TAG = "MainActivity";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+    //private NotificationHub hub;
+    private RegisterClient registerClient;
+    private static final String BACKEND_ENDPOINT = "http://letsbackend.azurewebsites.net";
+    GoogleCloudMessaging gcm;
 
 
     /**
@@ -104,6 +136,112 @@ public class MainActivity extends AppCompatActivity {
         isVisible = false;
     }
 
+
+
+    public void login(View view) throws UnsupportedEncodingException {
+        this.registerClient.setAuthorizationHeader(getAuthorizationHeader());
+
+        final Context context = this;
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected Object doInBackground(Object... params) {
+                try {
+                    String regid = gcm.register(NotificationSettings.SenderId);
+                    registerClient.register(regid, new HashSet<String>());
+                } catch (Exception e) {
+                    Toast.makeText(context, "MainActivity - Failed to register",
+                            Toast.LENGTH_LONG).show();
+
+                    return e;
+                }
+                return null;
+            }
+
+            protected void onPostExecute(Object result) {
+                Toast.makeText(context, "Logged in and registered.",
+                        Toast.LENGTH_LONG).show();
+            }
+        }.execute(null, null, null);
+    }
+
+    private String getAuthorizationHeader() throws UnsupportedEncodingException {
+//        EditText username = (EditText) findViewById(R.id.usernameText);
+//        EditText password = (EditText) findViewById(R.id.passwordText);
+//        String basicAuthHeader = username.getText().toString()+":"+password.getText().toString();
+        String basicAuthHeader = "";
+
+        //Trying android-util library, may be wrong...
+        basicAuthHeader = Base64.encodeToString(basicAuthHeader.getBytes("UTF-8"), Base64.NO_WRAP);
+        return basicAuthHeader;
+    }
+
+
+    /**
+     * Send Notification button click handler. This method sends the push notification
+     * message to each platform selected.
+     *
+     * @param v The view
+     */
+    public void sendNotificationButtonOnClick(View v)
+            throws ClientProtocolException, IOException {
+
+        String nhMessageTag = "Message Tag";
+        String nhMessage = "Message Body";
+
+        // JSON String
+        nhMessage = "\"" + nhMessage + "\"";
+
+        sendPush("gcm", nhMessageTag, nhMessage);
+    }
+
+
+    /**
+     * This method calls the ASP.NET WebAPI backend to send the notification message
+     * to the platform notification service based on the pns parameter.
+     *
+     * @param pns     The platform notification service to send the notification message to. Must
+     *                be one of the following ("wns", "gcm", "apns").
+     * @param userTag The tag for the user who will receive the notification message. This string
+     *                must not contain spaces or special characters.
+     * @param message The notification message string. This string must include the double quotes
+     *                to be used as JSON content.
+     */
+    public void sendPush(final String pns, final String userTag, final String message)
+            throws ClientProtocolException, IOException {
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected Object doInBackground(Object... params) {
+                try {
+
+                    String uri = BACKEND_ENDPOINT + "/api/notifications";
+                    uri += "?pns=" + pns;
+                    uri += "&to_tag=" + userTag;
+
+                    HttpPost request = new HttpPost(uri);
+                    request.addHeader("Authorization", "Basic "+ getAuthorizationHeader());
+                    request.setEntity(new StringEntity(message));
+                    request.addHeader("Content-Type", "application/json");
+
+                    HttpResponse response = new DefaultHttpClient().execute(request);
+
+                    if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                        Toast.makeText(MainActivity.this, "MainActivity - Error sending " + pns + " notification",
+                                Toast.LENGTH_LONG).show();
+
+                        throw new RuntimeException("Error sending notification");
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "MainActivity - Failed to send " + pns + " notification ",
+                            Toast.LENGTH_LONG).show();
+
+                    return e;
+                }
+
+                return null;
+            }
+        }.execute(null, null, null);
+    }
+
     public void registerWithNotificationHubs()
     {
         if (checkPlayServices()) {
@@ -121,7 +259,17 @@ public class MainActivity extends AppCompatActivity {
 
         mainActivity = this;
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler.class);
-        registerWithNotificationHubs();
+//        registerWithNotificationHubs();
+
+       gcm = GoogleCloudMessaging.getInstance(this);
+
+        //hub = new NotificationHub(HubName, HubListenConnectionString, this);
+        //registerWithNotificationHubs();
+
+        registerClient = new RegisterClient(this, BACKEND_ENDPOINT);
+
+
+
 
         //Gets the location manager to get the phone's location
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
