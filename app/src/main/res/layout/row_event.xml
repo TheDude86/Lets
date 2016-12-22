@@ -8,12 +8,6 @@
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="1dp">
 
-    <ImageView
-        android:id="@+id/eventImage"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:transitionName="tImage" />
 
     <!-- Used for the ripple effect on touch -->
     <LinearLayout
@@ -21,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?android:selectableItemBackground"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:alpha=".2" />
 
     <LinearLayout
         android:id="@+id/eventNameHolder"
@@ -33,39 +28,161 @@
         android:transitionName="tNameHolder">
 
 
-        <TextView
-            android:id="@+id/eventTitle"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="left"
-            android:paddingLeft="10dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@android:color/white" />
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+
+                android:id="@+id/imageView2"
+                android:src="#ffcc00" />
+
+            <TextView
+                android:layout_width="326dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@android:color/primary_text_light_nodisable"
+                android:text="Test"
+                android:textSize="25sp"
+                android:id="@+id/hostName" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/eventImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:transitionName="tImage" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/eventTime"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_gravity="center_vertical"
-                android:paddingLeft="10dp"
-                android:text="12/31/15   10:00PM - 2:00AM"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_weight="1"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/eventLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:paddingLeft="10dp"
-                android:text="D Sig House"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_weight="1"/>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/relativeLayout2"
+                    android:layout_below="@+id/relativeLayout"
+                    android:layout_toRightOf="@+id/imageView">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imageView4"
+                        android:src="@drawable/ic_place_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/eventLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text="D Sig House"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_toRightOf="@+id/imageView4"
+                        android:layout_weight="1"
+                        android:layout_centerVertical="true" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/relativeLayout"
+                    android:layout_alignTop="@+id/imageView"
+                    android:layout_toRightOf="@+id/imageView"
+                    android:layout_toEndOf="@+id/imageView"
+                    android:layout_marginTop="24dp">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imageView3"
+                        android:src="@drawable/ic_query_builder_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/eventTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text="10:00PM - 2:00AM"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_weight="1"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/imageView3"
+                        android:layout_toEndOf="@+id/imageView3" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:id="@+id/imageView"
+                    android:src="@drawable/ic_event_available_black_200dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="20dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_above="@+id/relativeLayout"
+                    android:background="#141414"></RelativeLayout>
+
+                <TextView
+                    android:id="@+id/eventTitle"
+                    android:layout_width="326dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="10dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@android:color/primary_text_light_nodisable"
+                    android:text="Test"
+                    android:textSize="35sp"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="05"
+                    android:id="@+id/day"
+                    android:layout_toLeftOf="@+id/relativeLayout2"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:textColor="#ff0000"
+                    android:textSize="22sp"
+                    android:layout_marginTop="75dp"
+                    android:layout_alignLeft="@+id/imageView"
+                    android:layout_alignStart="@+id/imageView" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Jan"
+                    android:id="@+id/month"
+                    android:layout_alignRight="@+id/imageView"
+                    android:layout_alignEnd="@+id/imageView"
+                    android:gravity="center_horizontal"
+                    android:textColor="#000000"
+                    android:layout_below="@+id/day"
+                    android:layout_alignLeft="@+id/imageView"
+                    android:layout_alignStart="@+id/imageView" />
+
+            </RelativeLayout>
 
             <Space
                 android:layout_width="match_parent"

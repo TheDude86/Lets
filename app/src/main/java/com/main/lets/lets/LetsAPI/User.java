@@ -1,17 +1,28 @@
 package com.main.lets.lets.LetsAPI;
 
+import android.support.v7.app.AppCompatActivity;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.LinkedList;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/12/2016.
  */
 public class User extends Entity {
+    private ArrayList<Entity> mFriends = new ArrayList<>();
+    public ArrayList<EventEntity> mEvents = new ArrayList<>();
     private LinkedList<Group> mGroups;
+    private OnLoadListener mLoad;
     private Timestamp birthday;
     private boolean gender;
     private boolean active;
@@ -56,6 +67,68 @@ public class User extends Entity {
         mGroups = new LinkedList<>();
 
     }
+
+    public User (int i) {
+        super(i, "NULL", EntityType.USER);
+
+    }
+
+    public void load(final AppCompatActivity a, final OnLoadListener load) {
+
+        final UserData u = new UserData(a);
+
+        Calls.getProfileByID(u.ID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                try {
+                    JSONObject j = response.getJSONArray("info").getJSONObject(0);
+
+                    setBirthday(new Timestamp(Long.parseLong(j.getString("Birthday")
+                            .substring(6, j.getString("Birthday").length() - 2))));
+                    setGender(j.getInt("Gender") == 1);
+                    setPropic(j.getString("Profile_Picture"));
+                    setInterests(j.getInt("Interests"));
+                    setName(j.getString("User_Name"));
+                    setBio(j.getString("Biography"));
+                    setUserID(j.getInt("User_ID"));
+                    setScore(j.getInt("Score"));
+
+
+                    Calls.getAttended(u.ID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                            L.println(User.class, response.toString());
+
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    mEvents.add(new EventEntity(response.getJSONObject(i)));
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+
+                            load.update();
+
+                        }
+                    });
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+    }
+
 
     public int getUserID() {
         return this.userID;
@@ -166,5 +239,10 @@ public class User extends Entity {
     public void setPropic(String propic) {
         this.propic = propic;
     }
+
+    public interface OnLoadListener {
+        void update();
+    }
+
 }
 

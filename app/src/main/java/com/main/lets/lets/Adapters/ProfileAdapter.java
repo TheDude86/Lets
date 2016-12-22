@@ -43,7 +43,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
 
     /**
      * The Profile Adapter contains the user's friends, groups, and attending/attended events.
-     * It passes on the active list to the Profile View Holder where it then takes the information
+     * It passes on the active list to the Profile View SearchEntityHolder where it then takes the information
      * to display it to the user.
      *
      * @param context used for various fuctions throughout

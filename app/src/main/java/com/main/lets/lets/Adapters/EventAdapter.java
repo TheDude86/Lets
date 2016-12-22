@@ -68,16 +68,20 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
 
             holder.mLocation.setText(e.getmLocationTitle());
             holder.mTime.setText(e.getTimeSpanString());
+            holder.mHost.setText(e.getmOwnerName());
             holder.mTitle.setText(e.getmTitle());
+            holder.mMonth.setText(e.getMonth());
+            holder.mDay.setText(e.getDay());
+
 
             Picasso.with(mActivity).load(e.getImageResourceId(mActivity))
                     .into((holder.mBackground));
 
-            holder.mTextBackground.setBackgroundColor(bgColors[j.getInt("Category")]);
+            holder.mBackgroundContainer.setBackgroundColor(bgColors[j.getInt("Category")]);
             holder.mCategory.setText(catgories[j.getInt("Category")]);
 
 
-            holder.mMainViewHolder.setOnClickListener(new View.OnClickListener() {
+            holder.mBackgroundContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     try {
@@ -101,13 +105,15 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
 
 
     protected class ViewHolder extends UltimateRecyclerviewViewHolder {
-        LinearLayout mMainViewHolder;
-        LinearLayout mTextBackground;
+        LinearLayout mBackgroundContainer;
         ImageView mBackground;
         TextView mLocation;
         TextView mCategory;
         TextView mTitle;
+        TextView mMonth;
+        TextView mHost;
         TextView mTime;
+        TextView mDay;
 
         /**
          * give more control over NORMAL or HEADER view binding
@@ -117,13 +123,15 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
         public ViewHolder(View itemView) {
             super(itemView);
 
-            mTextBackground = (LinearLayout) itemView.findViewById(R.id.eventNameHolder);
-            mMainViewHolder = (LinearLayout) itemView.findViewById(R.id.eventHolder);
+            mBackgroundContainer = (LinearLayout) itemView.findViewById(R.id.eventHolder);
             mBackground = (ImageView) itemView.findViewById(R.id.eventImage);
             mLocation = (TextView) itemView.findViewById(R.id.eventLocation);
             mCategory = (TextView) itemView.findViewById(R.id.category);
             mTitle = (TextView) itemView.findViewById(R.id.eventTitle);
             mTime = (TextView) itemView.findViewById(R.id.eventTime);
+            mHost = (TextView) itemView.findViewById(R.id.hostName);
+            mMonth = (TextView) itemView.findViewById(R.id.month);
+            mDay = (TextView) itemView.findViewById(R.id.day);
 
         }
 

@@ -16,6 +16,8 @@ import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,9 +27,12 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Adapters.ProfilePreviewAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Services.EventReminders;
 import com.main.lets.lets.Services.MyHandler;
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     public NotificationFeed mNotificationFeed;
     public LocationManager mLocationManager;
     public static final int SETTINGS = 0;
+    public UltimateRecyclerView mRecyclerView;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
     public String mActive;
@@ -138,32 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void login(View view) throws UnsupportedEncodingException {
-        this.registerClient.setAuthorizationHeader(getAuthorizationHeader());
-
-        final Context context = this;
-        new AsyncTask<Object, Object, Object>() {
-            @Override
-            protected Object doInBackground(Object... params) {
-                try {
-                    String regid = gcm.register(NotificationSettings.SenderId);
-                    registerClient.register(regid, new HashSet<String>());
-                } catch (Exception e) {
-                    Toast.makeText(context, "MainActivity - Failed to register",
-                            Toast.LENGTH_LONG).show();
-
-                    return e;
-                }
-                return null;
-            }
-
-            protected void onPostExecute(Object result) {
-                Toast.makeText(context, "Logged in and registered.",
-                        Toast.LENGTH_LONG).show();
-            }
-        }.execute(null, null, null);
-    }
-
     private String getAuthorizationHeader() throws UnsupportedEncodingException {
 //        EditText username = (EditText) findViewById(R.id.usernameText);
 //        EditText password = (EditText) findViewById(R.id.passwordText);
@@ -175,24 +155,6 @@ public class MainActivity extends AppCompatActivity {
         return basicAuthHeader;
     }
 
-
-    /**
-     * Send Notification button click handler. This method sends the push notification
-     * message to each platform selected.
-     *
-     * @param v The view
-     */
-    public void sendNotificationButtonOnClick(View v)
-            throws ClientProtocolException, IOException {
-
-        String nhMessageTag = "Message Tag";
-        String nhMessage = "Message Body";
-
-        // JSON String
-        nhMessage = "\"" + nhMessage + "\"";
-
-        sendPush("gcm", nhMessageTag, nhMessage);
-    }
 
 
     /**
@@ -268,7 +230,11 @@ public class MainActivity extends AppCompatActivity {
 
         registerClient = new RegisterClient(this, BACKEND_ENDPOINT);
 
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.println(Log.ASSERT, TAG, "Refreshed token: " + refreshedToken);
 
+
+        mRecyclerView = (UltimateRecyclerView) findViewById(R.id.list);
 
 
         //Gets the location manager to get the phone's location
@@ -412,6 +378,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         spinner.setVisibility(View.GONE);
 
         //Set OnClickListener for the Share Icon in the top toolbar, opens a share intent
@@ -433,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                Intent intent = new Intent(MainActivity.this, NewSearchActivity.class);
                 startActivity(intent);
             }
         });
@@ -467,7 +434,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
-                mProfileFeed.draw(null);
+
+
+
+                mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
+                mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
+
+//                mProfileFeed.draw(null);
 
                 //Saving the active visualizer so the activity knows which feed to draw when
                 //onResume is called

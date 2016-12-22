@@ -132,6 +132,7 @@ public class Calls {
      */
     public static void getEvent(int id, JsonHttpResponseHandler jsonHttpResponseHandler) {
 
+        client.removeAllHeaders();
         RequestParams params = new RequestParams();
         params.put("event_id", id);
         post(GetEventById, params, jsonHttpResponseHandler);

@@ -31,6 +31,7 @@
         android:layout_alignParentEnd="true"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Actions"/>
+        android:text="Actions"
+        android:layout_alignParentRight="true" />
 
 </LinearLayout>

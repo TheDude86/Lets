@@ -25,6 +25,7 @@ import com.main.lets.lets.Adapters.FeedAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.EditText;
@@ -42,7 +43,7 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/30/2016.
  */
 public class EventDetailFeed extends Client {
-    EventDetailAdapter mEventAdapter;
+    public EventDetailAdapter mEventAdapter;
     ArrayList<JSONObject> mUsers;
     String ShallonCreamerIsATwat;
     AppCompatActivity mActivity;
@@ -75,8 +76,8 @@ public class EventDetailFeed extends Client {
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
             mEventAdapter = new EventDetailAdapter(mActivity, j.toString(),
                     (new Event(j).getmOwnerID() == mID) ?
-                            EventDetailAdapter.MemberStatus.HOST :
-                            EventDetailAdapter.MemberStatus.GUEST);
+                            Event.MemberStatus.HOST :
+                            Event.MemberStatus.UNKNOWN);
 
             mEventAdapter.setOnActionsClicked(new EventDetailAdapter.OnActionsClicked() {
                 @Override
@@ -96,7 +97,7 @@ public class EventDetailFeed extends Client {
                                         Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                                mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
+                                                mEventAdapter.mStatus = Event.MemberStatus.MEMBER;
                                                 draw(j);
                                             }
                                         });
@@ -114,7 +115,7 @@ public class EventDetailFeed extends Client {
                         f.mOnLeave = new OnLeave() {
                             @Override
                             public void onLeave() {
-                                mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.GUEST;
+                                mEventAdapter.mStatus = Event.MemberStatus.GUEST;
                                 draw(j);
                             }
                         };
@@ -138,47 +139,26 @@ public class EventDetailFeed extends Client {
                         mCoHosts = response.getJSONArray("Cohosts");
                         String s = "";
 
+
                         for (int i = 0; i < json.length(); i++) {
-
-                            if (json.getJSONObject(i).getBoolean("status")) {
-                                mEventAdapter.mUsers.add(json.getJSONObject(i).toString());
-                                mEventAdapter.addElement(json.getJSONObject(i).toString());
-
-                                if (new Entity(json.getJSONObject(i)).mID == mID) {
-                                    mEventAdapter.getmMainHolder().mJoin.setText((new Event(j).getEnd()
-                                            .before(Calendar.getInstance().getTime())) ?
-                                            "You attended this event" :
-                                            "You're attending!");
-
-                                    if (mEventAdapter.mStatus != EventDetailAdapter.MemberStatus.HOST)
-                                        mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
-                                }
-
-                                if (mEventAdapter.mStatus == EventDetailAdapter.MemberStatus.GUEST) {
-                                    mEventAdapter.setOnJoinedClicked(new EventDetailAdapter.OnJoinClicked() {
-                                        @Override
-                                        public void onClicked(int eventID) {
-
-                                            Calls.inviteUserToEvent(eventID, mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                                @Override
-                                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                                    mEventAdapter.mStatus = EventDetailAdapter.MemberStatus.MEMBER;
-                                                    draw(j);
-                                                }
-                                            });
-
-                                        }
-                                    });
-                                }
-
-                                if (s.length() < 1)
-                                    s = json.getJSONObject(i).getString("name");
+                            if (new Entity(json.getJSONObject(i)).mID == mID) {
+                                if (json.getJSONObject(i).getBoolean("status"))
+                                    mEventAdapter.mStatus = Event.MemberStatus.MEMBER;
                                 else
-                                    s += ", " + json.getJSONObject(i).getString("name");
+                                    mEventAdapter.mStatus = Event.MemberStatus.INVITE;
 
                             }
 
                         }
+
+                        for (int i = 0; i < mCoHosts.length(); i++) {
+                            if (new Entity(mCoHosts.getJSONObject(i)).mID == mID)
+                                mEventAdapter.mStatus = Event.MemberStatus.HOST;
+
+                        }
+
+                        if (mID == response.getInt("Creator_ID"))
+                            mEventAdapter.mStatus = Event.MemberStatus.OWNER;
 
                         mEventAdapter.getmMainHolder().mAttendance.setText(s);
 
@@ -188,6 +168,8 @@ public class EventDetailFeed extends Client {
                             mEventAdapter.mComments.add(json.getJSONObject(i).toString());
 
                         }
+
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -219,14 +201,14 @@ public class EventDetailFeed extends Client {
 
         CharSequence[] guestActions = {"Join Event"};
 
-        EventDetailAdapter.MemberStatus mStatus;
+        Event.MemberStatus mStatus;
         AppCompatActivity mActivity;
         OnLeave mOnLeave;
         OnJoin mOnJoin;
         Event mEvent;
 
         public ActionDialogFragment(AppCompatActivity a, Event e,
-                                    EventDetailAdapter.MemberStatus s) {
+                                    Event.MemberStatus s) {
             mActivity = a;
             mStatus = s;
             mEvent = e;

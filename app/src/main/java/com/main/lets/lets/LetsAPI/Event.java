@@ -1,17 +1,20 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.content.Context;
-import android.util.Log;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Adapters.EventDetailAdapter;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 5/12/2016.
@@ -26,6 +29,8 @@ public class Event extends Entity implements Comparable<Event> {
     private int mRestrictions;
     private boolean mIsInvite;
     private boolean mIsActive;
+    private String mOwnerName;
+    private String mEventInfo;
     private JSONObject mJSON;
     private boolean mIsOwner;
     private double mDistance;
@@ -38,8 +43,54 @@ public class Event extends Entity implements Comparable<Event> {
     private Date mStart;
     private Date mEnd;
 
+    public ArrayList<Entity> mMembers = new ArrayList<>();
+    public ArrayList<Entity> mCohosts = new ArrayList<>();
+    public ArrayList<Comment> mComments = new ArrayList<>();
+
+    public enum MemberStatus {OWNER, HOST, MEMBER, INVITE, GUEST, UNKNOWN}
+
+
     public Event(org.json.JSONObject j) throws JSONException {
-        super(j.getInt("Event_ID"),j.getString("Event_Name"), EntityType.EVENT);
+        super(j.getInt("Event_ID"), j.getString("Event_Name"), EntityType.EVENT);
+        mEventInfo = j.toString();
+        loadData(j);
+
+    }
+
+    public Event(int eventID) {
+        super(eventID, "Blank", EntityType.EVENT);
+        mEventID = eventID;
+    }
+
+    public Event(JSONArray eventInfo, JSONArray attendance, JSONArray cohosts, JSONArray comments) throws JSONException {
+        super(eventInfo.getJSONObject(0).getInt("Event_ID"),
+                eventInfo.getJSONObject(0).getString("Event_Name"),
+                EntityType.EVENT);
+
+        mEventInfo = eventInfo.getJSONObject(0).toString();
+
+        loadData(eventInfo.getJSONObject(0));
+
+        for (int i = 0; i < attendance.length(); i++) {
+            Entity e = new Entity(attendance.getJSONObject(i));
+
+            if (e.mStatus)
+               mMembers.add(new Entity(attendance.getJSONObject(i)));
+
+        }
+
+        for (int i = 0; i < cohosts.length(); i++) {
+            mCohosts.add(new Entity(cohosts.getJSONObject(i)));
+        }
+
+        for (int i = 0; i < comments.length(); i++) {
+            mComments.add(new Comment(comments.getJSONObject(i)));
+        }
+
+
+    }
+
+    public void loadData(JSONObject j) throws JSONException {
         mCords = new HashMap<>();
 
         mCords.put("longitude", j.getDouble("Longitude"));
@@ -48,13 +99,14 @@ public class Event extends Entity implements Comparable<Event> {
         mMaxAttendance = j.getInt("Max_Attendance");
         mMinAttendance = j.getInt("Min_Attendance");
         mDescription = j.getString("Description");
+        mOwnerName = j.getString("Creator_Name");
         mTitle = j.getString("Event_Name");
         mOwnerID = j.getInt("Creator_ID");
         mCategory = j.getInt("Category");
         mEventID = j.getInt("Event_ID");
         mJSON = j;
 
-        if(j.has("Distance"))
+        if (j.has("Distance"))
             mDistance = j.getDouble("Distance");
 
         mStart = new Date((Long.parseLong(j.getString("Start_Time")
@@ -65,7 +117,67 @@ public class Event extends Entity implements Comparable<Event> {
 
         mCreated = new Date((Long.parseLong(j.getString("Time_Created")
                 .substring(6, j.getString("Time_Created").length() - 2))));
+    }
 
+
+
+    public void getEventByID(final onEventLoaded e) {
+
+        Calls.getEvent(mEventID, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                try {
+                    e.EventLoaded(new Event(response.getJSONArray("Event_info"),
+                            response.getJSONArray("Attending_users"),
+                            response.getJSONArray("Cohosts"),
+                            response.getJSONArray("Comments")));
+
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+
+
+            }
+        });
+
+    }
+
+    public MemberStatus getUserStatus(int ID) {
+        MemberStatus s = MemberStatus.GUEST;
+
+        for (int i = 0; i < mMembers.size(); i++) {
+            if (mMembers.get(i).mID == ID) {
+                if (mMembers.get(i).mStatus)
+                    s = MemberStatus.MEMBER;
+                else
+                    s = MemberStatus.INVITE;
+
+            }
+
+        }
+
+        for (int i = 0; i < mCohosts.size(); i++) {
+            if (mCohosts.get(i).mID == ID)
+                s = MemberStatus.HOST;
+
+        }
+
+        if (ID == mOwnerID)
+            s = MemberStatus.OWNER;
+
+        return s;
+    }
+
+    public ArrayList<Entity> getmCohosts() {return mCohosts;}
+
+    public String getmEventInfo() {
+        return mEventInfo;
+    }
+
+    public void setmEventInfo(String mEventInfo) {
+        this.mEventInfo = mEventInfo;
     }
 
     public int getmEventID() {
@@ -167,8 +279,17 @@ public class Event extends Entity implements Comparable<Event> {
 
     public String getTimeSpanString() {
 
-        return (new SimpleDateFormat("MMM dd").format(mStart.getTime()) + " from " + new SimpleDateFormat("h:mm a").format(mStart.getTime()) +
-                " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime()));
+        return (new SimpleDateFormat("h:mm a").format(mStart.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime()));
+    }
+
+    public String getMonth() {
+
+        return (new SimpleDateFormat("MMM").format(mStart.getTime()));
+    }
+
+    public String getDay() {
+
+        return (new SimpleDateFormat("dd").format(mStart.getTime()));
     }
 
     public boolean ismIsOwner() {
@@ -247,4 +368,17 @@ public class Event extends Entity implements Comparable<Event> {
     public void setmJSON(JSONObject mJSON) {
         this.mJSON = mJSON;
     }
+
+    public String getmOwnerName() {
+        return mOwnerName;
+    }
+
+    public void setmOwnerName(String mOwnerName) {
+        this.mOwnerName = mOwnerName;
+    }
+
+    public interface onEventLoaded {
+        public void EventLoaded(Event e);
+    }
+
 }

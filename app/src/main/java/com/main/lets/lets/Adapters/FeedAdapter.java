@@ -12,7 +12,9 @@ import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.PictureViewHolder;
+import com.main.lets.lets.LetsAPI.Comment;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
@@ -35,59 +37,72 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
     public ArrayList<String> mUsers = new ArrayList<>();
     public ArrayList<String> mList = new ArrayList<>();
     public AppCompatActivity mActivity;
+    public TextView mEventText;
     public TextView mComment;
-    public TextView mEvent;
     public TextView mGroup;
     public TextView mUser;
     public Active mActive;
+    public Event mEvent;
+
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
-        try {
-            final Entity e = new Entity(new JSONObject(mList.get(position)));
-            ((PictureViewHolder) holder).mText.setText(e.mText);
-            ((PictureViewHolder) holder).mDetail.setText(e.mDetail);
+        if (mActive == Active.COMMENT) {
+            Comment c = mEvent.mComments.get(position - 1);
 
-            if (e.mPic != null) {
-                Picasso.with(mActivity).load(e.mPic).into(((PictureViewHolder) holder).mImage);
+            ((PictureViewHolder) holder).mText.setText(c.mText);
+            ((PictureViewHolder) holder).mDetail.setText(c.mDetail);
 
-            } else if (e.mCategory != -1) {
-                Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory))
-                        .into(((PictureViewHolder) holder).mImage);
+//            Picasso.with(mActivity).load(c.mPic).into(((PictureViewHolder) holder).mImage);
 
-            }
+        } else {
 
-            ((PictureViewHolder) holder).mLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            try {
+                final Entity e = new Entity(new JSONObject(mList.get(position)));
+                ((PictureViewHolder) holder).mText.setText(e.mText);
+                ((PictureViewHolder) holder).mDetail.setText(e.mDetail);
 
-                    if (mActive == FeedAdapter.Active.USER) {
-                        Intent intent = new Intent(mActivity, UserDetailActivity.class);
+                if (e.mPic != null) {
+                    Picasso.with(mActivity).load(e.mPic).into(((PictureViewHolder) holder).mImage);
+
+                } else if (e.mCategory != -1) {
+                    Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory))
+                            .into(((PictureViewHolder) holder).mImage);
+
+                }
+
+                ((PictureViewHolder) holder).mLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (mActive == FeedAdapter.Active.USER) {
+                            Intent intent = new Intent(mActivity, UserDetailActivity.class);
                             intent.putExtra("UserID", e.mID);
 
                             mActivity.startActivity(intent);
 
-                    } else if (mActive == Active.EVENT) {
-                        Intent intent = new Intent(mActivity, EventDetailActivity.class);
-                        intent.putExtra("EventID", e.mID);
+                        } else if (mActive == Active.EVENT) {
+                            Intent intent = new Intent(mActivity, EventDetailActivity.class);
+                            intent.putExtra("EventID", e.mID);
 
-                        mActivity.startActivity(intent);
+                            mActivity.startActivity(intent);
 
-                    } else if (mActive == Active.GROUP) {
-                        Intent intent = new Intent(mActivity, GroupDetailActivity.class);
-                        intent.putExtra("GroupID", (e.mID));
-                        mActivity.startActivity(intent);
+                        } else if (mActive == Active.GROUP) {
+                            Intent intent = new Intent(mActivity, GroupDetailActivity.class);
+                            intent.putExtra("GroupID", (e.mID));
+                            mActivity.startActivity(intent);
+                        }
+
+
                     }
+                });
 
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
 
-                }
-            });
-
-        } catch (JSONException e1) {
-            e1.printStackTrace();
         }
-
 
     }
 
@@ -133,13 +148,13 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
     }
 
     public void setEvents(TextView e) {
-        mEvent = e;
-        mEvent.setOnClickListener(new View.OnClickListener() {
+        mEventText = e;
+        mEventText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mActive = Active.EVENT;
 
-                setActiveButton(mEvent);
+                setActiveButton(mEventText);
                 clearFeed();
 
                 for (String l : mEvents)
@@ -207,8 +222,8 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
         if (mComment != null && !t.equals(mComment))
             mComment.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
-        if (mEvent != null && !t.equals(mEvent))
-            mEvent.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
+        if (mEventText != null && !t.equals(mEventText))
+            mEventText.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
 
         if (mUser != null && !t.equals(mUser))
             mUser.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));

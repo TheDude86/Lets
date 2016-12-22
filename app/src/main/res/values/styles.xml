@@ -15,6 +15,8 @@
             @style/spinnerItemStyle
         </item>
 
+        <item name="actionMenuTextColor">@android:color/black</item>
+
         <!-- For each individual Spinner list item once clicked on -->
         <item name="android:spinnerDropDownItemStyle">
             @style/spinnerDropDownItemStyle
@@ -69,7 +71,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/accent_color</item>
 
-        <item name="android:navigationBarColor" tools:targetApi="21">@color/navigationBarColor</item>
+        <item name="android:navigationBarColor" tools:targetApi="21">@color/navigationBarColor
+        </item>
         <item name="android:windowDrawsSystemBarBackgrounds" tools:targetApi="21">true</item>
 
     </style>
@@ -81,7 +84,7 @@
 
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@color/drawerArrowColor</item>
+        <item name="color">@android:color/black</item>
     </style>
 
 

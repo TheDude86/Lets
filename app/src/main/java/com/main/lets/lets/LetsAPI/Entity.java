@@ -1,13 +1,16 @@
 package com.main.lets.lets.LetsAPI;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Visualizers.Client;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,9 +24,13 @@ import cz.msebera.android.httpclient.Header;
  * Class used to turn json objects into entity short hands and then retrieve their full details.
  */
 public class Entity extends Client {
-    enum EntityType {EVENT, USER, GROUP, COMMENT}
+    public enum EntityType {EVENT, USER, GROUP, COMMENT, UTITLITY}
+
+    public static final int UTITLITY_HEADER = 0;
+    public static final int UTITLITY_LOADMORE = 1;
 
     public EntityType mType;
+    public boolean mStatus;
     public String mDetail;
     public int mCategory;
     public String mText;
@@ -111,6 +118,10 @@ public class Entity extends Client {
                     mPic = j.getString("pic_ref");
             }
 
+            if (j.has("status")) {
+                mStatus = j.getBoolean("status");
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -122,6 +133,15 @@ public class Entity extends Client {
         //noinspection NumericOverflow
         int x = 3 / 0;
 
+    }
+
+    public void loadImage(Activity a, ImageView v) {
+        if (mPic != null && !mPic.equals(""))
+            Picasso.with(a).load(mPic).into(v);
+
+        if (mType == EntityType.EVENT)
+            Picasso.with(a).load(a.getResources().getIdentifier(("j" + Integer.toString(mCategory))
+                    .replaceAll("\\s+", "").toLowerCase(), "drawable", a.getPackageName())).into(v);
     }
 
     public void loadDetailActivity(final AppCompatActivity mActivity, final String token,
