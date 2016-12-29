@@ -1,7 +1,6 @@
 package com.main.lets.lets.Activities;
 
 import android.Manifest;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,15 +13,12 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
@@ -34,7 +30,6 @@ import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
-import com.main.lets.lets.Services.EventReminders;
 import com.main.lets.lets.Services.MyHandler;
 import com.main.lets.lets.Services.NotificationSettings;
 import com.main.lets.lets.Services.RegistrationIntentService;
@@ -45,9 +40,8 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.microsoft.windowsazure.notifications.NotificationsManager;
-import android.content.Intent;
+
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -57,25 +51,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
 
 import cz.msebera.android.httpclient.Header;
-import android.widget.Button;
-import java.io.UnsupportedEncodingException;
-import android.content.Context;
-import java.util.HashSet;
-import android.widget.Toast;
+
 import org.apache.http.client.ClientProtocolException;
 import java.io.IOException;
 import org.apache.http.HttpStatus;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.*;
-import com.microsoft.windowsazure.notifications.NotificationsManager;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
     public NotificationFeed mNotificationFeed;
@@ -397,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Set OnClickListener for the Search Icon in the top toolbar
-        findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.rotate_left).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NewSearchActivity.class);
@@ -436,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
 
 
-
+                mRecyclerView.setBackgroundResource(R.color.relax);
                 mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
                 mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
 
@@ -508,7 +489,9 @@ public class MainActivity extends AppCompatActivity {
             mGlobalFeed.draw(null);
 
         } else if (mActive.equals(mProfileFeed.getClass().toString())) {
-            mProfileFeed.draw(null);
+            mRecyclerView.setBackgroundResource(R.color.relax);
+            mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
+            mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
 
         }else if (mActive.equals(mNotificationFeed.getClass().toString())) {
             mNotificationFeed.draw(null);
@@ -585,7 +568,7 @@ public class MainActivity extends AppCompatActivity {
                     mGlobalFeed.draw(null);
 
                 } else if (mActive.equals(mProfileFeed.getClass().toString())) {
-                    mProfileFeed.draw(null);
+//                    mProfileFeed.draw(null);
 
                 } else if (mActive.equals(mNotificationFeed.getClass().toString())) {
                     mNotificationFeed.draw(null);

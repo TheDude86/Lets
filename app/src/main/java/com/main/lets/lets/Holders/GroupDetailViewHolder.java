@@ -33,7 +33,6 @@ public class GroupDetailViewHolder extends RecyclerView.ViewHolder {
         mName = (EditText) itemView.findViewById(R.id.txt_name);
         mMembers = (TextView) itemView.findViewById(R.id.btn_users);
         mComments = (TextView) itemView.findViewById(R.id.btn_comments);
-        mActions = (LinearLayout) itemView.findViewById(R.id.actions);
         mMainLayout = (LinearLayout) itemView.findViewById(R.id.main_layout);
         mActionsList = (LinearLayout) itemView.findViewById(R.id.actions_list);
 

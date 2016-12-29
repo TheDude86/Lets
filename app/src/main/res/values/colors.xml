@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#FFB79200</color>
     <color name="colorAccent">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="buttonBG">#FFFFFF</color>
 
     <array name="category_colors">
         <item>#5C4D81</item>
@@ -24,7 +25,7 @@
     <color name="videogames">#999999</color>
     <color name="sports">#73A0BA</color>
     <color name="music">#A7449A</color>
-    <color name="relax">#cfcfcf</color>
+    <color name="relax">#a0a0a0</color>
     <color name="other">#999999</color>
 
 </resources>

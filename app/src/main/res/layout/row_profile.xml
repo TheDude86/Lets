@@ -56,36 +56,19 @@
                     android:background="#00ffffff"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:id="@+id/options"/>
+                    android:id="@+id/options"
+                    android:layout_alignParentRight="true"/>
 
             </RelativeLayout>
 
         </FrameLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignEnd="@+id/txt_bio"
-            android:layout_alignBottom="@+id/txt_friends"
-            android:background="#b3b3b3"
-            android:id="@+id/line">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="This text is as insignificat as Shallon&apos;s existance"
-                android:id="@+id/ShallonDidNineEleven"
-                android:textSize="0dp"
-                android:textColor="#00ffffff" />
-        </LinearLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/line"
-            android:id="@+id/layout_info">
+            android:id="@+id/layout_info"
+            android:layout_alignLeft="@+id/line">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -96,7 +79,9 @@
                 android:layout_below="@+id/txt_interests"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="50dp"
-                android:elevation="0dp">
+                android:elevation="0dp"
+                android:layout_alignParentLeft="true"
+                >
 
                 <include layout="@layout/toolbar_profile"/>
 
@@ -108,7 +93,8 @@
                 android:layout_height="1dp"
                 android:background="#b3b3b3"
                 android:layout_below="@+id/layout_profile_bar"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -118,7 +104,8 @@
                 android:id="@+id/txt_bio"
                 android:layout_marginTop="36dp"
                 android:layout_below="@+id/txt_friends"
-                android:layout_alignStart="@+id/txt_friends" />
+                android:layout_alignStart="@+id/txt_friends"
+                android:layout_alignLeft="@+id/txt_friends"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,7 +114,8 @@
                 android:text="Fetching..."
                 android:id="@+id/txt_friends"
                 android:layout_marginStart="25dp"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -137,7 +125,31 @@
                 android:id="@+id/txt_score"
                 android:layout_alignTop="@+id/txt_friends"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="25dp" />
+                android:layout_marginEnd="25dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="25dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#b3b3b3"
+                android:id="@+id/line"
+                android:layout_below="@+id/txt_friends"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This text is as insignificat as Shallon&apos;s existance"
+                    android:id="@+id/ShallonDidNineEleven"
+                    android:textSize="0dp"
+                    android:textColor="#00ffffff" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -145,9 +157,13 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Interests"
                 android:id="@+id/textView2"
-                android:layout_marginTop="71dp"
+                android:layout_marginTop="40dp"
                 android:layout_below="@+id/txt_bio"
-                android:layout_alignStart="@+id/txt_bio" />
+                android:layout_alignStart="@+id/txt_bio"
+                android:layout_alignLeft="@+id/txt_bio"
+                android:textStyle="bold"
+                android:textIsSelectable="false"
+                android:textSize="13dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -156,7 +172,49 @@
                 android:text="Interests go here"
                 android:id="@+id/txt_interests"
                 android:layout_below="@+id/textView2"
-                android:layout_alignStart="@+id/textView2" />
+                android:layout_alignStart="@+id/textView2"
+                android:layout_alignLeft="@+id/textView2"
+                android:textSize="13dp"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#b3b3b3"
+                android:id="@+id/linearLayout5"
+                android:layout_alignTop="@+id/textView2"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This text is as insignificat as Shallon&apos;s existance"
+                    android:id="@+id/textView43"
+                    android:textSize="0dp"
+                    android:textColor="#00ffffff"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#b3b3b3"
+                android:id="@+id/linearLayout6"
+                android:layout_alignTop="@+id/layout_profile_bar"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This text is as insignificat as Shallon&apos;s existance"
+                    android:id="@+id/textView44"
+                    android:textSize="0dp"
+                    android:textColor="#00ffffff"/>
+            </LinearLayout>
 
         </RelativeLayout>
 

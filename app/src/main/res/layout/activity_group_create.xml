@@ -15,7 +15,8 @@
         android:layout_height="match_parent"
         android:id="@+id/scrollView2"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" >
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -28,7 +29,8 @@
                 android:text="Name your group"
                 android:id="@+id/textView11"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -37,7 +39,9 @@
                 android:layout_below="@+id/textView11"
                 android:layout_alignParentStart="true"
                 android:layout_alignEnd="@+id/bio"
-                android:hint="Title" />
+                android:hint="Title"
+                android:layout_alignParentLeft="true"
+                android:layout_alignRight="@+id/bio"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -47,7 +51,8 @@
                 android:id="@+id/textView12"
                 android:layout_below="@+id/title"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="50dp" />
+                android:layout_marginTop="50dp"
+                android:layout_alignParentLeft="true"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -57,7 +62,8 @@
                 android:id="@+id/bio"
                 android:layout_below="@+id/textView12"
                 android:layout_alignParentStart="true"
-                android:hint="Description" />
+                android:hint="Description"
+                android:layout_alignParentLeft="true"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -67,14 +73,16 @@
                 android:id="@+id/textView13"
                 android:layout_marginTop="50dp"
                 android:layout_below="@+id/bio"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"/>
 
             <RadioGroup
                 android:layout_width="match_parent"
                 android:id="@+id/joining"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/textView13"
-                android:layout_alignParentStart="true">
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true">
 
                 <RadioButton
                     android:layout_width="wrap_content"
@@ -103,14 +111,16 @@
                 app:cpb_textError="Something went wrong"
                 app:cpb_textIdle="Select Group Picture"
                 android:layout_below="@+id/joining"
-                android:layout_alignStart="@+id/joining" />
+                android:layout_alignStart="@+id/joining"
+                android:layout_alignLeft="@+id/joining"/>
 
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:id="@+id/group_pic"
                 android:layout_alignBottom="@+id/picture"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"/>
 
 
             <com.dd.CircularProgressButton

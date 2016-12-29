@@ -38,7 +38,7 @@ public class SearchActivity extends AppCompatActivity {
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
 
         //The Search bar is for users to input strings and search for users, events, and groups
-        SearchView searchView = (SearchView) findViewById(R.id.search);
+        SearchView searchView = (SearchView) findViewById(R.id.rotate_left);
         assert searchView != null;
 
         searchView.setIconifiedByDefault(false);

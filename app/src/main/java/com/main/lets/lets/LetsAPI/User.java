@@ -1,8 +1,11 @@
 package com.main.lets.lets.LetsAPI;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -238,6 +241,14 @@ public class User extends Entity {
 
     public void setPropic(String propic) {
         this.propic = propic;
+    }
+
+    @Override
+    public void loadImage(Activity a, ImageView v) {
+        mPic = propic;
+
+        super.loadImage(a, v);
+
     }
 
     public interface OnLoadListener {

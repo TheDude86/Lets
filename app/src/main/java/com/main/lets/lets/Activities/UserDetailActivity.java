@@ -11,8 +11,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.auth.UserInfo;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.UserDetailFeed;
 
@@ -26,7 +28,6 @@ public class UserDetailActivity extends AppCompatActivity{
     public enum Relationship {NONE, SENT, RECIEVED, FRIEND, OWNER}
 
     public Relationship mRelationship = Relationship.NONE;
-    public String ShallonCreamerIsATwat;
     public UserDetailFeed mFeed;
     public JSONObject mUserInfo;
     public int mUserID;
@@ -61,7 +62,6 @@ public class UserDetailActivity extends AppCompatActivity{
             }
 
 
-            ShallonCreamerIsATwat = getIntent().getStringExtra("token");
             mUserID = getIntent().getIntExtra("UserID", -1);
 
             if (getIntent().getStringExtra("JSON") != null) {
@@ -70,7 +70,8 @@ public class UserDetailActivity extends AppCompatActivity{
                 loadActivity(j);
 
             } else {
-                Calls.getProfileByID(mUserID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                UserData info = new UserData(this);
+                Calls.getProfileByID(mUserID, info.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -152,7 +153,7 @@ public class UserDetailActivity extends AppCompatActivity{
                 r.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Calls.sendFriendRequest(mUserID, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                        Calls.sendFriendRequest(mUserID, (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
 
                             @Override
                             public void onSuccess(int statusCode, Header[] headers,
@@ -184,7 +185,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
                             public void onClick(DialogInterface dialog, int id) {
 
-                                Calls.removeFriend(mUserID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                Calls.removeFriend(mUserID, (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers,
@@ -231,7 +232,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
                                     public void onClick(DialogInterface dialog, int id) {
 
-                                        Calls.removeFriend(mUserID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                        Calls.removeFriend(mUserID, (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers,
@@ -249,7 +250,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
                                     public void onClick(DialogInterface dialog, int id) {
 
-                                        Calls.sendFriendRequest(mUserID, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                        Calls.sendFriendRequest(mUserID, (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
 
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers,
@@ -294,7 +295,7 @@ public class UserDetailActivity extends AppCompatActivity{
 
     public void loadActivity(JSONObject j) throws JSONException {
         mFeed = new UserDetailFeed(this, (RecyclerView) findViewById(R.id.feed), j,
-                                   ShallonCreamerIsATwat, mRelationship);
+                                   (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat, mRelationship);
 
         mFeed.draw(j);
     }

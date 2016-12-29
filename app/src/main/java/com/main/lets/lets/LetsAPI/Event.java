@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -86,6 +87,8 @@ public class Event extends Entity implements Comparable<Event> {
         for (int i = 0; i < comments.length(); i++) {
             mComments.add(new Comment(comments.getJSONObject(i)));
         }
+
+        Collections.sort(mComments);
 
 
     }

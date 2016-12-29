@@ -32,12 +32,12 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
     public String ShallonCreamerIsATwat;
     public ArrayList<String> mEventTags;
     public ArrayList<String> mGroupTags;
+    public AppCompatActivity mActivity;
+    private boolean mLoadFeed = false;
     public ArrayList<String> mFriends;
     public ArrayList<String> mEvents;
     public ArrayList<String> mGroups;
-    private boolean mLoadFeed = false;
     public JSONObject mUserJSON;
-    public Activity mActivity;
     private int mID;
 
 
@@ -49,7 +49,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
      * @param context used for various fuctions throughout
      * @param a
      */
-    public ProfileAdapter(Activity context, ArrayList<String> a) {
+    public ProfileAdapter(AppCompatActivity context, ArrayList<String> a) {
         super(a);
         mActivity = context;
 

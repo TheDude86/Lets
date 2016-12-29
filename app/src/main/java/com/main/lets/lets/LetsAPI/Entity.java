@@ -2,6 +2,8 @@ package com.main.lets.lets.LetsAPI;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
@@ -30,6 +32,7 @@ public class Entity extends Client {
     public static final int UTITLITY_LOADMORE = 1;
 
     public EntityType mType;
+    public Drawable mPicture;
     public boolean mStatus;
     public String mDetail;
     public int mCategory;
@@ -136,12 +139,23 @@ public class Entity extends Client {
     }
 
     public void loadImage(Activity a, ImageView v) {
-        if (mPic != null && !mPic.equals(""))
-            Picasso.with(a).load(mPic).into(v);
 
-        if (mType == EntityType.EVENT)
-            Picasso.with(a).load(a.getResources().getIdentifier(("j" + Integer.toString(mCategory))
-                    .replaceAll("\\s+", "").toLowerCase(), "drawable", a.getPackageName())).into(v);
+        if (mPicture == null) {
+            if (mPic != null && !mPic.equals("")) {
+                Picasso.with(a).load(mPic).into(v);
+                mPicture = v.getDrawable();
+
+
+            }
+
+            if (mType == EntityType.EVENT)
+                Picasso.with(a).load(a.getResources().getIdentifier(("j" + Integer.toString(mCategory))
+                                                                            .replaceAll("\\s+", "").toLowerCase(), "drawable", a.getPackageName())).into(v);
+
+        } else {
+            v.setImageDrawable(mPicture);
+        }
+
     }
 
     public void loadDetailActivity(final AppCompatActivity mActivity, final String token,
@@ -210,4 +224,17 @@ public class Entity extends Client {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass().equals(Entity.class)) {
+            Entity e = (Entity) o;
+
+            if (e.mID == mID && e.mType == mType)
+                return true;
+
+        }
+
+
+        return false;
+    }
 }

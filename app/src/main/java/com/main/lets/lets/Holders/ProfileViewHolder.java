@@ -2,6 +2,7 @@ package com.main.lets.lets.Holders;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -36,10 +37,10 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
     public EntityAdapter.Viewing mActive;
     public ArrayList<String> mDetailList;
     public String ShallonCreamerIsATwat;
+    public AppCompatActivity mActivity;
     public RecyclerView mRecyclerView;
     public ArrayList<String> mList;
     public RelativeLayout mProfile;
-    public Activity mActivity;
     public ImageView mProPic;
     public TextView mName;
     public TextView mBio;
@@ -61,7 +62,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
      * @param a        also used for other methods for inflating XMLs
      * @param token    access token
      */
-    public ProfileViewHolder(final View itemView, final Activity a, final String token, int id) {
+    public ProfileViewHolder(final View itemView, final AppCompatActivity a, final String token, int id) {
         super(itemView);
 
         //initializing global variables, the arraylist holds the entity feed
@@ -92,7 +93,7 @@ public class ProfileViewHolder extends UltimateRecyclerviewViewHolder
 
         //Set the on text update listener for the search widget, when the user inputs text, the
         // feed is updated dyanically
-        ((SearchView) itemView.findViewById(R.id.search)).setOnQueryTextListener(
+        ((SearchView) itemView.findViewById(R.id.rotate_left)).setOnQueryTextListener(
                 new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {

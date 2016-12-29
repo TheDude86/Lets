@@ -42,7 +42,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tool_bar_under"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:background="@color/relax"/>
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/btn_add"

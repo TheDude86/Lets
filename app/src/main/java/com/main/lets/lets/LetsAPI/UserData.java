@@ -19,7 +19,7 @@ public class UserData {
 
         email = preferences.getString("email", "");
         password = preferences.getString("password", "");
-        ShallonCreamerIsATwat = preferences.getString("token", "");
+        ShallonCreamerIsATwat = preferences.getString("Token", "");
         ID = preferences.getInt("UserID", -1);
 
     }

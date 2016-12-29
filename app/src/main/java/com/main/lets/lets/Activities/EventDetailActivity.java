@@ -7,33 +7,61 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.telecom.Call;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Event;
-import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
-import com.main.lets.lets.Visualizers.EventDetailFeed;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
 public class EventDetailActivity extends AppCompatActivity {
-    EventDetailFeed mFeed;
-    JSONObject mJSON;
+    Event mEvent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
+        loadEvent();
+
+        final EditText comment = (EditText)findViewById(R.id.txt_comment);
+        findViewById(R.id.btn_comment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (!comment.getText().toString().equals("")) {
+
+                    Calls.addComment(mEvent.mID, new UserData(EventDetailActivity.this).ShallonCreamerIsATwat, comment.getText().toString(), new JsonHttpResponseHandler() {
+
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers,
+                                              JSONObject response) {
+                            comment.clearFocus();
+                            comment.setText("");
+                            loadEvent();
+                        }
+                    });
+                }
+
+
+            }
+        });
+
+    }
+
+    public void loadEvent() {
         final ProgressDialog dialog = ProgressDialog.show(this, "",
-                "Loading. Please wait...", true);
+                                                          "Loading. Please wait...", true);
 
         int eventID = getIntent().getIntExtra("EventID", -1);
 
@@ -42,7 +70,8 @@ public class EventDetailActivity extends AppCompatActivity {
 
         final int[] bgColors = getResources().getIntArray(R.array.category_colors);
 
-        new Event(eventID).getEventByID(new Event.onEventLoaded() {
+        mEvent = new Event(eventID);
+        mEvent.getEventByID(new Event.onEventLoaded() {
             @Override
             public void EventLoaded(Event e) {
 
@@ -71,7 +100,6 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
     }
-
 
     //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {

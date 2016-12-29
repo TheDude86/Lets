@@ -166,36 +166,6 @@ public class GroupDetailFeed extends Client {
                     }
                 });
 
-            } else {
-                mJoinButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            Calls.joinGroup(mID, mJSON.getJSONArray("Group_info")
-                                            .getJSONObject(0).getInt("group_id"), ShallonCreamerIsATwat,
-                                    new JsonHttpResponseHandler(){
-                                        @Override
-                                        public void onSuccess(int statusCode, Header[] headers,
-                                                              org.json.JSONObject response) {
-                                            mActivity.findViewById(R.id.layout_join)
-                                                    .setVisibility(View.GONE);
-
-                                            mAdapter.mStatus = GroupDetailAdapter.Status.MEMBER;
-
-                                        }
-
-                                        @Override
-                                        public void onFailure(int statusCode, Header[] headers, Throwable throwable,
-                                                              JSONObject errorResponse) {
-
-                                        }
-
-                                    });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
             }
 
 
@@ -208,11 +178,6 @@ public class GroupDetailFeed extends Client {
 
 
     public void editGroup() {
-        if (mAdapter.toggleEditable()) {
-            mActivity.findViewById(R.id.layout_join).setVisibility(View.VISIBLE);
-            mJoinButton.setText("Save Changes");
-        } else
-            mActivity.findViewById(R.id.layout_join).setVisibility(View.GONE);
 
     }
 

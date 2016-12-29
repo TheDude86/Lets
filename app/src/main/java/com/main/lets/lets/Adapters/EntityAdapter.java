@@ -1,32 +1,16 @@
 package com.main.lets.lets.Adapters;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.main.lets.lets.Activities.EventDetailActivity;
-import com.main.lets.lets.Activities.GroupDetailActivity;
-import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
-import com.main.lets.lets.Holders.PictureViewHolder;
+import com.main.lets.lets.LetsAPI.BitmapLoader;
 import com.main.lets.lets.LetsAPI.Entity;
-import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.R;
-import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -44,10 +28,10 @@ public class EntityAdapter extends RecyclerView.Adapter {
 
     private static final int DETAIL_CODE = 1;
     private ArrayList<String> mList;
-    private Activity mActivity;
+    private AppCompatActivity mActivity;
     private Viewing active;
 
-    public EntityAdapter(Activity a, ArrayList<String> list, Viewing v) {
+    public EntityAdapter(AppCompatActivity a, ArrayList<String> list, Viewing v) {
         mActivity = a;
         mList = list;
         active = v;
@@ -112,8 +96,13 @@ public class EntityAdapter extends RecyclerView.Adapter {
         holder.mTitle.setText(e.mText);
         holder.mDetail.setText(e.mDetail);
 
-        if (e.mPic != null)
-            Picasso.with(mActivity).load(e.mPic).into((holder).mImage);
+        if (e.mPic != null) {
+//            e.loadImage(mActivity, holder.mImage);
+            holder.mImage.setImageBitmap(new BitmapLoader(mActivity, e.mPic).decodeSampledBitmapFromFile(70, 70));
+        }
+
+
+//            Picasso.with(mActivity).load(e.mPic).into(holder.mImage);
 
 
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
@@ -152,10 +141,11 @@ public class EntityAdapter extends RecyclerView.Adapter {
         holder.mTitle.setText(e.mText);
         holder.mDetail.setText(e.mDetail);
 
-        if (e.mCategory != -1)
-            Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory))
-                    .into((holder).mImage);
+        if (e.mCategory != -1) {
+            holder.mImage.setImageBitmap(new BitmapLoader(mActivity, R.drawable.j0).decodeSampledBitmapFromResource(70, 70));
+//            holder.mImage.setImageBitmap(new BitmapLoader(mActivity, e.mPic).decodeSampledBitmapFromFile(70, 70));
 
+        }
 
 
         holder.mLayout.setOnClickListener(new View.OnClickListener() {

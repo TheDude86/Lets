@@ -12,6 +12,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.dd.CircularProgressButton;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -80,6 +82,7 @@ public class EventCreateActivity extends AppCompatActivity {
         assert title != null;
         assert date != null;
         assert time != null;
+
 
         /*
          *Initializing the HashMap that contains all of the following information:

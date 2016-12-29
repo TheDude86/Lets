@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+    >
+
+    <ImageButton
+        android:id="@+id/rotate_left"
+        style="@style/TextButtonToolBar"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_rotate_left_black_24dp"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/settings"
+        android:layout_toLeftOf="@+id/settings" />
+
+    <ImageButton
+        style="@style/TextButtonToolBar"
+        android:id="@+id/rotate_right"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_rotate_right_black_24dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/rotate_left"
+        android:layout_toEndOf="@+id/rotate_left"/>
+
+    <ImageButton
+        style="@style/TextButtonToolBar"
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_clear_white_24dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+    <ImageButton
+        style="@style/TextButtonToolBar"
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_done_white_24dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/cancel"
+        android:layout_toStartOf="@+id/cancel"/>
+
+
+</RelativeLayout>

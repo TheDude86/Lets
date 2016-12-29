@@ -66,8 +66,6 @@ public class EventActions extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final CharSequence[] list;
 
-        L.println(EventActions.class, "Status " + mStatus);
-
         switch (mStatus) {
             case OWNER:
                 list = hostActions;

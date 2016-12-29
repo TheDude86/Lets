@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.R;
@@ -45,6 +47,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getBaseContext());
 
         ShallonCreamerIsATwat = preferences.getString("Token", "");
+
 
         //noinspection ConstantConditions
         findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.main.lets.lets">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.main.lets.lets">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
     <application
         android:name="android.support.multidex.MultiDexApplication"
@@ -22,41 +22,41 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
         <activity android:name=".Activities.MainActivity">
-            <service android:name=".ExampleService" />
+            <service android:name=".ExampleService"/>
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".Activities.EventDetailActivity"
             android:label="@string/title_activity_event_detail"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".Activities.EventCreateActivity"
             android:label="Create a new Event"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="@string/google_maps_key"/>
 
         <activity
             android:name=".Activities.GroupCreateActivity"
             android:label="Create a new Group"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
         <activity
             android:name=".Activities.GroupDetailActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".Activities.UserDetailActivity" />
+            android:theme="@style/AppTheme"/>
+        <activity android:name=".Activities.UserDetailActivity"/>
         <activity
             android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -64,52 +64,52 @@
             android:theme="@style/CreateTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.main.lets.lets.Activities.MainActivity" />
+                android:value="com.main.lets.lets.Activities.MainActivity"/>
         </activity>
         <activity
             android:name=".Activities.SearchActivity"
-            android:theme="@style/SearchTheme" />
-        <activity android:name=".Activities.InviteActivity" />
+            android:theme="@style/SearchTheme"/>
+        <activity android:name=".Activities.InviteActivity"/>
         <activity
             android:name=".Activities.RegisterActivity"
             android:label="@string/title_activity_register"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
         <activity
             android:name=".Activities.DateActivity"
             android:label="@string/title_activity_birthday"
             android:parentActivityName=".Activities.RegisterActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
         <activity
             android:name=".Activities.AccountActivity"
             android:label="@string/title_activity_account"
             android:parentActivityName=".Activities.DateActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
         <activity
             android:name=".Activities.CreateDetailActivity"
             android:label="@string/title_activity_detail"
             android:parentActivityName=".Activities.DateActivity"
-            android:theme="@style/CreateTheme" />
+            android:theme="@style/CreateTheme"/>
 
         <service
             android:name=".Services.EventReminders"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
         <service
             android:name=".Services.RegistrationIntentService"
-            android:exported="false"></service>
+            android:exported="false"/>
 
         <receiver
             android:name="com.microsoft.windowsazure.notifications.NotificationsBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
 
-                <category android:name="com.lets.lets" />
+                <category android:name="com.lets.lets"/>
             </intent-filter>
         </receiver>
 
@@ -117,7 +117,16 @@
             android:name=".Activities.NewSearchActivity"
             android:label=""
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".Activities.ImagePreviewActivity"
+            android:label=""
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.main.lets.lets.Activities.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

@@ -28,24 +28,39 @@
                 android:background="#000031"
                 android:id="@+id/relativeLayout6">
 
-                <ImageView
-                    android:layout_width="250dp"
-                    android:layout_height="250dp"
-                    android:id="@+id/picture"
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="8dp" />
+                    android:innerRadius="0dp"
+                    android:shape="ring"
+                    android:thicknessRatio="1.9"
+                    android:layout_margin="8dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/picture"
+                        android:layout_width="250dp"
+                        android:layout_height="250dp"
+                        app:civ_border_width="2dp"
+                        app:civ_border_color="#FF000000"
+                        />
+
+                </RelativeLayout>
+
             </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Large Text"
                 android:id="@+id/name"
                 android:layout_below="@+id/relativeLayout6"
                 android:layout_centerHorizontal="true"
-                android:gravity="center" />
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="30dp"/>
 
             <TextView
                 android:layout_width="wrap_content"

@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:text="Events"
         android:id="@+id/events"
-        android:background="#00ffffff"
+        android:background="@color/buttonBG"
         android:layout_alignParentTop="true"
         android:layout_weight="1"
         android:gravity="center" />
@@ -30,7 +30,7 @@
         android:layout_height="match_parent"
         android:text="Groups"
         android:id="@+id/groups"
-        android:background="#00ffffff"
+        android:background="@color/buttonBG"
         android:layout_gravity="center_vertical"
         android:layout_alignParentTop="true"
         android:layout_weight="1"

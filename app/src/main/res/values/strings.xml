@@ -191,4 +191,5 @@
     <string name="image_desc">Display the entity\'s profile picture here</string>
     <string name="line_2">Line 2</string>
     <string name="title_activity_new_search">NewSearchActivity</string>
+    <string name="title_activity_image_preview">ImagePreviewActivity</string>
 </resources>

@@ -62,6 +62,7 @@ public class Calls {
     protected static final String GetEventById = "event/getEventById";
     protected static final String GetMyProfile = "user/getMyProfile";
     protected static final String RemoveFriend = "user/removeFriend";
+    protected static final String RemoveAdmin = "group/removeAdmin";
     protected static final String GetAttended = "user/getAttended";
     protected static final String LoginSecure = "user/loginSecure";
     protected static final String EditProfile = "user/editProfile";
@@ -494,6 +495,17 @@ public class Calls {
 
         post(RespondToGroupInvite, params, jsonHttpResponseHandler);
     }
+
+
+    public static void removeAdmin(int adminID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("group_id", groupID);
+        params.put("admin_id", adminID);
+        client.addHeader("Authorization", token);
+
+        post(RemoveAdmin, params, jsonHttpResponseHandler);
+    }
+
 
 
 

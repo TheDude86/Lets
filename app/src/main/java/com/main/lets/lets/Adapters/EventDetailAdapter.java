@@ -182,8 +182,6 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                         mStatus == Event.MemberStatus.HOST ||
                         mStatus == Event.MemberStatus.OWNER) {
 
-                    L.println(EventDetailAdapter.class, "Test");
-
                     EventActions e = new EventActions(mActivity, mEvent, new EventActions.ScreenUpdate() {
                         @Override
                         public void onScreenUpdate() {
@@ -328,18 +326,6 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             mDay = (TextView) itemView.findViewById(R.id.day);
 
 
-        }
-    }
-
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public RelativeLayout mLayout;
-        public TextView mName;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            mLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
-            mName = (TextView) itemView.findViewById(R.id.txt_entity_title);
         }
     }
 

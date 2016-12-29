@@ -1,5 +1,6 @@
 package com.main.lets.lets.Adapters;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.main.lets.lets.Holders.PictureViewHolder;
+import com.main.lets.lets.LetsAPI.BitmapLoader;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.EntityOnClickListener;
 import com.main.lets.lets.R;
@@ -44,7 +47,18 @@ public class SearchEntityAdapter extends RecyclerView.Adapter<SearchEntityAdapte
 
         holder.mTitle.setText(e.mText);
         holder.mDesc.setText(e.mDetail);
-        e.loadImage(mActivity, holder.mImageView);
+
+        if (e.mType == Entity.EntityType.EVENT) {
+            Bitmap b = new BitmapLoader(mActivity, mActivity.getResources()
+                    .getIdentifier("j" + e.mCategory, "drawable", mActivity.getPackageName()))
+                    .decodeSampledBitmapFromResource(70, 70);
+
+            holder.mImageView.setImageBitmap(b);
+
+        } else {
+            e.loadImage(mActivity, holder.mImageView);
+
+        }
 
         if (e.mType == Entity.EntityType.EVENT)
             holder.mRelativeLayout.setOnClickListener(l.OnEventClicked(mActivity));

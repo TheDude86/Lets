@@ -2,19 +2,26 @@ package com.main.lets.lets.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.PictureViewHolder;
+import com.main.lets.lets.LetsAPI.BitmapLoader;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Comment;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.User;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
@@ -22,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 8/23/2016.
@@ -46,15 +55,14 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
 
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
 
         if (mActive == Active.COMMENT) {
             Comment c = mEvent.mComments.get(position - 1);
 
             ((PictureViewHolder) holder).mText.setText(c.mText);
             ((PictureViewHolder) holder).mDetail.setText(c.mDetail);
-
-//            Picasso.with(mActivity).load(c.mPic).into(((PictureViewHolder) holder).mImage);
+            ((PictureViewHolder) holder).loadUserImage(mActivity, c.mAuthorID);
 
         } else {
 
@@ -67,8 +75,9 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
                     Picasso.with(mActivity).load(e.mPic).into(((PictureViewHolder) holder).mImage);
 
                 } else if (e.mCategory != -1) {
-                    Picasso.with(mActivity).load(getImageResourceId(mActivity, e.mCategory))
-                            .into(((PictureViewHolder) holder).mImage);
+                    Bitmap b = new BitmapLoader(mActivity, mActivity.getResources().getIdentifier("j" + e.mCategory, "drawable", mActivity.getPackageName())).decodeSampledBitmapFromResource(70, 70);
+                    ((PictureViewHolder)holder).mImage.setImageBitmap(b);
+
 
                 }
 

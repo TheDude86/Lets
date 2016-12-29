@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.InviteFeed;
 
@@ -33,13 +34,12 @@ public class InviteActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_invite);
 
 
+        UserData d = new UserData(this);
+        ShallonCreamerIsATwat = d.ShallonCreamerIsATwat;
+        mID = d.ID;
+
         String[] buttons = getIntent().getStringExtra("entities").split(":");
 
-        SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(getBaseContext());
-
-        ShallonCreamerIsATwat = preferences.getString("Token", "");
-        mID = preferences.getInt("UserID", -1);
 
         loadFeed(buttons);
 
