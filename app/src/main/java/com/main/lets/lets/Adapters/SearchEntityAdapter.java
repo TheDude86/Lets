@@ -18,6 +18,8 @@ import com.main.lets.lets.R;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by novosejr on 12/17/2016.
  */
@@ -81,7 +83,7 @@ public class SearchEntityAdapter extends RecyclerView.Adapter<SearchEntityAdapte
 
     public class Holder extends RecyclerView.ViewHolder {
         RelativeLayout mRelativeLayout;
-        ImageView mImageView;
+        CircleImageView mImageView;
         TextView mTitle;
         TextView mDesc;
 
@@ -92,7 +94,7 @@ public class SearchEntityAdapter extends RecyclerView.Adapter<SearchEntityAdapte
             mRelativeLayout = (RelativeLayout) itemView.findViewById(R.id.layout_info);
             mTitle = (TextView) itemView.findViewById(R.id.txt_entity_title);
             mDesc = (TextView) itemView.findViewById(R.id.txt_entity_detail);
-            mImageView = (ImageView) itemView.findViewById(R.id.image);
+            mImageView = (CircleImageView) itemView.findViewById(R.id.image);
 
         }
     }
