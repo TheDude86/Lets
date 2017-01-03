@@ -38,9 +38,11 @@
         android:layout_height="wrap_content"
         android:text="Next"
         android:id="@+id/next"
-        android:background="#ffffff"
+        android:background="@drawable/layout_bg"
         android:layout_below="@+id/birthday"
         android:layout_marginTop="37dp"
         android:layout_alignEnd="@+id/textView28"
-        android:layout_alignStart="@+id/textView28" />
+        android:layout_alignStart="@+id/textView28"
+        android:layout_alignRight="@+id/textView28"
+        android:layout_alignLeft="@+id/textView28" />
 </RelativeLayout>

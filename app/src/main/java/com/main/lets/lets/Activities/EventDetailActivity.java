@@ -41,7 +41,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
                 if (!comment.getText().toString().equals("")) {
 
-                    Calls.addComment(mEvent.mID, new UserData(EventDetailActivity.this).ShallonCreamerIsATwat, comment.getText().toString(), new JsonHttpResponseHandler() {
+                    Calls.addComment(mEvent.mID, new UserData(EventDetailActivity.this), comment.getText().toString(), new JsonHttpResponseHandler() {
 
                         @Override
                         public void onSuccess(int statusCode, Header[] headers,

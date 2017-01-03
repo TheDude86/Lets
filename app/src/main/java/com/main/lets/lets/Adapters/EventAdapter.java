@@ -3,6 +3,7 @@ package com.main.lets.lets.Adapters;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.quickAdapter.easyRegularAdapter;
@@ -18,6 +20,8 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Joe on 5/29/2016.
@@ -28,7 +32,7 @@ import java.util.List;
 public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHolder> {
     private static final int DETAIL_CODE = 1;
     String ShallonCreamerIsATwat;
-    Activity mActivity;
+    AppCompatActivity mActivity;
     Event e;
     int mID;
 
@@ -37,7 +41,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
      *
      * @param list the list source
      */
-    public EventAdapter(Activity a, List<String> list, String token, int id) {
+    public EventAdapter(AppCompatActivity a, List<String> list, String token, int id) {
         super(list);
         ShallonCreamerIsATwat = token;
         mActivity = a;
@@ -98,6 +102,16 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
                 }
             });
 
+            final User u = new User(e.getmOwnerID());
+            u.load(mActivity, new User.OnLoadListener() {
+                @Override
+                public void update() {
+
+                    u.loadImage(mActivity, holder.mPicture);
+
+                }
+            });
+
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
@@ -106,6 +120,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
 
     protected class ViewHolder extends UltimateRecyclerviewViewHolder {
         LinearLayout mBackgroundContainer;
+        CircleImageView mPicture;
         ImageView mBackground;
         TextView mLocation;
         TextView mCategory;
@@ -124,6 +139,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             super(itemView);
 
             mBackgroundContainer = (LinearLayout) itemView.findViewById(R.id.eventHolder);
+            mPicture = (CircleImageView) itemView.findViewById(R.id.picture);
             mBackground = (ImageView) itemView.findViewById(R.id.eventImage);
             mLocation = (TextView) itemView.findViewById(R.id.eventLocation);
             mCategory = (TextView) itemView.findViewById(R.id.category);

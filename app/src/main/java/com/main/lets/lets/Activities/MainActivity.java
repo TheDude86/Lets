@@ -27,6 +27,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.ProfilePreviewAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
@@ -57,15 +58,19 @@ import cz.msebera.android.httpclient.Header;
 import org.apache.http.client.ClientProtocolException;
 import java.io.IOException;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     public NotificationFeed mNotificationFeed;
+    public UltimateRecyclerView mRecyclerView;
     public LocationManager mLocationManager;
     public static final int SETTINGS = 0;
-    public UltimateRecyclerView mRecyclerView;
+    public static final int WELCOME = 69;
+    public boolean fromWelcome = false;
     public ProfileFeed mProfileFeed;
     public GlobalFeed mGlobalFeed;
-    public String mActive;
+    public String mActive = "";
+    int mAction = 0;
 
     public static MainActivity mainActivity;
     public static Boolean isVisible = false;
@@ -211,12 +216,8 @@ public class MainActivity extends AppCompatActivity {
 
         registerClient = new RegisterClient(this, BACKEND_ENDPOINT);
 
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.println(Log.ASSERT, TAG, "Refreshed token: " + refreshedToken);
-
-
         mRecyclerView = (UltimateRecyclerView) findViewById(R.id.list);
-
+        mRecyclerView.setBackgroundResource(R.color.relax);
 
         //Gets the location manager to get the phone's location
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -230,6 +231,12 @@ public class MainActivity extends AppCompatActivity {
 
         //Login object used for auto login for returning users
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+       if (!new UserData(this).isLoggedIn() && !fromWelcome) {
+            Intent i = new Intent(this, WelcomeActivity.class);
+            startActivityForResult(i, WELCOME);
+
+        }
 
         Calls.login(preferences.getString("email", ""), preferences.getString("password", ""),
                     new JsonHttpResponseHandler() {
@@ -259,6 +266,16 @@ public class MainActivity extends AppCompatActivity {
                         editor.putInt("UserID", response.getInt("user_id"));
                         editor.putString("Token", "Bearer " + response.getString("accessToken"));
                         editor.apply();
+
+                        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+                        Log.println(Log.ASSERT, TAG, "Refreshed token: " + refreshedToken);
+                        Calls.registerToken(refreshedToken, new UserData(MainActivity.this), new JsonHttpResponseHandler() {
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                L.println(MainActivity.class, response.toString());
+                            }
+                        });
 
                         mGlobalFeed.update(response.getInt("user_id"),
                                            "Bearer " + response.getString("accessToken"));
@@ -304,7 +321,16 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
 
             //Draw the local event feed
-            mGlobalFeed.draw(null);
+            if (fromWelcome && mAction == 0) {
+                findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
+
+                mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
+                mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
+
+            } else {
+                mGlobalFeed.draw(null);
+
+            }
 
             //Saving the active visualizer so the activity knows which feed to draw when
             //onResume is called
@@ -416,12 +442,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
 
-
-                mRecyclerView.setBackgroundResource(R.color.relax);
                 mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
                 mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
-
-//                mProfileFeed.draw(null);
 
                 //Saving the active visualizer so the activity knows which feed to draw when
                 //onResume is called
@@ -437,9 +459,10 @@ public class MainActivity extends AppCompatActivity {
                 ((ImageButton) findViewById(R.id.btn_notifications)).setImageResource(R.drawable.ic_notifications_none_black_24dp);
                 findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
 
-                if (preferences.getString("Token", "").equals("")) {
-                    mActive = mProfileFeed.getClass().toString();
-                    mProfileFeed.draw(null);
+                if (!new UserData(MainActivity.this).isLoggedIn()) {
+                    mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
+                    mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
+
                 }else {
                     mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
                     mActive = mNotificationFeed.getClass().toString();
@@ -453,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.create_event).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, EventCreateActivity.class);
+                Intent i = new Intent(MainActivity.this, NewEventActivity.class);
                 startActivity(i);
 
             }
@@ -463,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.create_group).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, GroupCreateActivity.class);
+                Intent i = new Intent(MainActivity.this, NewGroupActivity.class);
                 startActivity(i);
 
             }
@@ -488,13 +511,12 @@ public class MainActivity extends AppCompatActivity {
         if (mActive.equals(mGlobalFeed.getClass().toString())) {
             mGlobalFeed.draw(null);
 
-        } else if (mActive.equals(mProfileFeed.getClass().toString())) {
+        } else if (mActive.equals(mProfileFeed.getClass().toString()) || mActive.equals("PROFILE")) {
+            findViewById(R.id.btn_add).setVisibility(View.INVISIBLE);
+
             mRecyclerView.setBackgroundResource(R.color.relax);
             mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
             mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
-
-        }else if (mActive.equals(mNotificationFeed.getClass().toString())) {
-            mNotificationFeed.draw(null);
 
         }
 
@@ -574,6 +596,21 @@ public class MainActivity extends AppCompatActivity {
                     mNotificationFeed.draw(null);
                 }
             }
+        } else if (requestCode == WELCOME) {
+            mAction = data.getIntExtra("action", 0);
+            fromWelcome = true;
+
+            if (mAction == 1) {
+                mActive = "PROFILE";
+
+            }else if (mAction == 2){
+                Intent i = new Intent(this, RegisterActivity.class);
+                startActivity(i);
+            }
+
+
+
+
         }
     }
 

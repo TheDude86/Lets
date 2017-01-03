@@ -24,4 +24,9 @@ public class UserData {
 
     }
 
+    public boolean isLoggedIn() {
+        L.println(getClass(), "ID: " + ID);
+        return !(ID == -1);
+    }
+
 }

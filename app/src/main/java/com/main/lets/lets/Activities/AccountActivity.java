@@ -1,5 +1,6 @@
 package com.main.lets.lets.Activities;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,7 +37,7 @@ public class AccountActivity extends AppCompatActivity {
 
                 final AlertDialog.Builder errorBuilder = new AlertDialog.Builder(AccountActivity.this);
 
-                errorBuilder.setTitle("Error");
+                errorBuilder.setTitle("You done goofed");
 
                 errorBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -64,8 +65,11 @@ public class AccountActivity extends AppCompatActivity {
                             if (create.getText().toString().equals("Account Created!")) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(AccountActivity.this);
 
-                                builder.setMessage("You have already created an account, go back to see your profile")
-                                        .setTitle("Account Already Created");
+                                builder.setMessage("We're not quite sure what you're trying to accomplish " +
+                                        "right now but if you want to see your profile, just hit " +
+                                        "that little arrow up top until you see a screen with a list of events.");
+
+                                builder.setTitle("What are you doing?");
 
                                 builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
@@ -77,11 +81,16 @@ public class AccountActivity extends AppCompatActivity {
                                 dialog.show();
 
                             } else {
+
+                                final ProgressDialog loading = ProgressDialog.show(AccountActivity.this, "",
+                                        "Loading. Please wait...", true);
+
                                 Calls.createUser(email.getText().toString(), password.getText().toString(), name, birthday, new JsonHttpResponseHandler() {
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         try {
+                                            loading.hide();
 
                                             if (response.has("accessToken")) {
                                                 create.setText(R.string.account_created);
@@ -97,10 +106,9 @@ public class AccountActivity extends AppCompatActivity {
                                                 editor.putInt("UserID", response.getInt("user_id"));
                                                 editor.apply();
 
-                                                Intent intent = new Intent(AccountActivity.this, CreateDetailActivity.class);
-                                                intent.putExtra("token", "Bearer " + response.getString("accessToken"));
-                                                intent.putExtra("birthday", birthday);
-                                                intent.putExtra("name", name);
+                                                Intent intent = new Intent(AccountActivity.this, UserDetailActivity.class);
+                                                intent.putExtra("UserID", response.getInt("user_id"));
+                                                intent.putExtra("create", true);
                                                 startActivity(intent);
 
                                             } else {
@@ -121,17 +129,23 @@ public class AccountActivity extends AppCompatActivity {
 
 
                         } else {
-                            errorBuilder.setMessage("Your passwords do not match");
+                            errorBuilder.setMessage("Okay so you already screwed up putting in " +
+                                    "your password once because these two don't match, you should " +
+                                    "just start over and try again.");
                             AlertDialog errorDialog = errorBuilder.create();
                             errorDialog.show();
                         }
                     } else {
-                        errorBuilder.setMessage("Password must be at least six characters long");
+                        errorBuilder.setMessage("Your password is bad and should be at least 6 " +
+                                "characters long, I mean come on, how hard is it to remember 6 " +
+                                "characters?");
                         AlertDialog errorDialog = errorBuilder.create();
                         errorDialog.show();
                     }
                 } else {
-                    errorBuilder.setMessage("Email cannot be empty");
+                    errorBuilder.setMessage("You need to put in an email address this what you use " +
+                            "to log in, and don't worry about us selling any of your personal info" +
+                            " to advertising companies... We don't know how to do that");
                     AlertDialog errorDialog = errorBuilder.create();
                     errorDialog.show();
                 }

@@ -192,4 +192,15 @@
     <string name="line_2">Line 2</string>
     <string name="title_activity_new_search">NewSearchActivity</string>
     <string name="title_activity_image_preview">ImagePreviewActivity</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="title_activity_invite_friends_to_group">Invite Friends</string>
+    <string name="title_activity_welcome">Welcome</string>
+    <string name="title_activity_create_new_event">CreateNewEvent</string>
+
+
+    <string-array name="jokes_array">
+        <item>{"joke": "words", "credit" : "name"}</item>
+        <item>{"joke2": "words", "credit" : "name"}</item>
+        <item>{"joke3": "words", "credit" : "name"}</item>
+    </string-array>
 </resources>

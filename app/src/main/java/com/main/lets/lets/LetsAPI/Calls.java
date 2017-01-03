@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageButton;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -43,7 +44,10 @@ public class Calls {
      * links get updated then it is easy to update the client.
      */
 
+
+
     protected static final String BASE_URL = "http://letsapi.azurewebsites.net/";
+    protected static final String NOTIFY_URL = "http://lets-app-server.appspot.com/";
     protected static final String RespondToGroupInvite = "user/respondToGroupInvite";
     protected static final String TransferOwnership = "group/transferOwnership";
     protected static final String SendFriendRequest = "user/sendFriendRequest";
@@ -67,6 +71,7 @@ public class Calls {
     protected static final String LoginSecure = "user/loginSecure";
     protected static final String EditProfile = "user/editProfile";
     protected static final String UnattendEvent = "event/unattend";
+    protected static final String RegisterToken = "push/register";
     protected static final String GetGroupInfo = "group/getInfo";
     protected static final String GetFriends = "user/getFriends";
     protected static final String AddCohost = "event/addCohost";
@@ -75,11 +80,26 @@ public class Calls {
     protected static final String CreateEvent = "event/create";
     protected static final String GroupDelete = "group/delete";
     protected static final String AddAdmin = "group/addAdmin";
+    protected static final String RemoveToken = "push/remove";
     protected static final String LeaveGroup = "group/leave";
     protected static final String SearchName = "search/name";
     protected static final String CreateUser = "user/create";
     protected static final String EditGroup = "group/edit";
 
+
+
+    protected static final String FCMFriendRequest = "friendRequest";
+    protected static final String FCMEventInvite = "eventInvite";
+    protected static final String FCMAddedComment = "addedComment";
+    protected static final String FCMGroupInvite = "groupInvite";
+    protected static final String FCMGroupCommentAdded = "groupCommentAdded";
+    protected static final String FCMGroupInvitedToEvent = "groupInvited";
+
+
+
+    public Calls() {
+
+    }
 
     protected static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -96,6 +116,18 @@ public class Calls {
     }
 
     /**
+     * Base method for making network calls.
+     *
+     * @param url             the extention to be placed on the end of the base URL
+     * @param params          paramteters added to the post requests
+     * @param responseHandler code to be executed for specific events during the call
+     */
+    private static void postFCM(String url, RequestParams params,
+                             AsyncHttpResponseHandler responseHandler) {
+        client.post(getNotifyAbsoluteUrl(url), params, responseHandler);
+    }
+
+    /**
      * build the full URL from the extention.
      *
      * @param relativeUrl
@@ -103,6 +135,17 @@ public class Calls {
      */
     private static String getAbsoluteUrl(String relativeUrl) {
         return BASE_URL + relativeUrl;
+    }
+
+
+    /**
+     * build the full URL from the extention.
+     *
+     * @param relativeUrl
+     * @return
+     */
+    private static String getNotifyAbsoluteUrl(String relativeUrl) {
+        return NOTIFY_URL + relativeUrl;
     }
 
     /**
@@ -251,8 +294,12 @@ public class Calls {
 
     public static void editProfile(HashMap<String, Object> mUserInfo, String token,
                                    JsonHttpResponseHandler jsonHttpResponseHandler) {
+
+        SimpleDateFormat s = new SimpleDateFormat("MM-dd-yyyy", Locale.US);
+        s.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         RequestParams params = new RequestParams();
-        params.put("bday", new SimpleDateFormat("MM-dd-yyyy", Locale.US).format(mUserInfo.get("birthday")));
+        params.put("bday", s.format(mUserInfo.get("birthday")));
         params.put("interests", mUserInfo.get("interests"));
         params.put("edit_user_id", mUserInfo.get("id"));
         params.put("privacy", mUserInfo.get("privacy"));
@@ -298,12 +345,13 @@ public class Calls {
         post(GetGroupComments, params, jsonHttpResponseHandler);
     }
 
-    public static void addGroupComment(int id, String s, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void addGroupComment(int id, String s, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", id);
         params.put("message", s);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
+        groupCommentFCM(d.ID, id, new JsonHttpResponseHandler());
         post(AddGroupComment, params, jsonHttpResponseHandler);
     }
 
@@ -342,21 +390,25 @@ public class Calls {
         post(AddAdmin, params, jsonHttpResponseHandler);
     }
 
-    public static void joinGroup(int userID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void joinGroup(int userID, int groupID, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("invite_user", userID);
         params.put("group_id", groupID);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        if (d.ID != userID)
+            groupInviteFCM(d.ID, userID, groupID, new JsonHttpResponseHandler());
 
         post(GroupInviteUser, params, jsonHttpResponseHandler);
     }
 
-    public static void addComment(int eventID, String token, String message, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void addComment(int eventID, UserData d, String message, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("event_id", eventID);
         params.put("message", message);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
+        addedCommentFCM(d.ID, eventID, new JsonHttpResponseHandler());
         post(EventAddComment, params, jsonHttpResponseHandler);
     }
 
@@ -377,29 +429,34 @@ public class Calls {
         post(SearchName, params, jsonHttpResponseHandler);
     }
 
-    public static void inviteGroupToEvent(int eventID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void inviteGroupToEvent(int eventID, int groupID, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("event_id", eventID);
         params.put("group_id", groupID);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
+        groupInvitedToEventFCM(d.ID, groupID, eventID, new JsonHttpResponseHandler());
         post(InviteGroupToEvent, params, jsonHttpResponseHandler);
     }
 
-    public static void inviteUserToEvent(int eventID, int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void inviteUserToEvent(int eventID, int userID, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("event_id", eventID);
         params.put("invite_user_id", userID);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        if (d.ID != userID)
+            eventInviteFCM(d.ID, userID, eventID, new JsonHttpResponseHandler());
 
         post(InviteUserToEvent, params, jsonHttpResponseHandler);
     }
 
-    public static void sendFriendRequest(int userID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void sendFriendRequest(int userID, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("recieverId", userID);
-        client.addHeader("Authorization", token);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
+        friendRequestFCM(d.ID, userID, new JsonHttpResponseHandler());
         post(SendFriendRequest, params, jsonHttpResponseHandler);
     }
 
@@ -443,6 +500,7 @@ public class Calls {
         params.put("password", password);
         params.put("name", name);
         params.put("bday", birthday);
+        params.put("pic_ref", "http://www.oldpotterybarn.co.uk/wp-content/uploads/2015/06/default-medium.png");
 
         post(CreateUser, params, jsonHttpResponseHandler);
     }
@@ -467,7 +525,7 @@ public class Calls {
         params.put("group_name", title);
         params.put("pic_ref", picRef);
         params.put("public", any);
-        params.put("bio", bio);
+        params.put("bio", (bio.equals("")) ? "Bio" : bio);
         client.addHeader("Authorization", token);
 
         post(CreateGroup, params, jsonHttpResponseHandler);
@@ -496,7 +554,6 @@ public class Calls {
         post(RespondToGroupInvite, params, jsonHttpResponseHandler);
     }
 
-
     public static void removeAdmin(int adminID, int groupID, String token, JsonHttpResponseHandler jsonHttpResponseHandler) {
         RequestParams params = new RequestParams();
         params.put("group_id", groupID);
@@ -505,6 +562,84 @@ public class Calls {
 
         post(RemoveAdmin, params, jsonHttpResponseHandler);
     }
+
+    public static void registerToken(String FCMToken, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("token", FCMToken);
+        params.put("active", true);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        post(RegisterToken, params, jsonHttpResponseHandler);
+    }
+
+    public static void removeToken(String FCMToken, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("token", FCMToken);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        post(RemoveToken, params, jsonHttpResponseHandler);
+    }
+
+
+
+
+
+
+
+
+    public static void friendRequestFCM(int sender, int reciever, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("reciever", reciever);
+
+        postFCM(FCMFriendRequest, params, jsonHttpResponseHandler);
+    }
+
+    public static void eventInviteFCM(int sender, int reciever, int event, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("reciever", reciever);
+        params.put("event", event);
+
+        postFCM(FCMEventInvite, params, jsonHttpResponseHandler);
+    }
+
+    public static void addedCommentFCM(int sender, int event, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("event", event);
+
+        postFCM(FCMAddedComment, params, jsonHttpResponseHandler);
+    }
+
+    public static void groupInviteFCM(int sender, int reciever, int groupID, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("reciever", reciever);
+        params.put("group", groupID);
+
+        postFCM(FCMGroupInvite, params, jsonHttpResponseHandler);
+    }
+
+    public static void groupCommentFCM(int sender, int groupID, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("group", groupID);
+
+        postFCM(FCMGroupCommentAdded, params, jsonHttpResponseHandler);
+    }
+
+    public static void groupInvitedToEventFCM(int sender, int groupID, int eventID, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("sender", sender);
+        params.put("group", groupID);
+        params.put("event", eventID);
+
+        postFCM(FCMGroupInvitedToEvent, params, jsonHttpResponseHandler);
+    }
+
+
+
 
 
 

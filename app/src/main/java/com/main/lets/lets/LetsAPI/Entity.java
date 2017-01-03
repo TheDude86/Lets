@@ -31,9 +31,9 @@ public class Entity extends Client {
     public static final int UTITLITY_HEADER = 0;
     public static final int UTITLITY_LOADMORE = 1;
 
-    public EntityType mType;
+    public boolean mStatus = true;
     public Drawable mPicture;
-    public boolean mStatus;
+    public EntityType mType;
     public String mDetail;
     public int mCategory;
     public String mText;

@@ -1,5 +1,6 @@
 package com.main.lets.lets.Adapters;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -287,8 +288,6 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
                                     public void onSuccess(int statusCode, Header[] headers,
                                                           JSONObject response) {
 
-                                        L.println(ProfilePreviewAdapter.class, response.toString());
-
                                         if (response.has("accessToken")) {
                                             try {
                                                 SharedPreferences preferences = PreferenceManager
@@ -318,6 +317,11 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
 
                                         } else {
 
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                                            builder.setTitle("You shall not pass");
+                                            builder.setMessage("Your email or password is wrong, you should look into that");
+                                            builder.setPositiveButton("Okay", null);
+                                            builder.create().show();
 
                                         }
 

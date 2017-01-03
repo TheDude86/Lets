@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +25,11 @@ import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Dialogs.EventActions;
 import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
+import com.main.lets.lets.LetsAPI.EventEntity;
 import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 
 import org.json.JSONException;
@@ -111,7 +117,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                 if (mStatus == Event.MemberStatus.GUEST) {
 
                     Calls.inviteUserToEvent(mEvent.getmEventID(), preferences.getInt("UserID", -1),
-                            preferences.getString("Token", ""), new JsonHttpResponseHandler() {
+                            new UserData(mActivity), new JsonHttpResponseHandler() {
 
                                 @Override
                                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -126,7 +132,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             case R.id.action2:
                 if (mStatus == Event.MemberStatus.INVITE) {
                     Calls.inviteUserToEvent(mEvent.getmEventID(), preferences.getInt("UserID", -1),
-                            preferences.getString("Token", ""), new JsonHttpResponseHandler() {
+                            new UserData(mActivity), new JsonHttpResponseHandler() {
 
                                 @Override
                                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -268,10 +274,67 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         for (int i = 0; i < length; i++) {
             mEvent.mMembers.get(i).loadImage(mActivity, members[i]);
         }
+
+        h.mAttendanceList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showAttendance();
+
+            }
+        });
     }
 
 
+    public void showAttendance() {
+
+
+            final ArrayList<Entity> entityFeed = mEvent.mMembers;
+
+            SearchEntityAdapter adapter = new SearchEntityAdapter(entityFeed, mActivity);
+
+            View view = View.inflate(mActivity, R.layout.dialog_search_entity, null);
+            final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.view);
+            SearchView searchView = (SearchView) view.findViewById(R.id.search);
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    ArrayList<Entity> newFeed = new ArrayList<>();
+
+                    for (Entity e: entityFeed) {
+                        if (e.mText.toLowerCase().contains(newText.toLowerCase()))
+                            newFeed.add(e);
+                    }
+
+                    SearchEntityAdapter adapter = new SearchEntityAdapter(newFeed, mActivity);
+                    recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+                    recyclerView.setAdapter(adapter);
+
+                    return false;
+                }
+            });
+
+            recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+            recyclerView.setAdapter(adapter);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            builder.setTitle("People Interested");
+            builder.setView(view);
+            builder.setNegativeButton("Cancel", null);
+            builder.create().show();
+
+
+
+    }
+
     public class MainHolder extends RecyclerView.ViewHolder {
+        public LinearLayout mAttendanceList;
         public RelativeLayout mButton1;
         public RelativeLayout mButton2;
         public RelativeLayout mButton3;
@@ -301,6 +364,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         public MainHolder(View itemView) {
             super(itemView);
 
+            mAttendanceList = (LinearLayout) itemView.findViewById(R.id.attendance);
             mDescription = (TextView) itemView.findViewById(R.id.event_description);
             mActionBar = (LinearLayout) itemView.findViewById(R.id.actionBar);
             mLocation = (TextView) itemView.findViewById(R.id.event_location);
@@ -324,6 +388,8 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             mAction4 = (TextView) itemView.findViewById(R.id.text4);
             mMonth = (TextView) itemView.findViewById(R.id.month);
             mDay = (TextView) itemView.findViewById(R.id.day);
+
+
 
 
         }

@@ -146,6 +146,18 @@ public class Group extends Entity{
 
     }
 
+    public void saveGroup(AppCompatActivity a, final User.OnLoadListener l) {
+
+        Calls.editGroup(mID, mTitle, mBio, isPublic, isHidden, pic_ref, (new UserData(a).ShallonCreamerIsATwat), new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                l.update();
+            }
+        });
+
+    }
+
     public interface OnLoadListener {
         void OnUpdate();
 

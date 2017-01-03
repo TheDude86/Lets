@@ -11,12 +11,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.EntityViewHolder;
 import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.Holders.UserDetailViewHolder;
+import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.User;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
@@ -26,17 +31,20 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import cz.msebera.android.httpclient.Header;
+
 /**
  * Created by Joe on 6/30/2016.
  */
 public class UserDetailAdapter extends FeedAdapter {
-    public UserDetailActivity.Relationship mRelationship;
     public UserDetailViewHolder mHolder;
+    public boolean isEditing = false;
+    public User mUser;
 
-    public UserDetailAdapter(AppCompatActivity a, JSONObject j, UserDetailActivity.Relationship r) {
-        mList.add(j.toString());
-        mRelationship = r;
+    public UserDetailAdapter(AppCompatActivity a, User u) {
+        mList.add("S");
         mActivity = a;
+        mUser = u;
 
     }
 
@@ -49,7 +57,7 @@ public class UserDetailAdapter extends FeedAdapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == 0)
             return new UserDetailViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.row_profile, parent, false));
+                    .inflate(R.layout.row_profile, parent, false), mUser, mActivity, isEditing);
 
         return new PictureViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_entity_with_picture, parent, false));
@@ -68,58 +76,35 @@ public class UserDetailAdapter extends FeedAdapter {
 
     private void loadProfile(RecyclerView.ViewHolder holder) {
         mHolder = (UserDetailViewHolder) holder;
-        try {
-            JSONObject json = new JSONObject(mList.get(0));
-            JSONObject interests = json.getJSONObject("interests");
 
-            mHolder.mScore.setText("Score: " + json.getInt("Score"));
-            mHolder.mName.setText(json.getString("User_Name"));
-            mHolder.mBio.setText(json.getString("Biography"));
+        mHolder.mScore.setText("Score: " + mUser.getScore());
+        mHolder.mName.setText(mUser.getName());
+        mHolder.mBio.setText(mUser.getBio());
 
-            setUsers(mHolder.mFriendsButton);
-            setEvents(mHolder.mEventsButton);
-            setGroups(mHolder.mGroupsButton);
+        setUsers(mHolder.mFriendsButton);
+        setEvents(mHolder.mEventsButton);
+        setGroups(mHolder.mGroupsButton);
 
-            mHolder.mOptions.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    ActionDialogFragment f = new ActionDialogFragment(mActivity);
-                    f.show(mActivity.getFragmentManager(), "Test");
-
-                }
-            });
-
-            String interestString = "";
-            Iterator<String> keys = interests.keys();
-
-            while (keys.hasNext()){
-                String key = keys.next();
-                if (interests.getBoolean(key)) {
-                    if (interestString.length() == 0)
-                        interestString = key;
-                    else
-                        interestString += ", " + key;
-
-                }
-            }
-
-            mHolder.mInterests.setText(interestString);
-
-
-            Picasso.with(mActivity).load(json.getString("Profile_Picture")).into(mHolder.mPic);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        ((UserDetailViewHolder) holder).mName.setOnClickListener(new View.OnClickListener() {
+        mHolder.mOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addElement("poo");
+
+                ActionDialogFragment f = new ActionDialogFragment(mActivity);
+                f.show(mActivity.getFragmentManager(), "Test");
+
             }
         });
+
+        mHolder.mInterests.setText(mUser.getInterestsString());
+        mUser.loadImage(mActivity, mHolder.mPic);
+
+    }
+
+    public void notifyNewPicture(String url) {
+
+        mUser.setPropic(url);
+        mUser.loadImage(mActivity, mHolder.mPic);
+
     }
 
     @Override
@@ -144,10 +129,21 @@ public class UserDetailAdapter extends FeedAdapter {
 
     }
 
+    public void notifyFromCreate() {
+        isEditing = true;
+
+        if (mHolder != null) {
+            mHolder.setEditing(true);
+            mHolder.setEditToolbar();
+
+        }
+
+    }
+
     @SuppressLint("ValidFragment")
     public class ActionDialogFragment extends DialogFragment {
-        CharSequence[] mList = {"Report", "Block"};
-        CharSequence[] mFriendList = {"Report", "Block", "Unfriend"};
+        CharSequence[] mList = {"Report"};
+        CharSequence[] mFriendList = {"Report", "Unfriend"};
 
 
         AppCompatActivity mActivity;
@@ -162,7 +158,7 @@ public class UserDetailAdapter extends FeedAdapter {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final CharSequence[] list;
 
-            if (mRelationship == UserDetailActivity.Relationship.FRIEND)
+            if (mUser.mRelationship == User.Relationship.FRIEND)
                 list = mFriendList;
             else
                 list = mList;
@@ -201,6 +197,29 @@ public class UserDetailAdapter extends FeedAdapter {
 
                     break;
                 case "Unfriend":
+
+                    AlertDialog.Builder build = new AlertDialog.Builder(mActivity);
+                    build.setTitle("Remove Friend?");
+                    build.setMessage("Do you want to remove this person as a friend?");
+                    build.setNegativeButton("Cancel", null);
+                    build.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            UserData d = new UserData(mActivity);
+                            Calls.removeFriend(mUser.mID, d.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    mHolder.setGuestToolbar();
+                                    mHolder.setSearchToolbar();
+
+                                }
+                            });
+
+                        }
+                    });
+
+                    build.create().show();
 
                     break;
 

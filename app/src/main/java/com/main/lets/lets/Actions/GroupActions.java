@@ -11,6 +11,7 @@ import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Adapters.GroupDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.main.lets.lets.Visualizers.GroupDetailFeed;
 import com.rey.material.app.Dialog;
@@ -76,70 +77,6 @@ public class GroupActions implements View.OnClickListener {
                                                                                       "wait...",
                                                                               true);
                             EditText e = (EditText) fragment.getDialog().findViewById(R.id.text);
-                            try {
-                                Calls.addGroupComment(
-                                        mJSON.getJSONArray("Group_info").getJSONObject(0)
-                                                .getInt("group_id"), e.getText().toString(),
-                                        mFeed.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
-                                            @Override
-                                            public void onSuccess(int statusCode, Header[] headers,
-                                                                  org.json.JSONObject response) {
-                                                try {
-                                                    Calls.getGroupComments(
-                                                            mJSON.getJSONArray("Group_info")
-                                                                    .getJSONObject(0)
-                                                                    .getInt("group_id"),
-                                                            mFeed.ShallonCreamerIsATwat,
-                                                            new JsonHttpResponseHandler() {
-                                                                @Override
-                                                                public void onSuccess(
-                                                                        int statusCode,
-                                                                        Header[] headers,
-                                                                        org.json.JSONArray
-                                                                                response) {
-                                                                    for (int i = 0; i < response
-                                                                            .length(); i++) {
-                                                                        try {
-                                                                            mFeed.mAdapter.mComments
-                                                                                    .add(response.getJSONObject(
-                                                                                            i).toString());
-                                                                            dialog.hide();
-                                                                        } catch (JSONException e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-//                                                                draw(mJSON);
-
-                                                                }
-
-                                                                @Override
-                                                                public void onFailure(
-                                                                        int statusCode,
-                                                                        Header[] headers,
-                                                                        Throwable throwable,
-                                                                        JSONObject errorResponse) {
-
-                                                                }
-
-                                                            });
-                                                } catch (JSONException e1) {
-                                                    e1.printStackTrace();
-                                                }
-
-                                            }
-
-                                            @Override
-                                            public void onFailure(int statusCode, Header[] headers,
-                                                                  Throwable throwable,
-                                                                  JSONObject errorResponse) {
-
-                                            }
-
-                                        });
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
-
 
                             super.onPositiveActionClicked(fragment);
                         }

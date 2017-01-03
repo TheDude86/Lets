@@ -21,6 +21,7 @@ import com.main.lets.lets.Adapters.GroupDetailAdapter;
 import com.main.lets.lets.Adapters.UserDetailAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.R;
 
 import org.json.JSONArray;
@@ -35,25 +36,21 @@ import cz.msebera.android.httpclient.Header;
  * Created by jnovosel on 6/24/16.
  */
 public class UserDetailFeed extends Client {
-    public UserDetailActivity.Relationship mRelationship;
-
     String ShallonCreamerIsATwat;
     UserDetailAdapter mAdapter;
     RecyclerView mRecyclerView;
     AppCompatActivity mActivity;
-    JSONObject mJSON;
+    User mUser;
 
-    public UserDetailFeed(AppCompatActivity a, RecyclerView recyclerView, JSONObject j,
-                          String token, UserDetailActivity.Relationship r) {
+    public UserDetailFeed(AppCompatActivity a, RecyclerView recyclerView, User u,
+                          String token) {
 
         ShallonCreamerIsATwat = token;
         mRecyclerView = recyclerView;
-
-        mRelationship = r;
         mActivity = a;
-        mJSON = j;
+        mUser = u;
 
-        mAdapter = new UserDetailAdapter(mActivity, mJSON, mRelationship);
+        mAdapter = new UserDetailAdapter(mActivity, mUser);
 
 
         try {
@@ -85,7 +82,7 @@ public class UserDetailFeed extends Client {
      */
     public void loadGroups() throws JSONException {
 
-        Calls.getGroups(mJSON.getInt("User_ID"), ShallonCreamerIsATwat,
+        Calls.getGroups(mUser.mID, ShallonCreamerIsATwat,
                         new JsonHttpResponseHandler() {
                             /**
                              * When the call is made, it returns a JSON array object of all of
@@ -129,7 +126,7 @@ public class UserDetailFeed extends Client {
      */
     public void loadAttend() throws JSONException {
         //Call to get the events the user is attending/ attended
-        Calls.getAttended(mJSON.getInt("User_ID"), ShallonCreamerIsATwat,
+        Calls.getAttended(mUser.mID, ShallonCreamerIsATwat,
                           new JsonHttpResponseHandler() {
                               /**
                                * When the call is made, it returns a JSON array object of all of
@@ -146,7 +143,8 @@ public class UserDetailFeed extends Client {
                                   try {
                                       for (int i = 0; i < response.length(); i++) {
                                           //Loads the events in the temporary array list
-                                          mAdapter.mEvents.add(response.getJSONObject(i).toString());
+                                          if (response.getJSONObject(i).getBoolean("status"))
+                                              mAdapter.mEvents.add(response.getJSONObject(i).toString());
 
                                       }
 
@@ -167,7 +165,7 @@ public class UserDetailFeed extends Client {
      */
     public void loadFriends() throws JSONException {
         //Call to get the user's friends
-        Calls.getFriends(mJSON.getInt("User_ID"), new JsonHttpResponseHandler() {
+        Calls.getFriends(mUser.mID, new JsonHttpResponseHandler() {
             /**
              * When the call is made, it returns a JSON array object of all of
              * the friends the user attends.  The JSON objects from the array are
@@ -198,8 +196,8 @@ public class UserDetailFeed extends Client {
                 }
 
                 mAdapter.mHolder.mFriends.setText(mAdapter.mUsers.size() +
-                                                          ((mAdapter.mUsers.size() > 1) ? " Friends" :
-                                                                  " Friend"));
+                                                          ((mAdapter.mUsers.size() == 1) ? " Friend" :
+                                                                  " Friends"));
 
                 for (String l : mAdapter.mUsers)
                     mAdapter.addElement(l);
@@ -210,5 +208,13 @@ public class UserDetailFeed extends Client {
 
     }
 
+    public void notifyNewPicture(String url) {
+        mAdapter.notifyNewPicture(url);
 
+    }
+
+
+    public void notifyFromCreate() {
+        mAdapter.notifyFromCreate();
+    }
 }

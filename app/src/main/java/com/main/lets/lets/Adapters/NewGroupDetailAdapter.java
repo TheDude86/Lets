@@ -16,13 +16,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -35,6 +38,7 @@ import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Group;
 import com.main.lets.lets.LetsAPI.IntentDecorator;
 import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
@@ -61,7 +65,6 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mGroup = g;
 
     }
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -92,13 +95,20 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mHolder.mBio.setText(mGroup.getmBio());
             mGroup.loadImage(mActivity, mHolder.mGroupPic);
 
+            mHolder.mMembersList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showMembers();
+                }
+            });
+
         } else {
             CommentHolder h = (CommentHolder) holder;
             Comment c = mGroup.mComments.get(position - 1);
 
             h.mAuthor.setText(c.mText);
             h.mComment.setText(c.mDetail);
-            c.loadImage(mActivity, h.mPic);
+            h.loadUser(c.mAuthorID);
 
         }
 
@@ -123,9 +133,65 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         }
 
+        public void loadUser(int userID) {
+
+            final User u = new User(userID);
+            u.load(mActivity, new User.OnLoadListener() {
+                @Override
+                public void update() {
+                    u.loadImage(mActivity, mPic);
+                }
+            });
+
+        }
+
 
     }
 
+    public void showMembers() {
+        final ArrayList<Entity> entityFeed = mGroup.mMembers;
+
+        SearchEntityAdapter adapter = new SearchEntityAdapter(entityFeed, mActivity);
+
+        View view = View.inflate(mActivity, R.layout.dialog_search_entity, null);
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.view);
+        SearchView searchView = (SearchView) view.findViewById(R.id.search);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                ArrayList<Entity> newFeed = new ArrayList<>();
+
+                for (Entity e: entityFeed) {
+                    if (e.mText.toLowerCase().contains(newText.toLowerCase()))
+                        newFeed.add(e);
+                }
+
+                SearchEntityAdapter adapter = new SearchEntityAdapter(newFeed, mActivity);
+                recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+                recyclerView.setAdapter(adapter);
+
+                return false;
+            }
+        });
+
+        recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+        recyclerView.setAdapter(adapter);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        builder.setTitle("Members");
+        builder.setView(view);
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
+
+
+
+    }
 
     public void notifyNewImage(Bitmap b) {
         mHolder.updatePhoto(b);
@@ -142,6 +208,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public class MainHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView[] mMembers = new ImageView[5];
+        LinearLayout mMembersList;
         RelativeLayout mAction1;
         RelativeLayout mAction2;
         RelativeLayout mAction3;
@@ -163,6 +230,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public MainHolder(View itemView) {
             super(itemView);
 
+            mMembersList = (LinearLayout) itemView.findViewById(R.id.members);
             mAction1 = (RelativeLayout) itemView.findViewById(R.id.action1);
             mAction2 = (RelativeLayout) itemView.findViewById(R.id.action2);
             mAction3 = (RelativeLayout) itemView.findViewById(R.id.action3);
@@ -405,7 +473,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                                                   "Joining group. Please wait...",
                                                                   true);
 
-                Calls.joinGroup(d.ID, mGroup.mID, d.ShallonCreamerIsATwat,
+                Calls.joinGroup(d.ID, mGroup.mID, d,
                                 new JsonHttpResponseHandler() {
 
 

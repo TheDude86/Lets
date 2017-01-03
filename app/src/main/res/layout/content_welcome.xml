@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.main.lets.lets.Activities.WelcomeActivity"
+    tools:showIn="@layout/activity_welcome">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Welcome to Lets!"
+        android:id="@+id/textView59"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:textSize="35dp"
+        android:textColor="#000" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="While you don&apos;t have to log in to use the app, some features will not be availible until you create an account"
+        android:id="@+id/textView60"
+        android:layout_below="@+id/textView59"
+        android:layout_centerHorizontal="true"
+        android:textColor="#000"
+        android:gravity="center" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView14"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/layout_bg"
+        android:src="@mipmap/logo"
+        android:layout_below="@+id/textView60"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:id="@+id/login"
+        android:layout_below="@+id/imageView14"
+        android:layout_alignLeft="@+id/create"
+        android:layout_alignStart="@+id/create"
+        android:layout_alignRight="@+id/create"
+        android:layout_alignEnd="@+id/create"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/layout_bg" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:id="@+id/create"
+        android:layout_below="@+id/login"
+        android:layout_alignRight="@+id/guest"
+        android:layout_alignEnd="@+id/guest"
+        android:layout_alignLeft="@+id/guest"
+        android:layout_alignStart="@+id/guest"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/layout_bg" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="   Access as Guest   "
+        android:id="@+id/guest"
+        android:layout_below="@+id/create"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/layout_bg" />
+</RelativeLayout>

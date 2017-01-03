@@ -36,7 +36,10 @@ public class DateActivity extends AppCompatActivity {
                 } else {
                     AlertDialog.Builder errorBuilder = new AlertDialog.Builder(DateActivity.this);
 
-                    errorBuilder.setMessage("You must select a birthday").setTitle("Error");
+                    errorBuilder.setMessage("Unless you're some celestial being with no age you " +
+                            "were born into this world and we need that date for science reasons.");
+
+                    errorBuilder.setTitle("You have to have a birthday");
 
                     errorBuilder.setPositiveButton("Okay", null);
 

@@ -43,7 +43,7 @@
         android:id="@+id/next"
         android:layout_below="@+id/last"
         android:layout_marginTop="37dp"
-        android:background="#ffffff"
+        android:background="@drawable/layout_bg"
         android:layout_centerHorizontal="true"/>
 
     <TextView

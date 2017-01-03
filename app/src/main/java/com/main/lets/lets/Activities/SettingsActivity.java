@@ -44,9 +44,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Login;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
@@ -867,6 +869,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
 
             loggedOut = true;
+
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+
+            Calls.removeToken(refreshedToken, new UserData(getActivity()), new JsonHttpResponseHandler());
+
             Login.clearInfo(getActivity().getBaseContext());
             getActivity().setResult(RESULT_OK, new Intent(getActivity(), MainActivity.class));
             getActivity().finish();

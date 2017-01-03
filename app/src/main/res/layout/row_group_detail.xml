@@ -241,7 +241,8 @@
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:background="#dadada">
+            android:background="#dadada"
+            android:id="@+id/members">
 
             <ImageView
                 android:layout_width="40dp"

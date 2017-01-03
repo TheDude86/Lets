@@ -26,6 +26,7 @@ import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.EditText;
@@ -94,7 +95,7 @@ public class EventDetailFeed extends Client {
 
 
                                     } else {
-                                        Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                        Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, new UserData(mActivity), new JsonHttpResponseHandler() {
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                                 mEventAdapter.mStatus = Event.MemberStatus.MEMBER;
@@ -291,7 +292,7 @@ public class EventDetailFeed extends Client {
                                     "Loading. Please " +
                                             "wait...",
                                     true);
-                            Calls.addComment(event.getmEventID(), preferences.getString("Token", ""),
+                            Calls.addComment(event.getmEventID(), new UserData(mActivity),
                                     e.getText().toString(),
                                     new JsonHttpResponseHandler() {
                                         @Override

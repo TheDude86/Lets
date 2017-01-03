@@ -1,20 +1,24 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -22,16 +26,21 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/12/2016.
  */
 public class User extends Entity {
-    private ArrayList<Entity> mFriends = new ArrayList<>();
+    public enum Relationship {NONE, SENT, RECIEVED, FRIEND, OWNER}
+
+    public HashMap<String, Boolean> mInterests = new HashMap<>();
     public ArrayList<EventEntity> mEvents = new ArrayList<>();
-    private LinkedList<Group> mGroups;
-    private OnLoadListener mLoad;
+    public ArrayList<Entity> mFriends = new ArrayList<>();
+    public ArrayList<Entity> mGroups = new ArrayList<>();
+    public Relationship mRelationship = Relationship.NONE;
+    private LinkedList<Group> mGroupList;
     private Timestamp birthday;
     private boolean gender;
     private boolean active;
     private int ownerList;
     private String propic;
     private int interests;
+    public int genderInt;
     private String name;
     private int friends;
     private String bio;
@@ -42,7 +51,7 @@ public class User extends Entity {
     public User(int id, String name, String bio, int events, int score, Timestamp birthday, int friends, boolean active, int ownerList) {
         super(id, name, EntityType.USER);
 
-        mGroups = new LinkedList<>();
+        mGroupList = new LinkedList<>();
         this.setOwnerList(ownerList);
         this.setBirthday(birthday);
         this.setFriends(friends);
@@ -65,22 +74,199 @@ public class User extends Entity {
         this.setInterests(j.getInt("Interests"));
         this.setName(j.getString("User_Name"));
         this.setBio(j.getString("Biography"));
+        this.genderInt = j.getInt("Gender");
         this.setUserID(j.getInt("User_ID"));
         this.setScore(j.getInt("Score"));
-        mGroups = new LinkedList<>();
+        mGroupList = new LinkedList<>();
+
+        L.println(getClass(), j.toString());
 
     }
 
-    public User (int i) {
+    public User(int i) {
         super(i, "NULL", EntityType.USER);
 
+    }
+
+    public void loadFull(final AppCompatActivity a, final OnLoadListener load) {
+        load(a, new OnLoadListener() {
+            @Override
+            public void update() {
+
+                final int ID = new UserData(a).ID;
+
+                if (ID == userID) {
+                    mRelationship = Relationship.OWNER;
+                }
+
+                Calls.getFriends(mID, new JsonHttpResponseHandler() {
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers,
+                                          JSONArray response) {
+
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                if (response.getJSONObject(i).getBoolean("status"))
+                                    mFriends.add(new Entity(response.getJSONObject(i)));
+
+                                if (response.getJSONObject(i)
+                                        .getInt("user_id") == ID) {
+                                    if (response.getJSONObject(i)
+                                            .getInt("sender") == ID)
+                                        mRelationship = Relationship.SENT;
+                                    else
+                                        mRelationship = Relationship.RECIEVED;
+
+                                    if (response.getJSONObject(i)
+                                            .getBoolean("status")) {
+                                        mRelationship = Relationship.FRIEND;
+                                    }
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        UserData d = new UserData(a);
+
+                        Calls.getGroups(mID, d.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                                for (int i = 0; i < response.length(); i++) {
+                                    try {
+                                        mGroups.add(new Entity(response.getJSONObject(i)));
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+
+                                load.update();
+
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    public void saveUser(final AppCompatActivity a, final OnLoadListener load) {
+        String token = new UserData(a).ShallonCreamerIsATwat;
+        HashMap<String, Object> info = new HashMap<>();
+
+        String s = "";
+
+        Set<String> interestList = mInterests.keySet();
+
+        for (String str : interestList) {
+            if (mInterests.get(str))
+                s = s + str + ",";
+
+        }
+
+        if (s.endsWith(","))
+            s = s.substring(0, s.length() - 1);
+
+        if (s.equals("")) {
+            {
+                final CharSequence[] items = {" Party ", " Eating & Drinking ", " Studying ",
+                        " TV & Movies ", " Video Games ", " Sports ", " Music ", " Relax ",
+                        " Other "};
+                // arraylist to keep the selected items
+
+                final boolean[] interests = new boolean[mInterests.size()];
+
+                final String[] categories = {"Party",
+                        "Eat/Drink",
+                        "Study",
+                        "TV/Movies",
+                        "Video Games",
+                        "Sports",
+                        "Music",
+                        "Relax",
+                        "Other"};
+
+                for (int i = 0; i < interests.length; i++) {
+                    interests[i] = mInterests.get(categories[i]);
+
+                }
+
+                AlertDialog mainDialog = new AlertDialog.Builder(a)
+                        .setTitle("You must select at least one interest")
+                        .setCancelable(true)
+                        .setMultiChoiceItems(items, interests,
+                                new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int indexSelected, boolean isChecked) {
+                                        interests[indexSelected] = isChecked;
+
+                                    }
+                                })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                for (int i = 0; i < categories.length; i++) {
+                                    mInterests.put(categories[i], interests[i]);
+
+                                }
+
+                                saveUser(a, new User.OnLoadListener() {
+                                    @Override
+                                    public void update() {
+                                        load.update();
+                                    }
+                                });
+
+
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        }).create();
+                mainDialog.show();
+
+
+            }
+
+        } else {
+            info.put("interests", s);
+            info.put("birthday", new Date(birthday.getTime()));
+            info.put("id", mID);
+            info.put("privacy", 0);
+            info.put("picRef", propic);
+            info.put("gender", genderInt);
+            info.put("name", name);
+            info.put("bio", bio);
+
+            Calls.editProfile(info, token, new JsonHttpResponseHandler() {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    L.println(User.class, response.toString());
+                    load.update();
+                }
+            });
+
+        }
     }
 
     public void load(final AppCompatActivity a, final OnLoadListener load) {
 
         final UserData u = new UserData(a);
 
-        Calls.getProfileByID(u.ID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+        Calls.getProfileByID(mID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -95,16 +281,23 @@ public class User extends Entity {
                     setInterests(j.getInt("Interests"));
                     setName(j.getString("User_Name"));
                     setBio(j.getString("Biography"));
+                    genderInt = j.getInt("Gender");
                     setUserID(j.getInt("User_ID"));
                     setScore(j.getInt("Score"));
 
+                    JSONObject interests = response.getJSONObject("interests");
+                    Iterator<String> i = interests.keys();
 
-                    Calls.getAttended(u.ID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                    while (i.hasNext()) {
+                        String s = i.next();
+                        mInterests.put(s, interests.getBoolean(s));
+
+                    }
+
+                    Calls.getAttended(mID, u.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-
-                            L.println(User.class, response.toString());
 
                             for (int i = 0; i < response.length(); i++) {
                                 try {
@@ -132,6 +325,22 @@ public class User extends Entity {
 
     }
 
+    public String getInterestsString() {
+        String s = "";
+
+        Set<String> interests = mInterests.keySet();
+
+        for (String str: interests) {
+            if (mInterests.get(str))
+                s = s + str + ", ";
+
+        }
+
+        if (s.endsWith(", "))
+            s = s.substring(0, s.length() - 2);
+
+        return s;
+    }
 
     public int getUserID() {
         return this.userID;
@@ -227,12 +436,12 @@ public class User extends Entity {
         this.birthday = birthday;
     }
 
-    public LinkedList<Group> getmGroups() {
-        return mGroups;
+    public LinkedList<Group> getmGroupList() {
+        return mGroupList;
     }
 
-    public void setmGroups(LinkedList<Group> mGroups) {
-        this.mGroups = mGroups;
+    public void setmGroupList(LinkedList<Group> mGroupList) {
+        this.mGroupList = mGroupList;
     }
 
     public String getPropic() {

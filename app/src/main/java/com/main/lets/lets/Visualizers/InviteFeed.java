@@ -11,6 +11,7 @@ import com.main.lets.lets.Adapters.SearchAdapter;
 import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.Dialog;
 import com.rey.material.app.DialogFragment;
@@ -89,7 +90,7 @@ public class InviteFeed extends Client {
             public void onClick(View v) {
                 if (mActive == Mode.U2GFG) {
                     for (final Integer i : mSelectedUsers) {
-                        Calls.joinGroup(i, inviteID, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                        Calls.joinGroup(i, inviteID, new UserData(mActivity), new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
@@ -102,7 +103,7 @@ public class InviteFeed extends Client {
                 } else if (mActive == Mode.UG2EFE) {
 
                     for (final Integer i : mSelectedGroups) {
-                        Calls.inviteGroupToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                        Calls.inviteGroupToEvent(inviteID, i, new UserData(mActivity), new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 super.onSuccess(statusCode, headers, response);
@@ -113,7 +114,7 @@ public class InviteFeed extends Client {
                     }
 
                     for (final Integer i : mSelectedUsers) {
-                        Calls.inviteUserToEvent(inviteID, i, ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                        Calls.inviteUserToEvent(inviteID, i, new UserData(mActivity), new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 
@@ -164,7 +165,7 @@ public class InviteFeed extends Client {
                             super.onPositiveActionClicked(fragment);
                             try {
                                 Calls.inviteGroupToEvent(new Entity(list.getJSONObject(position)).mID,
-                                        mInviteID, ShallonCreamerIsATwat, new JsonHttpResponseHandler(){
+                                        mInviteID, new UserData(mActivity), new JsonHttpResponseHandler(){
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         mActivity.finish();

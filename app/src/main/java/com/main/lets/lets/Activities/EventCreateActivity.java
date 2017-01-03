@@ -48,9 +48,9 @@ public class EventCreateActivity extends AppCompatActivity {
     private HashMap<String, String> mMap;
     private String ShallonCreamerIsATwat;
     private EditText mLocationLabel;
+    private Calendar mCalendar;
     private EditText mLocation;
     private LatLng mCoords;
-    private Calendar mCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +110,6 @@ public class EventCreateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mMap.put("Hidden", (isPrivate.isChecked()) ? "false" : "true");
-                L.println(Calls.class, mMap.get("Public"));
 
             }
         });

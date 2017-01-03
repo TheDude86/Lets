@@ -30,19 +30,26 @@ public class RegisterActivity extends AppCompatActivity {
                         assert name != null;
                         assert last != null;
                         Intent intent = new Intent(RegisterActivity.this, DateActivity.class);
-                        intent.putExtra("name", name.getText().toString());
-                        intent.putExtra("last", last.getText().toString());
+                        intent.putExtra("name", name.getText().toString() + " " + last.getText().toString());
                         startActivity(intent);
 
                     } else {
-                        errorBuilder.setMessage("You must fill in a last name").setTitle("Error");
+                        errorBuilder.setMessage("We're skeptical you have no name, if you can " +
+                                "prove you don't have one then you can make an account without a " +
+                                "name but until then, fill out something.");
+
+                        errorBuilder.setTitle("You seriously have no name?");
 
                         AlertDialog errorDialog = errorBuilder.create();
                         errorDialog.show();
                     }
                 } else {
 
-                    errorBuilder.setMessage("You must fill in a name").setTitle("Error");
+                    errorBuilder.setMessage("We're skeptical you have no name, if you can " +
+                            "prove you don't have one then you can make an account without a " +
+                            "name but until then, fill out something.");
+
+                    errorBuilder.setTitle("You seriously have no name?");
 
                     AlertDialog errorDialog = errorBuilder.create();
                     errorDialog.show();

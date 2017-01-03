@@ -17,6 +17,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.BitmapLoader;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Group;
+import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
@@ -31,9 +32,12 @@ import cz.msebera.android.httpclient.Header;
 public class ImagePreviewActivity extends AppCompatActivity implements View.OnClickListener{
     SubsamplingScaleImageView mImage;
     boolean upload = false;
+    int mRotation = 0;
     String mURL = "";
+    String imageType;
     boolean isGroup;
     Bitmap mBitmap;
+    String mPath;
     Group mGroup;
     User mUser;
     int mID;
@@ -47,6 +51,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
         mID = getIntent().getIntExtra("ID", -1);
         isGroup = getIntent().getStringExtra("type").equalsIgnoreCase("group");
+        imageType = getIntent().getStringExtra("type");
 
         if (isGroup) {
             mGroup = new Group(mID);
@@ -77,9 +82,9 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
         mImage = (SubsamplingScaleImageView)findViewById(R.id.image);
 
-        String str = getIntent().getStringExtra("path");
-        mImage.setImage(ImageSource.uri(str));
-        mBitmap = (new BitmapLoader(this, str)).decodeSampledBitmapFromFile(300, 300);
+        mPath = getIntent().getStringExtra("path");
+        mImage.setImage(ImageSource.uri(mPath));
+        mBitmap = (new BitmapLoader(this, mPath)).decodeSampledBitmapFromFile(300, 300);
 
         findViewById(R.id.rotate_right).setOnClickListener(this);
         findViewById(R.id.rotate_left).setOnClickListener(this);
@@ -88,6 +93,14 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public int JoesModFunctionBcJavaIsStupid(int i, int mod) {
+
+        if (i >= 0 && mod >= 0)
+            return i % mod;
+
+        return 270;
     }
 
     @Override
@@ -99,7 +112,8 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
             case R.id.rotate_left:
 
                 mBitmap = RotateBitmap(mBitmap, -90);
-                mImage.setOrientation(r - 90);
+                mImage.setOrientation(JoesModFunctionBcJavaIsStupid(r - 90, 360));
+                mRotation -= 90;
 
 
                 break;
@@ -107,25 +121,33 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
             case R.id.rotate_right:
 
                 mBitmap = RotateBitmap(mBitmap, 90);
-                mImage.setOrientation(r + 90);
-
+                mImage.setOrientation((r + 90) % 360);
+                mRotation += 90;
 
                 break;
 
             case R.id.save:
 
-                long millis = System.currentTimeMillis();
-                mURL = "group" + mGroup.mID + "-" + millis;
-                Calls.uploadImage(mBitmap, this, mURL, new Calls.UploadImage.onFinished() {
-                    @Override
-                    public void onFinished() {
-                        if (upload)
-                            update();
-                        else
-                            upload = true;
+                if (imageType.equalsIgnoreCase("createGroup")) {
 
-                    }
-                });
+                    finishActivity(true);
+
+                } else {
+                    long millis = System.currentTimeMillis();
+                    mURL = (isGroup ? "group" : "user") + (isGroup ? mGroup.mID : mUser.mID) + "-" + millis;
+                    Calls.uploadImage(mBitmap, this, mURL, new Calls.UploadImage.onFinished() {
+                        @Override
+                        public void onFinished() {
+                            if (upload)
+                                update();
+                            else
+                                upload = true;
+
+                        }
+                    });
+
+                }
+
 
 
                 break;
@@ -142,6 +164,8 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
     public void finishActivity(boolean b) {
         Intent i = new Intent();
         i.putExtra("url", "https://let.blob.core.windows.net/mycontainer/" + mURL);
+        i.putExtra("path", mPath);
+        i.putExtra("rotation", mRotation);
         setResult(b ? Activity.RESULT_OK : RESULT_CANCELED, i);
         finish();
 
@@ -149,46 +173,51 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
     public void update() {
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(ImagePreviewActivity.this);
-        builder.setTitle("Picture Uploaded");
-        builder.setMessage("Your picture has been uploaded");
-        builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finishActivity(true);
-            }
-        });
+        if (imageType.equalsIgnoreCase("createGroup")) {
 
-        String token = (new UserData(this)).ShallonCreamerIsATwat;
-        JsonHttpResponseHandler j = new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-                builder.create().show();
-
-            }
-        };
-
-        if (isGroup) {
-            Calls.editGroup(mGroup.mID, mGroup.getmTitle(), mGroup.getmBio(), mGroup.isPublic(), mGroup.isHidden(), "https://let.blob.core.windows.net/mycontainer/" + mURL, token, j);
 
         } else {
-//            params.put("bday", new SimpleDateFormat("MM-dd-yyyy", Locale.US).format(mUserInfo.get("birthday")));
-//            params.put("interests", mUserInfo.get("interests"));
-//            params.put("edit_user_id", mUserInfo.get("id"));
-//            params.put("privacy", mUserInfo.get("privacy"));
-//            params.put("pic_ref", mUserInfo.get("picRef"));
-//            params.put("gender", mUserInfo.get("gender"));
-//            params.put("name", mUserInfo.get("name"));
-//            params.put("bio", mUserInfo.get("bio"));
-            HashMap<String, Object> info = new HashMap<>();
-            info.put("birthday", new Date(mUser.getBirthday().getTime()));
-            info.put("interests", mUser.getInterests());
+            final AlertDialog.Builder builder = new AlertDialog.Builder(ImagePreviewActivity.this);
+            builder.setTitle("Picture Uploaded");
+            builder.setMessage("Your picture has been uploaded");
+            builder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finishActivity(true);
+                }
+            });
 
-            Calls.editProfile(info, token, j);
+            String token = (new UserData(this)).ShallonCreamerIsATwat;
+
+            if (isGroup) {
+                Calls.editGroup(mGroup.mID, mGroup.getmTitle(), mGroup.getmBio(), mGroup.isPublic(),
+                        mGroup.isHidden(), "https://let.blob.core.windows.net/mycontainer/" + mURL, token, new JsonHttpResponseHandler() {
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                                builder.create().show();
+
+                            }
+                        });
+
+            } else {
+
+                mUser.setPropic("https://let.blob.core.windows.net/mycontainer/" + mURL);
+                mUser.saveUser(this, new User.OnLoadListener() {
+                    @Override
+                    public void update() {
+
+                        builder.create().show();
+
+                    }
+                });
+
+            }
 
         }
+
+
 
 
     }
