@@ -190,7 +190,14 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
                     EventActions e = new EventActions(mActivity, mEvent, new EventActions.ScreenUpdate() {
                         @Override
-                        public void onScreenUpdate() {
+                        public void onScreenUpdate(String action) {
+
+                            if (action.equalsIgnoreCase("Leave"))
+                                mStatus = Event.MemberStatus.GUEST;
+                            else if (action.equalsIgnoreCase("Join"))
+                                mStatus = Event.MemberStatus.MEMBER;
+
+                            loadMainViewHolder();
 
                         }
                     });
@@ -204,9 +211,9 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
     }
 
-
     public void loadMainViewHolder() {
         MainHolder h = mMainHolder;
+        h.resetToolbar();
 
         h.mTime.setText(mEvent.getTimeSpanString());
         h.mLocation.setText(mEvent.getmLocationTitle());
@@ -221,6 +228,10 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             case GUEST:
                 h.mAction1.setText("Interested");
                 h.mImage1.setImageResource(R.drawable.ic_add_black_24dp);
+
+                h.mButton2.setVisibility(View.GONE);
+                h.mButton3.setVisibility(View.GONE);
+                h.mButton4.setVisibility(View.GONE);
 
                 break;
             case INVITE:
@@ -289,46 +300,45 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
     public void showAttendance() {
 
 
-            final ArrayList<Entity> entityFeed = mEvent.mMembers;
+        final ArrayList<Entity> entityFeed = mEvent.mMembers;
 
-            SearchEntityAdapter adapter = new SearchEntityAdapter(entityFeed, mActivity);
+        SearchEntityAdapter adapter = new SearchEntityAdapter(entityFeed, mActivity);
 
-            View view = View.inflate(mActivity, R.layout.dialog_search_entity, null);
-            final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.view);
-            SearchView searchView = (SearchView) view.findViewById(R.id.search);
+        View view = View.inflate(mActivity, R.layout.dialog_search_entity, null);
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.view);
+        SearchView searchView = (SearchView) view.findViewById(R.id.search);
 
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                ArrayList<Entity> newFeed = new ArrayList<>();
+
+                for (Entity e : entityFeed) {
+                    if (e.mText.toLowerCase().contains(newText.toLowerCase()))
+                        newFeed.add(e);
                 }
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    ArrayList<Entity> newFeed = new ArrayList<>();
+                SearchEntityAdapter adapter = new SearchEntityAdapter(newFeed, mActivity);
+                recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+                recyclerView.setAdapter(adapter);
 
-                    for (Entity e: entityFeed) {
-                        if (e.mText.toLowerCase().contains(newText.toLowerCase()))
-                            newFeed.add(e);
-                    }
+                return false;
+            }
+        });
 
-                    SearchEntityAdapter adapter = new SearchEntityAdapter(newFeed, mActivity);
-                    recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
-                    recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
+        recyclerView.setAdapter(adapter);
 
-                    return false;
-                }
-            });
-
-            recyclerView.setLayoutManager(new GridLayoutManager(mActivity, 1));
-            recyclerView.setAdapter(adapter);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-            builder.setTitle("People Interested");
-            builder.setView(view);
-            builder.setNegativeButton("Cancel", null);
-            builder.create().show();
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        builder.setTitle("People Interested");
+        builder.setView(view);
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
 
 
     }
@@ -389,10 +399,28 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             mMonth = (TextView) itemView.findViewById(R.id.month);
             mDay = (TextView) itemView.findViewById(R.id.day);
 
+        }
 
+        public void resetToolbar() {
+            mButton1.setVisibility(View.VISIBLE);
+            mButton2.setVisibility(View.VISIBLE);
+            mButton3.setVisibility(View.VISIBLE);
+            mButton4.setVisibility(View.VISIBLE);
+
+            mImage1.setImageBitmap(null);
+            mImage2.setImageBitmap(null);
+            mImage3.setImageBitmap(null);
+            mImage4.setImageBitmap(null);
+
+            mAction1.setText("");
+            mAction2.setText("");
+            mAction3.setText("");
+            mAction4.setText("");
 
 
         }
+
+
     }
 
     public MainHolder getmMainHolder() {

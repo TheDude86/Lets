@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +17,7 @@ import com.main.lets.lets.Adapters.JokesAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.R;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.rey.material.app.Dialog;
 import com.rey.material.widget.TextView;
@@ -25,6 +28,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 
 import cz.msebera.android.httpclient.Header;
@@ -93,18 +97,6 @@ public class GlobalFeed extends Client {
                             mEventAdapter.insertLast(e.getmJSON().toString());
                         }
 
-                        if (events.size() == 0) {
-                            try {
-                                JokesAdapter j = new JokesAdapter(mActivity);
-//                              mRecyclerView.setAdapter(j);
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-
-                        }
 
                         dialog.hide();
 

@@ -91,14 +91,7 @@
             android:parentActivityName=".Activities.DateActivity"
             android:theme="@style/CreateTheme" />
 
-        <service
-            android:name=".Services.EventReminders"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
+
         <service
             android:name=".Services.RegistrationIntentService"
             android:exported="false" />

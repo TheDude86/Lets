@@ -65,7 +65,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
 
             final int[] bgColors = mActivity.getResources().getIntArray(R.array.category_colors);
 
-            final String[] catgories = mActivity.getResources().getStringArray(R.array.categories);
+            final String[] categories = mActivity.getResources().getStringArray(R.array.categories);
 
             final org.json.JSONObject j = new org.json.JSONObject(data);
             e = new Event(j);
@@ -82,7 +82,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
                     .into((holder.mBackground));
 
             holder.mBackgroundContainer.setBackgroundColor(bgColors[j.getInt("Category")]);
-            holder.mCategory.setText(catgories[j.getInt("Category")]);
+            holder.mCategory.setText(categories[j.getInt("Category")]);
 
 
             holder.mBackgroundContainer.setOnClickListener(new View.OnClickListener() {

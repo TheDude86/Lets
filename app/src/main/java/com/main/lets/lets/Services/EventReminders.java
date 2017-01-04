@@ -7,18 +7,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 public class EventReminders extends FirebaseInstanceIdService {
 
-//        NotificationCompat.Builder mBuilder =  new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-//                .setContentTitle("My notification")
-//                .setContentText("Hello World!");
 
-
-
-
-    @Override
-    public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     public void onTokenRefresh() {

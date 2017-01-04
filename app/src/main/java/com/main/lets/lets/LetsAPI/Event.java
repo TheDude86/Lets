@@ -99,8 +99,8 @@ public class Event extends Entity implements Comparable<Event> {
         mCords.put("longitude", j.getDouble("Longitude"));
         mCords.put("latitude", j.getDouble("Latitude"));
         mLocationTitle = j.getString("Location_Title");
-        mMaxAttendance = j.getInt("Max_Attendance");
-        mMinAttendance = j.getInt("Min_Attendance");
+//        mMaxAttendance = j.getInt("Max_Attendance");
+//        mMinAttendance = j.getInt("Min_Attendance");
         mDescription = j.getString("Description");
         mOwnerName = j.getString("Creator_Name");
         mTitle = j.getString("Event_Name");
@@ -118,8 +118,8 @@ public class Event extends Entity implements Comparable<Event> {
         mEnd = new Date((Long.parseLong(j.getString("End_Time")
                 .substring(6, j.getString("End_Time").length() - 2))));
 
-        mCreated = new Date((Long.parseLong(j.getString("Time_Created")
-                .substring(6, j.getString("Time_Created").length() - 2))));
+//        mCreated = new Date((Long.parseLong(j.getString("Time_Created")
+//                .substring(6, j.getString("Time_Created").length() - 2))));
     }
 
 
@@ -324,6 +324,13 @@ public class Event extends Entity implements Comparable<Event> {
     }
 
     public int compareTo(Event arg0) {
+        if ((arg0.getCategory() == 9 || getCategory() == 9) && arg0.getCategory() != getCategory()) {
+
+            return arg0.getCategory() == 9 ? 1 : -1;
+
+        }
+
+
         return this.priority() == arg0.priority() ? (mStart.before(arg0.mStart) ? -1 : (mStart.after(arg0.mStart) ? 1 : 0)) : (this.priority() > arg0.priority() ? -1 : 1);
     }
 

@@ -27,7 +27,6 @@ public class MyHandler extends NotificationsHandler {
     public void onReceive(Context context, Bundle bundle) {
         ctx = context;
         String nhMessage = bundle.getString("message");
-        sendNotification(nhMessage);
         if (MainActivity.isVisible) {
             L.println(MyHandler.class, nhMessage + "Hi");
         }
@@ -48,7 +47,7 @@ public class MyHandler extends NotificationsHandler {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
                         .setSmallIcon(R.drawable.ic_notifications_none_black_24dp)
-                        .setContentTitle("Notification Hub Demo")
+                        .setContentTitle("Notification Hub Demsdfso")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setSound(defaultSoundUri)

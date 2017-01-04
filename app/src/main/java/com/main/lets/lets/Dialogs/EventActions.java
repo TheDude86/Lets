@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -41,6 +42,7 @@ public class EventActions extends DialogFragment {
 
 
     CharSequence[] memberActions = {"Leave Event"};
+    CharSequence[] memberActionsCode = {"Enter Code", "Leave Event"};
     CharSequence[] hostActions = {"Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
 
     CharSequence[] guestActions = {"Join Event"};
@@ -76,7 +78,10 @@ public class EventActions extends DialogFragment {
 
                 break;
             case MEMBER:
-                list = memberActions;
+                if (mEvent.getCategory() == 9)
+                    list = memberActionsCode;
+                else
+                    list = memberActions;
 
                 break;
             case GUEST:
@@ -197,14 +202,14 @@ public class EventActions extends DialogFragment {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 if (mUpdate != null)
-                                    mUpdate.onScreenUpdate();
+                                    mUpdate.onScreenUpdate("Leave");
 
                             }
 
                             @Override
                             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                                 if (mUpdate != null)
-                                    mUpdate.onScreenUpdate();
+                                    mUpdate.onScreenUpdate("Leave");
 
                             }
                         });
@@ -244,8 +249,61 @@ public class EventActions extends DialogFragment {
             case "Join Event":
 
                 if (mUpdate != null) {
-                    mUpdate.onScreenUpdate();
+                    mUpdate.onScreenUpdate("Join");
                 }
+
+                break;
+
+            case "Enter Code":
+
+                AlertDialog.Builder build = new AlertDialog.Builder(mActivity);
+                build.setTitle("Enter Code");
+
+                View v = View.inflate(mActivity, R.layout.dialog_enter_code, null);
+                final android.widget.EditText code = (android.widget.EditText) v.findViewById(R.id.code);
+
+                build.setView(v);
+                build.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String s = code.getText().toString();
+
+                        Calls.enterCode(s, new UserData(mActivity), new JsonHttpResponseHandler() {
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                                AlertDialog.Builder responseDialog = new AlertDialog.Builder(mActivity);
+                                responseDialog.setPositiveButton("Okay", null);
+
+                                if (!response.has("error")) {
+
+                                    responseDialog.setTitle("Code Entered!");
+                                    responseDialog.setMessage("Congratulations!  You are now entered " +
+                                            "to win!  Keep coming back and enter the daily code for" +
+                                            " a better chance to win!");
+
+                                } else {
+
+                                    responseDialog.setTitle("WRONG" + new String(Character.toChars(0x1F612)));
+                                    responseDialog.setMessage("This is not the code you're looking for...");
+
+                                }
+
+
+
+                                responseDialog.create().show();
+
+                            }
+                        });
+
+
+                    }
+                });
+
+                build.setNegativeButton("Cancel", null);
+                build.create().show();
 
                 break;
 
@@ -259,7 +317,7 @@ public class EventActions extends DialogFragment {
     }
 
     public interface ScreenUpdate {
-        void onScreenUpdate();
+        void onScreenUpdate(String action);
     }
 
 }

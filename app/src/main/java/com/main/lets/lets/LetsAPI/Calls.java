@@ -85,6 +85,7 @@ public class Calls {
     protected static final String SearchName = "search/name";
     protected static final String CreateUser = "user/create";
     protected static final String EditGroup = "group/edit";
+    protected static final String EnterCode = "tools/registerEventCode";
 
 
 
@@ -579,6 +580,18 @@ public class Calls {
 
         post(RemoveToken, params, jsonHttpResponseHandler);
     }
+
+    public static void enterCode(String code, UserData d, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("code", code);
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        post(EnterCode, params, jsonHttpResponseHandler);
+    }
+
+
+
+
 
 
 
