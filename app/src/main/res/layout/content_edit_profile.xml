@@ -48,13 +48,33 @@
         android:layout_below="@+id/birthday"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="*We&apos;re on the honor system here so don&apos;t lie about this stuff bro, if you do we will send you pictures of sad pugs"
+        android:id="@+id/textView47"
+        android:layout_below="@+id/radioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save Info"
+        android:id="@+id/save"
+        android:background="@drawable/layout_bg"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="81dp" />
+
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/radioGroup"
         android:layout_below="@+id/textView46"
         android:layout_alignLeft="@+id/birthday"
-        android:layout_alignStart="@+id/birthday"
-        android:id="@+id/radioGroup">
+        android:layout_alignStart="@+id/birthday">
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -68,7 +88,8 @@
             android:layout_height="wrap_content"
             android:text="Female"
             android:id="@+id/btn_female"
-            android:checked="false" />
+            android:checked="false"
+            android:textSize="14sp" />
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -77,32 +98,5 @@
             android:id="@+id/btn_freak"
             android:checked="false" />
     </RadioGroup>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="*We&apos;re on the honor system here so don&apos;t lie about this stuff bro, if you do we will send you pictures of sad pugs"
-        android:id="@+id/textView47"
-        android:layout_below="@+id/radioGroup"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp" />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="73dp"
-        android:background="#000000">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Info"
-            android:id="@+id/save"
-            android:background="#FFFFFF"
-            android:layout_margin="1dp" />
-    </RelativeLayout>
 
 </RelativeLayout>

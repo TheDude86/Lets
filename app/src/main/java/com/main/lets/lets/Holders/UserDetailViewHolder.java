@@ -402,7 +402,7 @@ public class UserDetailViewHolder extends RecyclerView.ViewHolder implements Vie
         image1.setImageResource(R.drawable.ic_done_black_24dp);
         image2.setImageResource(R.drawable.ic_clear_black_24dp);
         image3.setImageResource(R.drawable.ic_favorite_black_24dp);
-        image4.setImageResource(R.drawable.ic_setting_light);
+        image4.setImageResource(R.drawable.ic_settings_black_24dp);
 
         text1.setText("Save\nChanges");
         text2.setText("Cancel");

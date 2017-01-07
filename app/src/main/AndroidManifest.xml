@@ -22,7 +22,6 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
         <activity android:name=".Activities.MainActivity">
-            <service android:name=".ExampleService" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -123,11 +122,11 @@
         <activity
             android:name=".Activities.EditProfileActivity"
             android:label="Edit Profile"
-            android:parentActivityName=".Activities.MainActivity"
+            android:parentActivityName=".Activities.UserDetailActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.main.lets.lets.Activities.MainActivity" />
+                android:value="com.main.lets.lets.Activities.UserDetailActivity" />
         </activity>
         <activity
             android:name=".Activities.NewGroupActivity"
