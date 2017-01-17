@@ -23,6 +23,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_create_new_event" />
+    <include layout="@layout/content_new_event" />
 
 </android.support.design.widget.CoordinatorLayout>

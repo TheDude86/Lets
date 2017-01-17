@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, NewSettingsActivity.class);
                 startActivityForResult(intent, SETTINGS);
             }
         });
@@ -481,6 +481,14 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 if (data.getBooleanExtra("LoggedOut", false))
                     mProfileFeed.updateToken("Bearer ");
+
+                else if (data.getBooleanExtra("Edit", false)) {
+                    Intent i = new Intent(this, UserDetailActivity.class);
+                    i.putExtra("UserID", (new UserData(this)).ID);
+                    i.putExtra("create", true);
+                    startActivity(i);
+
+                }
 
                 if (mActive.equals(mGlobalFeed.getClass().toString())) {
                     mGlobalFeed.draw(null);

@@ -22,7 +22,6 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
         <activity android:name=".Activities.MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -55,7 +54,10 @@
         <activity
             android:name=".Activities.GroupDetailActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".Activities.UserDetailActivity" />
+        <activity
+            android:name=".Activities.UserDetailActivity"
+            android:label=""
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Activities.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -89,7 +91,6 @@
             android:label="@string/title_activity_detail"
             android:parentActivityName=".Activities.DateActivity"
             android:theme="@style/CreateTheme" />
-
 
         <service
             android:name=".Services.RegistrationIntentService"
@@ -176,8 +177,18 @@
         <activity
             android:name=".Activities.NewEventActivity"
             android:label="@string/title_activity_create_new_event"
-            android:theme="@style/AppTheme"
-            android:parentActivityName=".Activities.MainActivity"></activity>
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/AppTheme" />
+
+        <activity android:name=".Activities.NewSettingsActivity"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/AppTheme">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.main.lets.lets.Activities.MainActivity" />
+
+        </activity>
+
     </application>
 
 </manifest>

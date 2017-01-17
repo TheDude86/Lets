@@ -224,6 +224,7 @@ public class ProfileAdapter extends easyRegularAdapter<String, UltimateRecyclerv
                 Intent intent = new Intent(mActivity, UserDetailActivity.class);
 
                 intent.putExtra("UserID", id);
+                intent.putExtra("UserID", id);
                 intent.putExtra("token", ShallonCreamerIsATwat);
                 mActivity.startActivity(intent);
             }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.Notifications;
 import com.main.lets.lets.LetsAPI.Search;
 import com.main.lets.lets.R;
 
@@ -27,9 +28,19 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
     AppCompatActivity mActivity;
     String[] mFeeds = {"Events", "People", "Groups"};
 
+    enum SearchType {SEARCH, NOTIFICATIONS}
+
+    SearchType mSearchType = SearchType.SEARCH;
+
     public NewSearchAdapter(AppCompatActivity a, Search s) {
         mActivity = a;
         mSearch = s;
+
+        if (s.getClass().equals(Notifications.class)) {
+            mFeeds = new String[]{"Event Invites", "Friend Requests", "Group Invites"};
+            mSearchType = SearchType.NOTIFICATIONS;
+
+        }
     }
 
 
@@ -67,6 +78,8 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
         SearchEntityAdapter mAdapter;
         ProgressBar mLoading;
 
+        String[] mEmptyFeed = {"No events with this name", "No people with this name", "No groups with this name"};
+
         public SearchEntityHolder(View itemView, Search s, AppCompatActivity a) {
             super(itemView);
 
@@ -83,23 +96,32 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
         public void loadFeed(String s) {
             mEntityType = s;
 
-            if (s.equalsIgnoreCase("Events")) {
+            if (mSearchType == SearchType.NOTIFICATIONS) {
+                mLoadMore.setVisibility(View.GONE);
+                mEmptyFeed = new String[] {"No event invites", "No friend requests", "No group invites"};
+            }
+
+            if (s.equalsIgnoreCase(mFeeds[0])) {
                 mFeed = mSearch.mEvents;
 
                 if (!mSearch.mLoadMore[0])
                     mLoadMore.setVisibility(View.GONE);
 
-                if (mFeed.size() == 0)
-                    loadEmptyFeed("No events with this name");
+                if (mFeed.size() == 0) {
+                    loadEmptyFeed(mEmptyFeed[0]);
 
-            }else if (s.equalsIgnoreCase("People")) {
+                }
+
+            }else if (s.equalsIgnoreCase(mFeeds[1])) {
                 mFeed = mSearch.mUsers;
 
                 if (!mSearch.mLoadMore[1])
                     mLoadMore.setVisibility(View.GONE);
 
-                if (mFeed.size() == 0)
-                    loadEmptyFeed("No people with this name");
+                if (mFeed.size() == 0) {
+                    loadEmptyFeed(mEmptyFeed[1]);
+
+                }
 
             }else {
                 mFeed = mSearch.mGroups;
@@ -107,8 +129,10 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
                 if (!mSearch.mLoadMore[2])
                     mLoadMore.setVisibility(View.GONE);
 
-                if (mFeed.size() == 0)
-                    loadEmptyFeed("No groups with this name");
+                if (mFeed.size() == 0) {
+                   loadEmptyFeed(mEmptyFeed[2]);
+
+                }
             }
 
             mLoadMore.setOnClickListener(this);

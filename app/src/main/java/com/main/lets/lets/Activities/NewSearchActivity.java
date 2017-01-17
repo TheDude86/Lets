@@ -1,16 +1,12 @@
 package com.main.lets.lets.Activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 
 import com.main.lets.lets.Adapters.NewSearchAdapter;
 import com.main.lets.lets.LetsAPI.L;
@@ -35,7 +31,7 @@ public class NewSearchActivity extends AppCompatActivity {
 
         mListener = new Search.onUpdateListener() {
             @Override
-            public void onSearch() {
+            public void onUpdate() {
 
                 mRecyclerView.setAlpha(1);
                 mRecyclerView.setLayoutManager(new GridLayoutManager(NewSearchActivity.this, 1));
@@ -52,7 +48,6 @@ public class NewSearchActivity extends AppCompatActivity {
         s.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                L.println(this.getClass(), "Test");
                 return false;
             }
 

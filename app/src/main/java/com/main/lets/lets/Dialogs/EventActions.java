@@ -307,6 +307,56 @@ public class EventActions extends DialogFragment {
 
                 break;
 
+            case "Delete Event":
+
+                AlertDialog.Builder delete = new AlertDialog.Builder(mActivity);
+                delete.setTitle("Lets Think about what you're doing");
+                delete.setMessage("Events are like small children, if you fucked it up or no " +
+                        "one likes it, you should just put it down.  We understand.");
+                delete.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        final ProgressDialog loading = ProgressDialog.show(mActivity, "",
+                                "Destroying Event and Hiding Remains. Please wait...", true);
+
+                        Calls.deleteEvent(new UserData(mActivity), mEvent.mID, new JsonHttpResponseHandler() {
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                                loading.hide();
+
+                                L.println(EventActions.class, response.toString());
+
+                                AlertDialog.Builder suc = new AlertDialog.Builder(mActivity);
+                                suc.setTitle("Event Terminated");
+                                suc.setMessage("Your event has been wiped from existence.  " +
+                                        "Also we don't support child murder, it was just a joke, " +
+                                        "don't get all angry unless you want to start an internet" +
+                                        " campaign in protest, that's usually good for business.");
+
+                                suc.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        mActivity.finish();
+                                    }
+                                });
+
+                                suc.create().show();
+
+                            }
+                        });
+
+                    }
+                });
+
+                delete.setNegativeButton("Cancel", null);
+
+                delete.create().show();
+
+                break;
+
         }
 
         if (builder != null) {

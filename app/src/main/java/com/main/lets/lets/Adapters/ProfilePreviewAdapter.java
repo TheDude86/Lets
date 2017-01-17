@@ -81,40 +81,43 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
             @Override
             public void update() {
 
-                mUser.loadImage(a, mMain.mImage);
-                mMain.mName.setText(mUser.getName());
+                dialog.hide();
+
+                try {
+                    mUser.loadImage(a, mMain.mImage);
+                    mMain.mName.setText(mUser.getName());
 
 
-                mPast.mNoEventsText.setText("No past events");
-                mFuture.mNoEventsText.setText("No upcoming events");
+                    for (EventEntity e : mUser.mEvents) {
 
-                for (EventEntity e : mUser.mEvents) {
+                        if (e.mEnd.before(Calendar.getInstance().getTime())) {
+                            mPast.mAdapter.mFeed.add(e);
+                            mPast.mNoEvents.setVisibility(View.GONE);
 
-                    if (e.mEnd.before(Calendar.getInstance().getTime())) {
-                        mPast.mAdapter.mFeed.add(e);
-                        mPast.mNoEvents.setVisibility(View.GONE);
+                        } else {
+                            mFuture.mAdapter.mFeed.add(0, e);
+                            mFuture.mNoEvents.setVisibility(View.GONE);
 
-                    } else {
-                        mFuture.mAdapter.mFeed.add(0, e);
-                        mFuture.mNoEvents.setVisibility(View.GONE);
+                        }
 
                     }
 
+                    mFuture.mAdapter.notifyDataSetChanged();
+                    mPast.mAdapter.notifyDataSetChanged();
+
+
+
+
+
+                    mPast.mNoEventsText.setText("No past events");
+                    mFuture.mNoEventsText.setText("No upcoming events");
+
+
+                }catch (NullPointerException e) {
+
                 }
 
-                mFuture.mAdapter.notifyDataSetChanged();
-                mPast.mAdapter.notifyDataSetChanged();
 
-                final Animation anim = AnimationUtils.loadAnimation(mActivity, R.anim.alpha);
-                anim.reset();
-
-                mFuture.mLayout.clearAnimation();
-                mFuture.mLayout.startAnimation(anim);
-                mFuture.mLayout.setAlpha(1);
-                mPast.mLayout.setAlpha(1);
-
-
-                dialog.hide();
 
             }
 
@@ -209,11 +212,11 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
     }
 
 
-    public class MainHolder extends UltimateRecyclerviewViewHolder {
+    private class MainHolder extends UltimateRecyclerviewViewHolder {
         CircleImageView mImage;
         TextView mName;
 
-        public MainHolder(View itemView) {
+        MainHolder(View itemView) {
             super(itemView);
 
             mImage = (CircleImageView) itemView.findViewById(R.id.picture);
@@ -233,7 +236,7 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
 
     }
 
-    public class EventHolder extends UltimateRecyclerviewViewHolder {
+    private class EventHolder extends UltimateRecyclerviewViewHolder {
         SearchEntityAdapter mAdapter;
         RecyclerView mRecyclerView;
         RelativeLayout mNoEvents;
@@ -241,7 +244,7 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
         TextView mNoEventsText;
         TextView mTitle;
 
-        public EventHolder(View itemView) {
+        EventHolder(View itemView) {
             super(itemView);
 
             mTitle = (TextView) itemView.findViewById(R.id.title);
@@ -260,13 +263,13 @@ public class ProfilePreviewAdapter extends UltimateViewAdapter<UltimateRecyclerv
 
     }
 
-    public class LoginHolder extends UltimateRecyclerviewViewHolder {
+    private class LoginHolder extends UltimateRecyclerviewViewHolder {
         EditText mEmail;
         EditText mPassword;
         Button mLogin;
         Button mRegister;
 
-        public LoginHolder(View itemView) {
+        LoginHolder(View itemView) {
             super(itemView);
 
             mPassword = (EditText) itemView.findViewById(R.id.txt_pass);

@@ -81,6 +81,8 @@ public class UserDetailAdapter extends FeedAdapter {
         mHolder.mName.setText(mUser.getName());
         mHolder.mBio.setText(mUser.getBio());
 
+        mHolder.mBio.setHint("bio coming soon...");
+
         setUsers(mHolder.mFriendsButton);
         setEvents(mHolder.mEventsButton);
         setGroups(mHolder.mGroupsButton);

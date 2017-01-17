@@ -12,9 +12,13 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.UserInfo;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -44,6 +48,12 @@ public class UserDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
@@ -66,22 +76,34 @@ public class UserDetailActivity extends AppCompatActivity {
             alertDialog.show();
         }
 
-        fromCreate = getIntent().getBooleanExtra("create", false);
 
-        mUserID = getIntent().getIntExtra("UserID", -1);
-        mUser = new User(mUserID);
+
+        fromCreate = getIntent().getBooleanExtra("create", false);
 
         loadActivity();
 
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onRestart() {
+        super.onRestart();
 
+        fromCreate = false;
         loadActivity();
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                finish();
+                break;
+        }
+        return true;
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -103,8 +125,7 @@ public class UserDetailActivity extends AppCompatActivity {
         } else if (requestCode == UPLOAD_PICTURE) {
             if (resultCode == RESULT_OK) {
 
-                String url = data.getStringExtra("url");
-                mFeed.notifyNewPicture(url);
+                loadActivity();
 
             }
         }
@@ -130,6 +151,8 @@ public class UserDetailActivity extends AppCompatActivity {
 
     public void loadActivity() {
 
+        mUserID = getIntent().getIntExtra("UserID", -1);
+        mUser = new User(mUserID);
 
         final ProgressDialog loading = ProgressDialog.show(this, "",
                 "Loading. Please wait...", true);
@@ -137,7 +160,6 @@ public class UserDetailActivity extends AppCompatActivity {
         mUser.loadFull(this, new User.OnLoadListener() {
             @Override
             public void update() {
-
 
                 mFeed = new UserDetailFeed(UserDetailActivity.this, (RecyclerView) findViewById(R.id.feed), mUser,
                         (new UserData(UserDetailActivity.this)).ShallonCreamerIsATwat);
@@ -170,5 +192,11 @@ public class UserDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_blank, menu);
+        return true;
+    }
 
 }

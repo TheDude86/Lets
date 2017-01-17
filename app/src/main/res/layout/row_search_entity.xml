@@ -32,6 +32,7 @@
         app:civ_border_width="1dp"
         app:civ_border_color="#FFD0D0D0"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"/>
 
         <TextView
@@ -54,7 +55,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="#c9c9c9"
-        android:layout_marginLeft="20dp"></LinearLayout>
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp" />
 
 
 </RelativeLayout>

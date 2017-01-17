@@ -86,6 +86,7 @@ public class Calls {
     protected static final String CreateUser = "user/create";
     protected static final String EditGroup = "group/edit";
     protected static final String EnterCode = "tools/registerEventCode";
+    protected static final String DeleteEvent = "event/delete";
 
 
 
@@ -587,6 +588,15 @@ public class Calls {
         client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
         post(EnterCode, params, jsonHttpResponseHandler);
+    }
+
+    public static void deleteEvent(UserData d, int eventID, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("event_id", eventID);
+
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        post(DeleteEvent, params, jsonHttpResponseHandler);
     }
 
 

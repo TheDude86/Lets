@@ -3,6 +3,7 @@ package com.main.lets.lets.LetsAPI;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * Created by novosejr on 12/14/2016.
@@ -11,12 +12,14 @@ public class UserData {
     public int ID;
     public String email;
     public String password;
+    public AppCompatActivity mActivity;
     public String ShallonCreamerIsATwat;
 
-    public UserData(Activity a) {
+    public UserData(AppCompatActivity a) {
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(a.getBaseContext());
 
+        mActivity = a;
         email = preferences.getString("email", "");
         password = preferences.getString("password", "");
         ShallonCreamerIsATwat = preferences.getString("Token", "");
@@ -27,6 +30,19 @@ public class UserData {
     public boolean isLoggedIn() {
         L.println(getClass(), "ID: " + ID);
         return !(ID == -1);
+    }
+
+    public void clear() {
+
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(mActivity.getBaseContext());
+
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+
+        editor.apply();
+
     }
 
 }

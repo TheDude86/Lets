@@ -1,6 +1,7 @@
 package com.main.lets.lets.Activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,6 +32,8 @@ import cz.msebera.android.httpclient.Header;
 
 public class ImagePreviewActivity extends AppCompatActivity implements View.OnClickListener{
     SubsamplingScaleImageView mImage;
+    ProgressDialog mPicLoading;
+
     boolean upload = false;
     int mRotation = 0;
     String mURL = "";
@@ -52,6 +55,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
         mID = getIntent().getIntExtra("ID", -1);
         isGroup = getIntent().getStringExtra("type").equalsIgnoreCase("group");
         imageType = getIntent().getStringExtra("type");
+
 
         if (isGroup) {
             mGroup = new Group(mID);
@@ -133,6 +137,12 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                     finishActivity(true);
 
                 } else {
+
+
+                    mPicLoading = ProgressDialog.show(this, "",
+                            "Uploading Sexy Pic. Please wait...", true);
+
+
                     long millis = System.currentTimeMillis();
                     mURL = (isGroup ? "group" : "user") + (isGroup ? mGroup.mID : mUser.mID) + "-" + millis;
                     Calls.uploadImage(mBitmap, this, mURL, new Calls.UploadImage.onFinished() {
@@ -190,12 +200,15 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
             String token = (new UserData(this)).ShallonCreamerIsATwat;
 
             if (isGroup) {
+
+
                 Calls.editGroup(mGroup.mID, mGroup.getmTitle(), mGroup.getmBio(), mGroup.isPublic(),
                         mGroup.isHidden(), "https://let.blob.core.windows.net/mycontainer/" + mURL, token, new JsonHttpResponseHandler() {
 
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 
+                                mPicLoading.hide();
                                 builder.create().show();
 
                             }
@@ -208,6 +221,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                     @Override
                     public void update() {
 
+                        mPicLoading.hide();
                         builder.create().show();
 
                     }

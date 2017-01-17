@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -195,7 +196,8 @@ public class UserDetailFeed extends Client {
 
                 }
 
-                mAdapter.mHolder.mFriends.setText(mAdapter.mUsers.size() +
+                if (mAdapter.mHolder != null)
+                    mAdapter.mHolder.mFriends.setText(mAdapter.mUsers.size() +
                                                           ((mAdapter.mUsers.size() == 1) ? " Friend" :
                                                                   " Friends"));
 

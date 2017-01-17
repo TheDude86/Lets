@@ -73,7 +73,7 @@ public class Search {
                 }
 
 
-                mListener.onSearch();
+                mListener.onUpdate();
 
             }
         });
@@ -176,7 +176,7 @@ public class Search {
     }
 
     public interface onUpdateListener {
-        void onSearch();
+        void onUpdate();
 
     }
 

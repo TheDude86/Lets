@@ -197,6 +197,17 @@
     <string name="title_activity_invite_friends_to_group">Invite Friends</string>
     <string name="title_activity_welcome">Welcome</string>
     <string name="title_activity_create_new_event">CreateNewEvent</string>
+    <string name="when_were_you_born">When were you born?</string>
+    <string name="birthday">Birthday</string>
+    <string name="next">Next</string>
+    <string name="no_events">No Events</string>
+    <string name="go_to_explore">Go to explore</string>
+    <string name="upcoming_events">Upcoming Events</string>
+    <string name="search">search</string>
+    <string name="load_more">Load More</string>
+    <string name="title_search_entity">Title</string>
+    <string name="icon">icon</string>
+    <string name="logout">Logout</string>
 
 
     <string-array name="jokes_array">

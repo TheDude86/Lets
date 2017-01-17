@@ -8,8 +8,13 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Adapters.NewSearchAdapter;
 import com.main.lets.lets.Adapters.NotificationAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.L;
+import com.main.lets.lets.LetsAPI.Notifications;
+import com.main.lets.lets.LetsAPI.Search;
+import com.main.lets.lets.LetsAPI.UserData;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.json.JSONObject;
@@ -43,22 +48,23 @@ public class NotificationFeed extends Client {
         dialog.setMessage("Loading, Please wait...");
         dialog.show();
 
-        Calls.getNotifications(ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+        UserData u = new UserData(mActivity);
+        final Notifications notifications = new Notifications(u);
 
+        notifications.updateNotifications(new Search.onUpdateListener() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            public void onUpdate() {
                 dialog.hide();
-
 
                 mRecyclerView.setLayoutManager(
                         new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
 
-                mAdapter = new NotificationAdapter(mActivity, response);
+                NewSearchAdapter adapter = new NewSearchAdapter(mActivity, notifications);
+                mAdapter = new NotificationAdapter(mActivity, adapter);
                 mRecyclerView.setAdapter(mAdapter);
 
             }
         });
-
 
     }
 }

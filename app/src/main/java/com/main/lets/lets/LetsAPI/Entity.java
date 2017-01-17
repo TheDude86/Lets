@@ -38,6 +38,7 @@ public class Entity extends Client {
     public int mCategory;
     public String mText;
     public String mPic;
+    public int mSender;
     public int mID;
 
     /**
@@ -71,6 +72,10 @@ public class Entity extends Client {
                 mType = EntityType.USER;
                 mID = j.getInt("user_id");
                 mText = j.getString("name");
+
+                if (j.has("sender"))
+                    mSender = j.getInt("sender");
+
                 if (j.has("pic_ref"))
                     mPic = j.getString("pic_ref");
 

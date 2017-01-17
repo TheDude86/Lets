@@ -67,6 +67,8 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         mActivity = a;
         mEvent = e;
 
+        L.println(EventDetailAdapter.class, mStatus.toString());
+
     }
 
     @Override

@@ -45,6 +45,7 @@ public class Event extends Entity implements Comparable<Event> {
     private Date mEnd;
 
     public ArrayList<Entity> mMembers = new ArrayList<>();
+    public ArrayList<Entity> mInvites = new ArrayList<>();
     public ArrayList<Entity> mCohosts = new ArrayList<>();
     public ArrayList<Comment> mComments = new ArrayList<>();
 
@@ -77,6 +78,8 @@ public class Event extends Entity implements Comparable<Event> {
 
             if (e.mStatus)
                mMembers.add(new Entity(attendance.getJSONObject(i)));
+            else
+               mInvites.add(new Entity(attendance.getJSONObject(i)));
 
         }
 
@@ -151,13 +154,19 @@ public class Event extends Entity implements Comparable<Event> {
         MemberStatus s = MemberStatus.GUEST;
 
         for (int i = 0; i < mMembers.size(); i++) {
+            L.println(Event.class, mID + " ID");
+
             if (mMembers.get(i).mID == ID) {
                 if (mMembers.get(i).mStatus)
                     s = MemberStatus.MEMBER;
-                else
-                    s = MemberStatus.INVITE;
 
             }
+
+        }
+
+        for (int i = 0; i < mInvites.size(); i++) {
+            if (mInvites.get(i).mID == ID)
+                s = MemberStatus.INVITE;
 
         }
 
@@ -281,6 +290,12 @@ public class Event extends Entity implements Comparable<Event> {
 
 
     public String getTimeSpanString() {
+        String s = new SimpleDateFormat("h:mm a").format(mStart.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime());
+
+        if (s.equalsIgnoreCase("12:00 AM - 12:00 AM")) {
+
+            return "All Day";
+        }
 
         return (new SimpleDateFormat("h:mm a").format(mStart.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime()));
     }

@@ -531,6 +531,8 @@ public class UserDetailViewHolder extends RecyclerView.ViewHolder implements Vie
 
     public void setEditing(boolean b) {
 
+        mBio.setHint(b ? "Insert cool bio here <--" : "bio coming soon...");
+
         mName.setFocusable(b);
         mName.setFocusableInTouchMode(b);
 

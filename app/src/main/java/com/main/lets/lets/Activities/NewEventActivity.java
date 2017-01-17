@@ -4,9 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -25,7 +28,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Adapters.CreateEventAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
@@ -59,8 +64,26 @@ public class NewEventActivity extends AppCompatActivity {
     private RelativeLayout mDurationLayout;
     private RelativeLayout mLocationLayout;
 
+    private RecyclerView mRecyclerView;
+    private CreateEventAdapter mAdapter;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_create_new_event);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mAdapter = new CreateEventAdapter(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.view);
+
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
+
+    protected void onCreateOld(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_event);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -463,8 +486,7 @@ public class NewEventActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.menu_context_settings) {
-            mDurationLayout.setVisibility(View.VISIBLE);
-            mLocationLayout.setVisibility(View.VISIBLE);
+            mAdapter.notifyMoreSettings();
 
         }
 
@@ -479,18 +501,15 @@ public class NewEventActivity extends AppCompatActivity {
         if (requestCode == 0
                 && resultCode == Activity.RESULT_OK) {
 
+
             // The user has selected a place. Extract the name and address.
             //GEFN
             @SuppressWarnings("deprecation")
             Place place = PlacePicker.getPlace(data, this);
 
-            final CharSequence name = place.getName();
-            final CharSequence address = place.getAddress();
+            mAdapter.notifyAddedLocation(place);
 
 
-            mLocationLabel.setText(name);
-            mCoords = place.getLatLng();
-            mLocation.setText(address);
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);
