@@ -2,6 +2,7 @@ package com.main.lets.lets.LetsAPI;
 
 import android.content.Context;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
 
@@ -36,6 +37,7 @@ public class Event extends Entity implements Comparable<Event> {
     private boolean mIsOwner;
     private double mDistance;
     private int mAttendance;
+    private LatLng mCoords;
     private Date mCreated;
     private String mTitle;
     private int mCategory;
@@ -49,15 +51,16 @@ public class Event extends Entity implements Comparable<Event> {
     public ArrayList<Entity> mCohosts = new ArrayList<>();
     public ArrayList<Comment> mComments = new ArrayList<>();
 
-    public enum MemberStatus {OWNER, HOST, MEMBER, INVITE, GUEST, UNKNOWN}
 
 
+    public enum MemberStatus {OWNER, HOST, MEMBER, INVITE, GUEST, UNKNOWN;}
     public Event(org.json.JSONObject j) throws JSONException {
         super(j.getInt("Event_ID"), j.getString("Event_Name"), EntityType.EVENT);
         mEventInfo = j.toString();
         loadData(j);
 
     }
+
 
     public Event(int eventID) {
         super(eventID, "Blank", EntityType.EVENT);
@@ -99,6 +102,8 @@ public class Event extends Entity implements Comparable<Event> {
     public void loadData(JSONObject j) throws JSONException {
         mCords = new HashMap<>();
 
+        mCoords = new LatLng(j.getDouble("Latitude"), j.getDouble("Longitude"));
+
         mCords.put("longitude", j.getDouble("Longitude"));
         mCords.put("latitude", j.getDouble("Latitude"));
         mLocationTitle = j.getString("Location_Title");
@@ -125,8 +130,6 @@ public class Event extends Entity implements Comparable<Event> {
 //                .substring(6, j.getString("Time_Created").length() - 2))));
     }
 
-
-
     public void getEventByID(final onEventLoaded e) {
 
         Calls.getEvent(mEventID, new JsonHttpResponseHandler() {
@@ -149,6 +152,8 @@ public class Event extends Entity implements Comparable<Event> {
         });
 
     }
+
+
 
     public MemberStatus getUserStatus(int ID) {
         MemberStatus s = MemberStatus.GUEST;
@@ -180,6 +185,14 @@ public class Event extends Entity implements Comparable<Event> {
             s = MemberStatus.OWNER;
 
         return s;
+    }
+
+    public LatLng getmCoords() {
+        return mCoords;
+    }
+
+    public void setmCoords(LatLng mCoords) {
+        this.mCoords = mCoords;
     }
 
     public ArrayList<Entity> getmCohosts() {return mCohosts;}

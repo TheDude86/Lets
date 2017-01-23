@@ -215,4 +215,5 @@
         <item>{"joke2": "words", "credit" : "name"}</item>
         <item>{"joke3": "words", "credit" : "name"}</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>

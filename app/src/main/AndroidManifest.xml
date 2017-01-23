@@ -179,16 +179,21 @@
             android:label="@string/title_activity_create_new_event"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/AppTheme" />
-
-        <activity android:name=".Activities.NewSettingsActivity"
+        <activity
+            android:name=".Activities.NewSettingsActivity"
             android:parentActivityName=".Activities.MainActivity"
             android:theme="@style/AppTheme">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.main.lets.lets.Activities.MainActivity" />
-
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.main.lets.lets.Activities.MainActivity" />
         </activity>
-
+        <activity
+            android:name=".Activities.MapsActivity"
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.main.lets.lets.Activities.NewSearchActivity" />
+        </activity>
     </application>
 
 </manifest>

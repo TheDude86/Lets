@@ -388,6 +388,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.show_on_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                startActivity(i);
+            }
+        });
+
     }
 
 
