@@ -1,15 +1,23 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.main.lets.lets.Adapters.EventDetailAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +34,7 @@ public class Event extends Entity implements Comparable<Event> {
     private int mMaxAttendance = 200;
     private boolean mUserAttending;
     private String mLocationTitle;
+    StorageReference mStorageRef;
     private String mDescription;
     private int mMinAttendance;
     private int mRestrictions;
@@ -150,6 +159,34 @@ public class Event extends Entity implements Comparable<Event> {
 
             }
         });
+
+    }
+
+    public void uploadImage(Bitmap b, String url, final OnPictureUploaded l) {
+
+        mStorageRef = FirebaseStorage.getInstance()
+                .getReferenceFromUrl("gs://lets-push-notifications-829d7.appspot.com")
+                .child("events/event" + getmEventID() + "/" + url + ".jpg");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = mStorageRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                l.ImageUploaded(downloadUrl);
+            }
+        });
+
 
     }
 
@@ -416,7 +453,11 @@ public class Event extends Entity implements Comparable<Event> {
     }
 
     public interface onEventLoaded {
-        public void EventLoaded(Event e);
+        void EventLoaded(Event e);
+    }
+
+    public interface OnPictureUploaded {
+        void ImageUploaded(Uri url);
     }
 
 }

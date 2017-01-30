@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.InviteActivity;
+import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.FeedAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
@@ -41,9 +42,9 @@ import cz.msebera.android.httpclient.Header;
 public class EventActions extends DialogFragment {
 
 
-    CharSequence[] memberActions = {"Leave Event"};
-    CharSequence[] memberActionsCode = {"Enter Code", "Leave Event"};
-    CharSequence[] hostActions = {"Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
+    CharSequence[] memberActions = { "Upload Pictures", "Leave Event"};
+    CharSequence[] memberActionsCode = {"Enter Code", "Upload Pictures", "Leave Event"};
+    CharSequence[] hostActions = {"Upload Pictures", "Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
 
     CharSequence[] guestActions = {"Join Event"};
 
@@ -119,6 +120,12 @@ public class EventActions extends DialogFragment {
 
         switch (s) {
 
+            case "Upload Pictures":
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                mActivity.startActivityForResult(photoPickerIntent, UserDetailActivity.SELECT_PICTURE);
+
+                break;
             case "Add Co-hosts":
                 Intent inviteIntent = new Intent(mActivity, InviteActivity.class);
                 inviteIntent.putExtra("invite_id", event.getmEventID());

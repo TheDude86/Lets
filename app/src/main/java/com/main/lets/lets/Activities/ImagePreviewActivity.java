@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,12 @@ import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.BitmapLoader;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.Group;
 import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.User;
@@ -40,9 +44,11 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
     String imageType;
     boolean isGroup;
     Bitmap mBitmap;
+    Event mEvent;
     String mPath;
     Group mGroup;
     User mUser;
+
     int mID;
 
     @Override
@@ -57,7 +63,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
         imageType = getIntent().getStringExtra("type");
 
 
-        if (isGroup) {
+        if (imageType.equalsIgnoreCase("group")) {
             mGroup = new Group(mID);
             mGroup.loadGroup(this, new Group.OnLoadListener() {
                 @Override
@@ -69,7 +75,8 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
                 }
             });
-        } else {
+
+        } else if (imageType.equalsIgnoreCase("user")) {
             mUser = new User(mID);
             mUser.load(this, new User.OnLoadListener() {
                 @Override
@@ -82,7 +89,20 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                 }
             });
 
+        } else if (imageType.equalsIgnoreCase("event")) {
+            mEvent = new Event(mID);
+            mEvent.getEventByID(new Event.onEventLoaded() {
+                @Override
+                public void EventLoaded(Event e) {
+                    if (upload)
+                        update();
+                    else
+                        upload = true;
+                }
+            });
+
         }
+
 
         mImage = (SubsamplingScaleImageView)findViewById(R.id.image);
 
@@ -144,7 +164,28 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
 
                     long millis = System.currentTimeMillis();
-                    mURL = (isGroup ? "group" : "user") + (isGroup ? mGroup.mID : mUser.mID) + "-" + millis;
+
+                    if (imageType.equalsIgnoreCase("group")) {
+                        mURL = "group" + mGroup.mID + "-" + millis;
+
+                    } else if (imageType.equalsIgnoreCase("user")) {
+                        mURL = "user" + mEvent.mID + "-" + millis;
+
+
+                    } else if (imageType.equalsIgnoreCase("event")) {
+                        int ID = (new UserData(this)).ID;
+                        mEvent.uploadImage(mBitmap, "user" + ID + "-" + millis, new Event.OnPictureUploaded() {
+                            @Override
+                            public void ImageUploaded(Uri url) {
+                                mPicLoading.hide();
+                                finish();
+                                
+                            }
+                        });
+
+                        return;
+                    }
+
                     Calls.uploadImage(mBitmap, this, mURL, new Calls.UploadImage.onFinished() {
                         @Override
                         public void onFinished() {
@@ -199,9 +240,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
             String token = (new UserData(this)).ShallonCreamerIsATwat;
 
-            if (isGroup) {
-
-
+            if (imageType.equalsIgnoreCase("group")) {
                 Calls.editGroup(mGroup.mID, mGroup.getmTitle(), mGroup.getmBio(), mGroup.isPublic(),
                         mGroup.isHidden(), "https://let.blob.core.windows.net/mycontainer/" + mURL, token, new JsonHttpResponseHandler() {
 
@@ -213,9 +252,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
                             }
                         });
-
-            } else {
-
+            } else if (imageType.equalsIgnoreCase("user")) {
                 mUser.setPropic("https://let.blob.core.windows.net/mycontainer/" + mURL);
                 mUser.saveUser(this, new User.OnLoadListener() {
                     @Override
@@ -226,8 +263,10 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
                     }
                 });
+            } else if (imageType.equalsIgnoreCase("event")) {
 
             }
+
 
         }
 
