@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
@@ -26,15 +28,21 @@ import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
-public class ImagePreviewActivity extends AppCompatActivity implements View.OnClickListener{
+public class ImagePreviewActivity extends AppCompatActivity implements View.OnClickListener {
     SubsamplingScaleImageView mImage;
     ProgressDialog mPicLoading;
 
@@ -101,13 +109,23 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                 }
             });
 
+        } else if (imageType.equalsIgnoreCase("display")) {
+            findViewById(R.id.rotate_right).setVisibility(View.GONE);
+            findViewById(R.id.rotate_left).setVisibility(View.GONE);
+            findViewById(R.id.cancel).setVisibility(View.GONE);
+            findViewById(R.id.save).setVisibility(View.GONE);
+
+            Picasso.with(this).load(getIntent().getStringExtra("path")).into((ImageView) findViewById(R.id.url_image));
+
         }
 
 
-        mImage = (SubsamplingScaleImageView)findViewById(R.id.image);
-
+        mImage = (SubsamplingScaleImageView) findViewById(R.id.image);
         mPath = getIntent().getStringExtra("path");
-        mImage.setImage(ImageSource.uri(mPath));
+
+        if (!imageType.equalsIgnoreCase("display"))
+            mImage.setImage(ImageSource.uri(mPath));
+
         mBitmap = (new BitmapLoader(this, mPath)).decodeSampledBitmapFromFile(300, 300);
 
         findViewById(R.id.rotate_right).setOnClickListener(this);
@@ -174,12 +192,12 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
 
                     } else if (imageType.equalsIgnoreCase("event")) {
                         int ID = (new UserData(this)).ID;
-                        mEvent.uploadImage(mBitmap, "user" + ID + "-" + millis, new Event.OnPictureUploaded() {
+                        mEvent.uploadImage(ID, mBitmap, "user" + ID + "-" + millis, new Event.OnPictureUploaded() {
                             @Override
                             public void ImageUploaded(Uri url) {
                                 mPicLoading.hide();
                                 finish();
-                                
+
                             }
                         });
 
@@ -198,7 +216,6 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                     });
 
                 }
-
 
 
                 break;
@@ -271,12 +288,9 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
         }
 
 
-
-
     }
 
-    public static Bitmap RotateBitmap(Bitmap source, float angle)
-    {
+    public static Bitmap RotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);

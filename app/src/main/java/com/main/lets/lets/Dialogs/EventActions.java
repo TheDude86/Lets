@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.CollageActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.FeedAdapter;
@@ -42,11 +43,11 @@ import cz.msebera.android.httpclient.Header;
 public class EventActions extends DialogFragment {
 
 
-    CharSequence[] memberActions = { "Upload Pictures", "Leave Event"};
-    CharSequence[] memberActionsCode = {"Enter Code", "Upload Pictures", "Leave Event"};
-    CharSequence[] hostActions = {"Upload Pictures", "Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
+    CharSequence[] memberActions = { "View Pictures", "Upload Pictures", "Leave Event"};
+    CharSequence[] memberActionsCode = {"Enter Code", "View Pictures", "Upload Pictures", "Leave Event"};
+    CharSequence[] hostActions = { "View Pictures", "Upload Pictures", "Delete Event", "Add Co-hosts", "Remove Co-hosts", "Edit Event"};
 
-    CharSequence[] guestActions = {"Join Event"};
+    CharSequence[] guestActions = {"Join Event", "View Pictures"};
 
     Event.MemberStatus mStatus;
     AppCompatActivity mActivity;
@@ -361,6 +362,15 @@ public class EventActions extends DialogFragment {
                 delete.setNegativeButton("Cancel", null);
 
                 delete.create().show();
+
+                break;
+
+            case  "View Pictures":
+
+                Intent i = new Intent(mActivity, CollageActivity.class);
+                i.putExtra("Event", mEvent.getmEventID());
+                mActivity.startActivity(i);
+
 
                 break;
 

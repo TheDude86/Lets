@@ -4,10 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -33,6 +39,7 @@ public class Event extends Entity implements Comparable<Event> {
     private HashMap<String, Double> mCords;
     private int mMaxAttendance = 200;
     private boolean mUserAttending;
+    DatabaseReference mDatabaseRef;
     private String mLocationTitle;
     StorageReference mStorageRef;
     private String mDescription;
@@ -54,6 +61,7 @@ public class Event extends Entity implements Comparable<Event> {
     private int mOwnerID;
     private Date mStart;
     private Date mEnd;
+    private int mPicCount = 0;
 
     public ArrayList<Entity> mMembers = new ArrayList<>();
     public ArrayList<Entity> mInvites = new ArrayList<>();
@@ -162,11 +170,73 @@ public class Event extends Entity implements Comparable<Event> {
 
     }
 
-    public void uploadImage(Bitmap b, String url, final OnPictureUploaded l) {
+    public void getImages(final OnPictureUploaded l) {
 
+
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("pictures");
+
+        mDatabaseRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                EventImage e = dataSnapshot.getValue(EventImage.class);
+
+                L.println(Event.class, e.getURL());
+
+                StorageReference storage = FirebaseStorage.getInstance()
+                        .getReferenceFromUrl("gs://lets-push-notifications-829d7.appspot.com")
+                        .child(e.getURL());
+
+                storage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+
+                        l.ImageUploaded(uri);
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void uploadImage(int id, Bitmap b, String url, final OnPictureUploaded l) {
+
+        String s = "events/event" + getmEventID() + "/" + url + ".jpg";
         mStorageRef = FirebaseStorage.getInstance()
                 .getReferenceFromUrl("gs://lets-push-notifications-829d7.appspot.com")
-                .child("events/event" + getmEventID() + "/" + url + ".jpg");
+                .child(s);
+
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("pictures");
+
+        EventImage e = new EventImage(s, getmEventID(), id);
+
+        mDatabaseRef.push().setValue(e);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         b.compress(Bitmap.CompressFormat.JPEG, 100, baos);

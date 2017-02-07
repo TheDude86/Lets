@@ -216,4 +216,5 @@
         <item>{"joke3": "words", "credit" : "name"}</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_collage">CollageActivity</string>
 </resources>

@@ -194,6 +194,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.main.lets.lets.Activities.NewSearchActivity" />
         </activity>
+        <activity
+            android:name=".Activities.CollageActivity"
+            android:label="@string/title_activity_collage"
+            android:parentActivityName=".Activities.EventDetailActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.main.lets.lets.Activities.EventDetailActivity" />
+        </activity>
     </application>
 
 </manifest>
