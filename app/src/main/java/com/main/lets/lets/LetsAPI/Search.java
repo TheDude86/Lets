@@ -1,5 +1,10 @@
 package com.main.lets.lets.LetsAPI;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -30,6 +35,92 @@ public class Search {
 
         mListener = l;
 
+    }
+
+
+    public void makeHashtagSearch(String[] hashtags) {
+        mUsers = new ArrayList<>();
+        mEvents = new ArrayList<>();
+        mGroups = new ArrayList<>();
+
+        if (mListener instanceof onSearchListener) {
+            ((onSearchListener) mListener).onHashtagInit();
+
+            for (String s : hashtags) {
+                String tag = s.replace("#", "");
+
+                if (tag.length() > 0) {
+
+                    DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("hashtags/" + tag);
+                    db.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            int ID = dataSnapshot.getValue(int.class);
+
+                            Event e = new Event(ID);
+
+                            if (!isEventLoaded(e)) {
+                                e.getEventByID(new Event.onEventLoaded() {
+                                    @Override
+                                    public void EventLoaded(Event e) {
+
+                                        mEvents.add(e);
+                                        ((onSearchListener) mListener).onHashtagSearch();
+
+                                    }
+                                });
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
+
+
+            }
+
+
+        }
+
+
+    }
+
+    public boolean isEventLoaded(Event e) {
+
+        for(Entity entity: mEvents) {
+
+            if (entity instanceof Event) {
+                Event event = (Event) entity;
+
+                if (event.getmEventID() == e.getmEventID())
+                    return true;
+
+            }
+
+        }
+
+        return false;
     }
 
     public void makeSearch(String s) {
@@ -179,6 +270,13 @@ public class Search {
         void onUpdate();
 
     }
+
+    public interface onSearchListener extends onUpdateListener {
+        void onHashtagInit();
+
+        void onHashtagSearch();
+    }
+
 
     public interface onLoadMoreListener {
         void AddEntity(Boolean loadMore);

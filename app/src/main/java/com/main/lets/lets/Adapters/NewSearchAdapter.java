@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Notifications;
 import com.main.lets.lets.LetsAPI.Search;
@@ -27,6 +28,9 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
     Search mSearch;
     AppCompatActivity mActivity;
     String[] mFeeds = {"Events", "People", "Groups"};
+
+    public enum Mode {STRING, HASHTAG}
+    public Mode mMode = Mode.STRING;
 
     enum SearchType {SEARCH, NOTIFICATIONS}
 
@@ -62,7 +66,16 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
 
     @Override
     public int getItemCount() {
-        return 3;
+        return mMode == Mode.STRING ? 3 : 1;
+    }
+
+    public void addEvent() {
+        notifyDataSetChanged();
+    }
+
+    public void setMode(Mode m){
+        mMode = m;
+        notifyDataSetChanged();
     }
 
 
@@ -104,12 +117,16 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
             if (s.equalsIgnoreCase(mFeeds[0])) {
                 mFeed = mSearch.mEvents;
 
+                L.println(NewSearchAdapter.class, mFeed.size() + " Events");
+                L.println(NewSearchAdapter.class, "TEST");
                 if (!mSearch.mLoadMore[0])
                     mLoadMore.setVisibility(View.GONE);
 
                 if (mFeed.size() == 0) {
                     loadEmptyFeed(mEmptyFeed[0]);
 
+                } else if (mMode == Mode.HASHTAG){
+                    clearEmptyFeed();
                 }
 
             }else if (s.equalsIgnoreCase(mFeeds[1])) {
@@ -150,6 +167,10 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
             mLoadMore.setVisibility(View.VISIBLE);
             mLoadMoreText.setText(s);
             mLoadMoreText.setTypeface(mLoadMoreText.getTypeface(), Typeface.ITALIC);
+        }
+
+        public void clearEmptyFeed() {
+            mLoadMore.setVisibility(View.GONE);
         }
 
         @Override

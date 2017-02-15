@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,28 +16,17 @@ import android.widget.ImageView;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.LetsAPI.BitmapLoader;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.Group;
-import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 

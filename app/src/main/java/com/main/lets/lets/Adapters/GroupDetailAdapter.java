@@ -280,6 +280,7 @@ public class GroupDetailAdapter extends FeedAdapter {
     }
 
     public void loadAdminActions(GroupDetailViewHolder holder) {
+        holder.mActionsList.addView(mActions.get("create event"));
         holder.mActionsList.addView(mActions.get("remove members"));
         holder.mActionsList.addView(mActions.get("remove admins"));
         holder.mActionsList.addView(mActions.get("add admins"));

@@ -5,8 +5,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.KeyListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +27,13 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.NewEventActivity;
 import com.main.lets.lets.LetsAPI.Calls;
+import com.main.lets.lets.LetsAPI.Hashtag;
 import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
@@ -40,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -56,6 +65,7 @@ public class CreateEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private AppCompatActivity mActivity;
     private CategoryHolder mCategory;
     private LocationHolder mLocation;
+    private HashtagHolder mHashtags;
     private NameHolder mName;
     private DateHolder mDate;
 
@@ -97,6 +107,12 @@ public class CreateEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             return mCategory;
         } else if (viewType == 5) {
+            mHashtags = new HashtagHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_hashtag,
+                            parent, false));
+
+            return mHashtags;
+        } else if (viewType == 6) {
 
             return new CreateHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_create_create,
@@ -113,7 +129,7 @@ public class CreateEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        return 6;
+        return 7;
     }
 
     @Override
@@ -145,6 +161,54 @@ public class CreateEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public NameHolder(View itemView) {
             super(itemView);
             mTitle = (EditText) itemView.findViewById(R.id.event_name);
+        }
+
+    }
+
+    public class HashtagHolder extends RecyclerView.ViewHolder {
+
+        RecyclerView mList;
+        EditText mHashtag;
+        HashtagAdapter mAdapter;
+
+        public HashtagHolder(View itemView) {
+            super(itemView);
+
+            mList = (RecyclerView) itemView.findViewById(R.id.list);
+            mHashtag = (EditText) itemView.findViewById(R.id.hashtag);
+            mAdapter = new HashtagAdapter(mActivity);
+
+            mList.setLayoutManager(new GridLayoutManager(mActivity, 1));
+            mList.setAdapter(mAdapter);
+
+
+            mHashtag.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    if (charSequence.toString().endsWith(" ") || charSequence.toString().contains("\n")) {
+
+                        if (charSequence.length() > 1) {
+                            String s  = "#" + charSequence.toString().replace("#", "").trim();
+                            mAdapter.add(s.replace(" ", "_"));
+                            mHashtag.setText("");
+
+                        }
+
+                    } else if (charSequence.toString().contains(" ")){
+                        mHashtag.setText(charSequence.toString().replace(" ", "_"));
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
         }
 
     }
@@ -608,12 +672,23 @@ public class CreateEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                                 try {
 
-                                    L.println(NewEventActivity.class, response.toString());
+                                    int ID = response.getJSONObject(0).getInt("Event_ID");
+
+                                    DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+                                    DatabaseReference db2 = FirebaseDatabase.getInstance().getReference();
+
+                                    ArrayList<String> tags = mHashtags.mAdapter.mList;
+
+                                    for (String s: tags) {
+                                        db.child("events/" + ID).push().setValue(s.replace("#", ""));
+                                        db2.child("hashtags/" + s.replace("#", "")).push().setValue(ID);
+
+                                    }
+
 
                                     Intent intent = new Intent(mActivity,
                                             EventDetailActivity.class);
-                                    intent.putExtra("EventID",
-                                            response.getJSONObject(0).getInt("Event_ID"));
+                                    intent.putExtra("EventID", ID);
 
                                     mActivity.finish();
                                     mActivity.startActivity(intent);

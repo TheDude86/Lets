@@ -67,8 +67,6 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         mActivity = a;
         mEvent = e;
 
-        L.println(EventDetailAdapter.class, mStatus.toString());
-
     }
 
     @Override
@@ -345,6 +343,11 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
     }
 
+    public void addHashtag(String s) {
+        String text = mMainHolder.mHashtags.getText().toString();
+        mMainHolder.mHashtags.setText(text + " #" + s);
+    }
+
     public class MainHolder extends RecyclerView.ViewHolder {
         public LinearLayout mAttendanceList;
         public RelativeLayout mButton1;
@@ -355,6 +358,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         public TextView mDescription;
         public TextView mAttendance;
         public TextView mLocation;
+        public TextView mHashtags;
         public TextView mAction1;
         public TextView mAction2;
         public TextView mAction3;
@@ -384,6 +388,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             mButton2 = (RelativeLayout) itemView.findViewById(R.id.action2);
             mButton3 = (RelativeLayout) itemView.findViewById(R.id.action3);
             mButton4 = (RelativeLayout) itemView.findViewById(R.id.action4);
+            mHashtags = (TextView) itemView.findViewById(R.id.hashtags);
             mPerson1 = (ImageView) itemView.findViewById(R.id.person1);
             mPerson2 = (ImageView) itemView.findViewById(R.id.person2);
             mPerson3 = (ImageView) itemView.findViewById(R.id.person3);

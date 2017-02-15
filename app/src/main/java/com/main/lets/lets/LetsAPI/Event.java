@@ -37,6 +37,7 @@ import cz.msebera.android.httpclient.Header;
  */
 public class Event extends Entity implements Comparable<Event> {
     private HashMap<String, Double> mCords;
+
     private int mMaxAttendance = 200;
     private boolean mUserAttending;
     DatabaseReference mDatabaseRef;
@@ -56,7 +57,6 @@ public class Event extends Entity implements Comparable<Event> {
     private LatLng mCoords;
     private Date mCreated;
     private String mTitle;
-    private int mCategory;
     private int mEventID;
     private int mOwnerID;
     private Date mStart;
@@ -155,10 +155,71 @@ public class Event extends Entity implements Comparable<Event> {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 
                 try {
-                    e.EventLoaded(new Event(response.getJSONArray("Event_info"),
+                    Event event = new Event(response.getJSONArray("Event_info"),
                             response.getJSONArray("Attending_users"),
                             response.getJSONArray("Cohosts"),
-                            response.getJSONArray("Comments")));
+                            response.getJSONArray("Comments"));
+
+                    e.EventLoaded(event);
+
+                } catch (JSONException e1) {
+                    L.println(Event.class, response.toString());
+                    e1.printStackTrace();
+                }
+
+
+            }
+        });
+
+    }
+
+    public void getEventByID(final onFullEventLoaded e) {
+
+        Calls.getEvent(mEventID, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                try {
+                    Event event = new Event(response.getJSONArray("Event_info"),
+                            response.getJSONArray("Attending_users"),
+                            response.getJSONArray("Cohosts"),
+                            response.getJSONArray("Comments"));
+
+                    e.EventLoaded(event);
+
+                    DatabaseReference db = FirebaseDatabase.getInstance()
+                            .getReference().child("events/" + event.getmEventID());
+
+                    db.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            String string = dataSnapshot.getValue(String.class);
+                            e.HashtagLoaded(string);
+
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
 
                 } catch (JSONException e1) {
                     e1.printStackTrace();
@@ -522,8 +583,26 @@ public class Event extends Entity implements Comparable<Event> {
         this.mOwnerName = mOwnerName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof  Event) {
+            Event e = (Event) o;
+
+            if (e.getmEventID() == getmEventID())
+                return true;
+
+        }
+
+        return false;
+    }
+
     public interface onEventLoaded {
         void EventLoaded(Event e);
+    }
+
+    public interface onFullEventLoaded {
+        void EventLoaded(Event e);
+        void HashtagLoaded(String s);
     }
 
     public interface OnPictureUploaded {

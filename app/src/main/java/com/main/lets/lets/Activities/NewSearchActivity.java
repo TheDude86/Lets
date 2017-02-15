@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.main.lets.lets.Adapters.NewSearchAdapter;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Search;
 import com.main.lets.lets.R;
@@ -20,6 +21,7 @@ public class NewSearchActivity extends AppCompatActivity {
     Search mSearch;
     RecyclerView mRecyclerView;
     Search.onUpdateListener mListener;
+    NewSearchAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +33,34 @@ public class NewSearchActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mListener = new Search.onUpdateListener() {
+        mListener = new Search.onSearchListener() {
+
             @Override
-            public void onUpdate() {
+            public void onHashtagInit() {
+
+                mAdapter = new NewSearchAdapter(NewSearchActivity.this, mSearch);
+                mAdapter.setMode(NewSearchAdapter.Mode.HASHTAG);
 
                 mRecyclerView.setAlpha(1);
                 mRecyclerView.setLayoutManager(new GridLayoutManager(NewSearchActivity.this, 1));
-                mRecyclerView.setAdapter(new NewSearchAdapter(NewSearchActivity.this, mSearch));
+                mRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onHashtagSearch() {
+
+                mAdapter.addEvent();
+            }
+
+            @Override
+            public void onUpdate() {
+
+                mAdapter = new NewSearchAdapter(NewSearchActivity.this, mSearch);
+                mAdapter.setMode(NewSearchAdapter.Mode.STRING);
+
+                mRecyclerView.setAlpha(1);
+                mRecyclerView.setLayoutManager(new GridLayoutManager(NewSearchActivity.this, 1));
+                mRecyclerView.setAdapter(mAdapter);
             }
 
         };
@@ -55,11 +78,20 @@ public class NewSearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                L.println(this.getClass(), newText);
+                if (newText.length() > 0) {
 
-                if (newText.length() > 0)
-                    mSearch = new Search(mListener);
-                    mSearch.makeSearch(newText);
+                    if (newText.startsWith("#")) {
+                        mSearch.makeHashtagSearch(newText.split(" "));
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        mSearch = new Search(mListener);
+
+                        mSearch.makeSearch(newText);
+
+                    }
+
+                }
 
                 return false;
             }

@@ -34,6 +34,7 @@ import cz.msebera.android.httpclient.Header;
 public class EventDetailActivity extends AppCompatActivity {
     public final static int SELECT_PICTURE = 0;
     public final static int UPLOAD_PICTURE = 1;
+    EventDetailAdapter eventAdapter;
     Event mEvent;
 
     @Override
@@ -113,7 +114,7 @@ public class EventDetailActivity extends AppCompatActivity {
         final int[] bgColors = getResources().getIntArray(R.array.category_colors);
 
         mEvent = new Event(eventID);
-        mEvent.getEventByID(new Event.onEventLoaded() {
+        mEvent.getEventByID(new Event.onFullEventLoaded() {
             @Override
             public void EventLoaded(Event e) {
 
@@ -132,11 +133,17 @@ public class EventDetailActivity extends AppCompatActivity {
                 assert recyclerView != null;
                 recyclerView.setLayoutManager(
                         new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
-                EventDetailAdapter eventAdapter = new EventDetailAdapter(EventDetailActivity.this, e);
+                eventAdapter = new EventDetailAdapter(EventDetailActivity.this, e);
                 recyclerView.setAdapter(eventAdapter);
 
 
                 dialog.hide();
+
+            }
+
+            @Override
+            public void HashtagLoaded(String s) {
+                eventAdapter.addHashtag(s);
 
             }
         });
