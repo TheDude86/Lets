@@ -87,6 +87,7 @@ public class Calls {
     protected static final String EditGroup = "group/edit";
     protected static final String EnterCode = "tools/registerEventCode";
     protected static final String DeleteEvent = "event/delete";
+    protected static final String DeleteGroupComment = "group/deleteComment";
 
 
 
@@ -597,6 +598,16 @@ public class Calls {
         client.addHeader("Authorization", d.ShallonCreamerIsATwat);
 
         post(DeleteEvent, params, jsonHttpResponseHandler);
+    }
+
+    public static void deleteGroupComment(UserData d, int groupID, int commentID, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams params = new RequestParams();
+        params.put("comment_id", commentID);
+        params.put("group_id", groupID);
+
+        client.addHeader("Authorization", d.ShallonCreamerIsATwat);
+
+        post(DeleteGroupComment, params, jsonHttpResponseHandler);
     }
 
 

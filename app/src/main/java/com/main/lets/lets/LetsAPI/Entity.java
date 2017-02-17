@@ -82,7 +82,7 @@ public class Entity extends Client {
             } else if (j.has("event_id") && !j.has("text")) {
                 mType = EntityType.EVENT;
                 mID = j.getInt("event_id");
-                mText = j.getString("event_name");
+                mText = j.getString("event_name").equals("{null}") ? "Untitled Event" : j.getString("event_name");
 
                 if (j.has("category")) {
                     mCategory = j.getInt("category");

@@ -163,8 +163,7 @@ public class Event extends Entity implements Comparable<Event> {
                     e.EventLoaded(event);
 
                 } catch (JSONException e1) {
-                    L.println(Event.class, response.toString());
-                    e1.printStackTrace();
+                    e.EventLoaded(null);
                 }
 
 
@@ -430,7 +429,11 @@ public class Event extends Entity implements Comparable<Event> {
     }
 
     public String getmTitle() {
-        return this.mTitle;
+        return this.mTitle.equals("{null}") ? String.format("%s's Event", getmOwnerName()) : this.mTitle;
+    }
+
+    public boolean hasTitle() {
+        return !this.mTitle.equals("{null}");
     }
 
     public void setmTitle(String mTitle) {
@@ -438,7 +441,11 @@ public class Event extends Entity implements Comparable<Event> {
     }
 
     public String getmLocationTitle() {
-        return this.mLocationTitle;
+        return this.mLocationTitle.equals("{null}") ? "No location set" : this.mLocationTitle;
+    }
+
+    public boolean hasLocation() {
+        return !this.mLocationTitle.equals("{null}");
     }
 
     public void setmLocationTitle(String mLocationTitle) {

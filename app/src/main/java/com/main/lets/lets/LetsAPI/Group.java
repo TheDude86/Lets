@@ -121,7 +121,7 @@ public class Group extends Entity{
 
                             try {
                                 for (int i = 0; i < response.length(); i++) {
-                                    mComments.add(new Comment(response.getJSONObject(i)));
+                                    mComments.add(0, new Comment(response.getJSONObject(i)));
 
                                 }
 

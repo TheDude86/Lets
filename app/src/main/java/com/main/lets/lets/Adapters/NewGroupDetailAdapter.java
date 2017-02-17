@@ -29,12 +29,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Comment;
 import com.main.lets.lets.LetsAPI.Entity;
+import com.main.lets.lets.LetsAPI.Event;
 import com.main.lets.lets.LetsAPI.Group;
 import com.main.lets.lets.LetsAPI.IntentDecorator;
 import com.main.lets.lets.LetsAPI.L;
@@ -42,11 +46,17 @@ import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
+import com.rey.material.app.TimePickerDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import cz.msebera.android.httpclient.Header;
@@ -71,16 +81,35 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         if (viewType == 0)
             return new MainHolder(LayoutInflater.from(parent.getContext())
-                                          .inflate(R.layout.row_group_detail, parent, false));
+                    .inflate(R.layout.row_group_detail, parent, false));
 
-        return new CommentHolder(LayoutInflater.from(parent.getContext())
-                                         .inflate(R.layout.row_entity_with_picture, parent, false));
 
+        if (viewType == 1)
+            return new CommentHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_entity_with_picture, parent, false));
+
+        return new EventHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_group_event, parent, false));
 
     }
 
     @Override
     public int getItemViewType(int position) {
+
+        if (position == 0)
+            return 0;
+
+        String c = mGroup.mComments.get(position - 1).mDetail;
+
+        if (c.startsWith("{") && c.endsWith("}")) {
+            try {
+                new JSONObject(c);
+
+                return 2;
+            } catch (JSONException e) {
+                return 1;
+            }
+        }
 
         return position;
     }
@@ -90,6 +119,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         if (position == 0) {
             mHolder = (MainHolder) holder;
+            mHolder.populateHolder();
 
             mHolder.mTitle.setText(mGroup.getmTitle());
             mHolder.mBio.setText(mGroup.getmBio());
@@ -103,12 +133,120 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             });
 
         } else {
-            CommentHolder h = (CommentHolder) holder;
-            Comment c = mGroup.mComments.get(position - 1);
 
-            h.mAuthor.setText(c.mText);
-            h.mComment.setText(c.mDetail);
-            h.loadUser(c.mAuthorID);
+            if (holder instanceof CommentHolder) {
+                CommentHolder h = (CommentHolder) holder;
+                Comment c = mGroup.mComments.get(position - 1);
+
+
+                h.mAuthor.setText(c.mText);
+                h.mComment.setText(c.mDetail);
+                h.loadUser(c.mAuthorID);
+
+
+
+            } else if (holder instanceof EventHolder) {
+                final EventHolder h = (EventHolder) holder;
+
+                final Comment c = mGroup.mComments.get(position - 1);
+                L.println(Comment.class, c.mAuthorID + " ID");
+
+
+                h.loadUser(c.mAuthorID);
+                h.mHost.setText(c.mText);
+                h.mEventContainer.setVisibility(View.GONE);
+
+                h.mEventContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+
+                        UserData d = new UserData(mActivity);
+
+                        if (c.mAuthorID == d.ID) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                            builder.setTitle("Delete Event?");
+                            builder.setMessage("Are you sure you want to delete this event from the group?");
+                            builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    Calls.deleteGroupComment(new UserData(mActivity), mGroup.getGroupID(), c.mID, new JsonHttpResponseHandler() {
+
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                                            notifyDataSetChanged();
+
+                                        }
+                                    });
+
+                                }
+                            });
+
+                            builder.setNegativeButton("Cancel", null);
+                            builder.create().show();
+                        }
+
+                        return true;
+                    }
+                });
+
+                try {
+                    JSONObject j = new JSONObject(c.mDetail);
+
+                    Event e = new Event(j.getInt("event id"));
+                    e.getEventByID(new Event.onEventLoaded() {
+                        @Override
+                        public void EventLoaded(final Event e) {
+
+                            if (e == null) {
+                                h.mLoadingContainer.setVisibility(View.GONE);
+
+                            } else {
+                                if (!e.hasTitle()) {
+                                    h.mTitle.setVisibility(View.GONE);
+                                    h.mTitlebar.setVisibility(View.GONE);
+
+                                } else
+                                    h.mTitle.setText(e.getmTitle());
+
+
+                                h.mDay.setText(e.getDay());
+                                h.mMonth.setText(e.getMonth());
+                                h.mTime.setText(e.getTimeSpanString());
+
+                                if (!e.hasLocation())
+                                    h.mLocationContainer.setVisibility(View.GONE);
+                                else
+                                    h.mLocation.setText(e.getmLocationTitle());
+
+                                h.mEventContainer.setVisibility(View.VISIBLE);
+                                h.mLoadingContainer.setVisibility(View.GONE);
+
+                                h.mEventContainer.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        Intent i = new Intent(mActivity, EventDetailActivity.class);
+                                        i.putExtra("EventID", e.getmEventID());
+                                        mActivity.startActivity(i);
+                                    }
+                                });
+
+                            }
+
+
+                        }
+
+                    });
+
+
+                } catch (JSONException e) {
+                    h.mLoadingContainer.setVisibility(View.GONE);
+
+                }
+
+            }
+
 
         }
 
@@ -119,10 +257,55 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return 1 + mGroup.mComments.size();
     }
 
+    class EventHolder extends RecyclerView.ViewHolder {
+        RelativeLayout mLocationContainer;
+        RelativeLayout mLoadingContainer;
+        RelativeLayout mEventContainer;
+        RelativeLayout mTitlebar;
+        TextView mLocation;
+        TextView mMonth;
+        TextView mTitle;
+        TextView mTime;
+        TextView mHost;
+        ImageView mPic;
+        TextView mDay;
+
+
+        public EventHolder(View itemView) {
+            super(itemView);
+
+            mLocationContainer = (RelativeLayout) itemView.findViewById(R.id.location_layout);
+            mLoadingContainer = (RelativeLayout) itemView.findViewById(R.id.loading);
+            mEventContainer = (RelativeLayout) itemView.findViewById(R.id.content);
+            mTitlebar = (RelativeLayout) itemView.findViewById(R.id.title_bar);
+            mLocation = (TextView) itemView.findViewById(R.id.eventLocation);
+            mTitle = (TextView) itemView.findViewById(R.id.eventTitle);
+            mTime = (TextView) itemView.findViewById(R.id.eventTime);
+            mHost = (TextView) itemView.findViewById(R.id.hostName);
+            mPic = (ImageView) itemView.findViewById(R.id.picture);
+            mMonth = (TextView) itemView.findViewById(R.id.month);
+            mDay = (TextView) itemView.findViewById(R.id.day);
+
+        }
+
+        public void loadUser(int userID) {
+
+            final User u = new User(userID);
+            u.load(mActivity, new User.OnLoadListener() {
+                @Override
+                public void update() {
+                    u.loadImage(mActivity, mPic);
+                }
+            });
+
+        }
+    }
+
     public class CommentHolder extends RecyclerView.ViewHolder {
         ImageView mPic;
         TextView mAuthor;
         TextView mComment;
+        RelativeLayout mContainer;
 
         public CommentHolder(View itemView) {
             super(itemView);
@@ -130,6 +313,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mPic = (ImageView) itemView.findViewById(R.id.image);
             mAuthor = (TextView) itemView.findViewById(R.id.txt_entity_title);
             mComment = (TextView) itemView.findViewById(R.id.txt_entity_detail);
+            mContainer = (RelativeLayout) itemView.findViewById(R.id.layout_info);
 
         }
 
@@ -167,7 +351,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             public boolean onQueryTextChange(String newText) {
                 ArrayList<Entity> newFeed = new ArrayList<>();
 
-                for (Entity e: entityFeed) {
+                for (Entity e : entityFeed) {
                     if (e.mText.toLowerCase().contains(newText.toLowerCase()))
                         newFeed.add(e);
                 }
@@ -188,7 +372,6 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         builder.setView(view);
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
-
 
 
     }
@@ -254,7 +437,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mBio = (EditText) itemView.findViewById(R.id.txt_bio);
             mBio = (EditText) itemView.findViewById(R.id.txt_bio);
 
-            for (ImageView i: mMembers) {
+            for (ImageView i : mMembers) {
                 i.setImageBitmap(null);
             }
 
@@ -316,6 +499,9 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
                     mImage3.setImageResource(R.drawable.ic_clear_black_24dp);
                     mText3.setText("Reject\nInvite");
+
+                    mAction2.setOnClickListener(this);
+                    mAction3.setOnClickListener(this);
 
                     break;
                 case MEMBER:
@@ -444,21 +630,21 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
 
             Calls.editGroup(mGroup.mID, mGroup.getmTitle(), mGroup.getmBio(),
-                            mGroup.isPublic(), mGroup.isHidden(), s, token,
-                            new JsonHttpResponseHandler() {
+                    mGroup.isPublic(), mGroup.isHidden(), s, token,
+                    new JsonHttpResponseHandler() {
 
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers,
-                                                      JSONObject response) {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers,
+                                              JSONObject response) {
 
-                                    loadToolbar();
-                                    setEditing(false);
+                            loadToolbar();
+                            setEditing(false);
 
-                                    dialog.hide();
+                            dialog.hide();
 
-                                }
+                        }
 
-                            });
+                    });
 
         }
 
@@ -470,100 +656,156 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 UserData d = new UserData(mActivity);
 
                 final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
-                                                                  "Joining group. Please wait...",
-                                                                  true);
+                        "Joining group. Please wait...",
+                        true);
 
                 Calls.joinGroup(d.ID, mGroup.mID, d,
-                                new JsonHttpResponseHandler() {
+                        new JsonHttpResponseHandler() {
 
 
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers,
+                                                  JSONObject response) {
+
+                                mGroup.loadGroup(mActivity, new Group.OnLoadListener() {
                                     @Override
-                                    public void onSuccess(int statusCode, Header[] headers,
-                                                          JSONObject response) {
+                                    public void OnUpdate() {
 
-                                        mGroup.loadGroup(mActivity, new Group.OnLoadListener() {
-                                            @Override
-                                            public void OnUpdate() {
-
-                                                populateHolder();
-
-                                            }
-                                        });
-
-                                        dialog.hide();
+                                        populateHolder();
 
                                     }
-
                                 });
+
+                                dialog.hide();
+
+                            }
+
+                        });
+
+            } else if (view.equals(mAction2)) {
+
+                UserData d = new UserData(mActivity);
+                int ID = d.ID;
+
+                final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
+                        "Joining group. Please wait...",
+                        true);
+
+                Calls.joinGroup(ID, mGroup.getGroupID(), d, new JsonHttpResponseHandler() {
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                        mGroup.loadGroup(mActivity, new Group.OnLoadListener() {
+                            @Override
+                            public void OnUpdate() {
+
+                                dialog.hide();
+                                notifyDataSetChanged();
+
+                            }
+                        });
+
+                    }
+                });
 
             } else if (view.equals(mAction3)) {
 
-                setEditing(true);
-                resetToolbar();
+                if (mGroup.getmStatus() == Group.Status.INVITE) {
 
-                mGroupPic.setOnClickListener(this);
+                    final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
+                            "Declining invite. Please wait...",
+                            true);
 
-                mImage2.setImageResource(R.drawable.ic_done_black_24dp);
-                mText2.setText("Save\nChanges");
+                    Calls.leaveGroup(mGroup.getGroupID(),
+                            new UserData(mActivity).ShallonCreamerIsATwat,
+                            new JsonHttpResponseHandler() {
 
-                mImage3.setImageResource(R.drawable.ic_clear_black_24dp);
-                mText3.setText("Cancel");
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    mGroup.loadGroup(mActivity, new Group.OnLoadListener() {
+                                        @Override
+                                        public void OnUpdate() {
+
+                                            dialog.hide();
+                                            notifyDataSetChanged();
+
+                                        }
+                                    });
+
+                                }
+                            });
+
+                } else {
+                    setEditing(true);
+                    resetToolbar();
+
+                    mGroupPic.setOnClickListener(this);
+
+                    mImage2.setImageResource(R.drawable.ic_done_black_24dp);
+                    mText2.setText("Save\nChanges");
+
+                    mImage3.setImageResource(R.drawable.ic_clear_black_24dp);
+                    mText3.setText("Cancel");
 
 
-                mAction2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                    mAction2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-                        final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
-                                                                          "Loading. Please wait...",
-                                                                          true);
+                            final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
+                                    "Loading. Please wait...",
+                                    true);
 
-                        mGroup.setmTitle(mTitle.getText().toString());
-                        mGroup.setmBio(mBio.getText().toString());
+                            mGroup.setmTitle(mTitle.getText().toString());
+                            mGroup.setmBio(mBio.getText().toString());
 
-                        if (mNewPic != null) {
+                            if (mNewPic != null) {
 
-                            long millis = System.currentTimeMillis();
-                            final String name = "group" + mGroup.mID + "-" + millis;
+                                long millis = System.currentTimeMillis();
+                                final String name = "group" + mGroup.mID + "-" + millis;
 
-                            Calls.uploadImage(mNewPic, mActivity,
-                                              name,
-                                              new Calls.UploadImage
-                                                      .onFinished() {
-                                                  @Override
-                                                  public void onFinished() {
+                                Calls.uploadImage(mNewPic, mActivity,
+                                        name,
+                                        new Calls.UploadImage
+                                                .onFinished() {
+                                            @Override
+                                            public void onFinished() {
 
-                                                      String s = "https://let.blob.core.windows" +
-                                                              ".net/mycontainer/" + name;
+                                                String s = "https://let.blob.core.windows" +
+                                                        ".net/mycontainer/" + name;
 
-                                                      saveChanges(dialog, s);
+                                                saveChanges(dialog, s);
 
-                                                  }
+                                            }
 
-                                              });
+                                        });
 
-                        } else {
-                            saveChanges(dialog, mGroup.getPic_ref());
+                            } else {
+                                saveChanges(dialog, mGroup.getPic_ref());
+                            }
+
+
                         }
 
+                    });
 
-                    }
+                    mAction3.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            loadToolbar();
+                            setEditing(false);
 
-                });
+                            mTitle.setText(mGroup.getmTitle());
+                            mBio.setText(mGroup.getmBio());
 
-                mAction3.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        loadToolbar();
-                        setEditing(false);
+                            mGroup.loadImage(mActivity, mGroupPic);
 
-                        mTitle.setText(mGroup.getmTitle());
-                        mBio.setText(mGroup.getmBio());
+                        }
+                    });
 
-                        mGroup.loadImage(mActivity, mGroupPic);
+                }
 
-                    }
-                });
 
 
             } else if (view.equals(mAction4)) {
@@ -597,9 +839,9 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         CharSequence[] mActions;
 
         CharSequence[] memberActions = {"Leave Group"};
-        CharSequence[] adminActions = {"Invite group to Event", "Add Admin", "Remove Admin", "Remove Member",
+        CharSequence[] adminActions = {"Create Group Event", "Invite group to Event", "Add Admin", "Remove Admin", "Remove Member",
                 "Leave Group"};
-        CharSequence[] ownerActions = {"Invite group to Event", "Add Admin", "Remove Admin", "Remove Member",
+        CharSequence[] ownerActions = {"Create Group Event", "Invite group to Event", "Add Admin", "Remove Admin", "Remove Member",
                 "Transfer Ownership", "Leave Group", "Delete Group"};
 
 
@@ -652,6 +894,111 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
             final UserData d = new UserData(mActivity);
             switch (String.valueOf(s)) {
+                case "Create Group Event":
+
+                    final Calendar mCalendar = Calendar.getInstance();
+
+                    TimePickerDialog.Builder calBuilder =
+                            new TimePickerDialog.Builder(mCalendar.get(Calendar.HOUR_OF_DAY),
+                                    mCalendar.get(Calendar.MINUTE)) {
+
+                                /**
+                                 * When the user confirm's the start time of the event, update the HashMap
+                                 * values and the EditText
+                                 * @param fragment the parameter from when the dialog closes containing the
+                                 *                 time's information
+                                 */
+                                //GEFN
+                                @SuppressLint("SimpleDateFormat")
+                                @Override
+                                public void onPositiveActionClicked(com.rey.material.app.DialogFragment fragment) {
+                                    TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
+
+                                    mCalendar.set(Calendar.HOUR_OF_DAY, dialog.getHour());
+                                    mCalendar.set(Calendar.MINUTE, dialog.getMinute());
+
+                                    Calendar current = Calendar.getInstance();
+
+                                    if (mCalendar.before(current)) {
+                                        mCalendar.add(Calendar.DAY_OF_YEAR, 1);
+
+                                    }
+
+                                    Calendar end = (Calendar) mCalendar.clone();
+                                    end.add(Calendar.HOUR_OF_DAY, 2);
+
+                                    String token = new UserData(mActivity).ShallonCreamerIsATwat;
+                                    HashMap<String, String> params = new HashMap<>();
+
+                                    params.put("Category", "9");
+                                    params.put("Latitude", "0.0");
+                                    params.put("Longitude", "0.0");
+                                    params.put("Map Title", "{null}");
+                                    params.put("Title", "{null}");
+                                    params.put("Description", " ");
+                                    params.put("End Time", end.getTimeInMillis() + "");
+                                    params.put("Start Time", mCalendar.getTimeInMillis() + "");
+                                    params.put("Hidden", "false");
+
+
+                                    Calls.createEvent(params, token, new JsonHttpResponseHandler() {
+
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                                            try {
+
+                                                int ID = response.getJSONObject(0).getInt("Event_ID");
+
+                                                Calls.inviteGroupToEvent(ID, mGroup.getGroupID(),
+                                                        new UserData(mActivity), new JsonHttpResponseHandler());
+
+
+                                                Calls.addGroupComment(mGroup.getGroupID(),
+                                                        String.format("{\"event id\" : %d}", ID),
+                                                        new UserData(mActivity),
+                                                        new JsonHttpResponseHandler() {
+
+                                                            @Override
+                                                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                                                mGroup.loadGroup(mActivity, new Group.OnLoadListener() {
+                                                                    @Override
+                                                                    public void OnUpdate() {
+
+                                                                        notifyDataSetChanged();
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            L.println(NewGroupDetailAdapter.class, response.toString());
+                                        }
+                                    });
+
+
+                                    super.onPositiveActionClicked(fragment);
+                                }
+
+                                @Override
+                                public void onNegativeActionClicked(com.rey.material.app.DialogFragment fragment) {
+                                    super.onNegativeActionClicked(fragment);
+                                }
+                            };
+
+                    //Setting the bottom buttons texts' to "OK" and "CANCEL"
+                    calBuilder.positiveAction("OK")
+                            .negativeAction("CANCEL");
+
+                    //Showing the dialog over the current Activity
+                    com.rey.material.app.DialogFragment fragment = com.rey.material.app.DialogFragment.newInstance(calBuilder);
+                    fragment.show(mActivity.getSupportFragmentManager(), "Select Time");
+
+                    break;
                 case "Leave Group":
 
                     AlertDialog.Builder b = new AlertDialog.Builder(mActivity);
@@ -663,8 +1010,8 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                     public void onClick(DialogInterface dialogInterface, int i) {
 
                                         final ProgressDialog dialog = ProgressDialog.show(mActivity, "",
-                                                                                          "Leaving group. Please wait...",
-                                                                                          true);
+                                                "Leaving group. Please wait...",
+                                                true);
 
                                         Calls.leaveGroup(mGroup.mID, (new UserData(mActivity)).ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
@@ -674,15 +1021,15 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                                                   JSONObject response) {
 
                                                 mGroup.loadGroup(mActivity,
-                                                                 new Group.OnLoadListener() {
-                                                                     @Override
-                                                                     public void OnUpdate() {
+                                                        new Group.OnLoadListener() {
+                                                            @Override
+                                                            public void OnUpdate() {
 
-                                                                         mHolder.populateHolder();
-                                                                         dialog.hide();
+                                                                mHolder.populateHolder();
+                                                                dialog.hide();
 
-                                                                     }
-                                                                 });
+                                                            }
+                                                        });
 
                                             }
                                         });
@@ -728,16 +1075,16 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                     builder.setTitle("Add Admins");
                     builder.setMultiChoiceItems(t, null,
-                                                new DialogInterface.OnMultiChoiceClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface,
-                                                                        int i, boolean b) {
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface,
+                                                    int i, boolean b) {
 
-                                                        admins[i] = b;
+                                    admins[i] = b;
 
 
-                                                    }
-                                                });
+                                }
+                            });
 
 
                     builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
@@ -779,16 +1126,16 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     AlertDialog.Builder build = new AlertDialog.Builder(mActivity);
                     build.setTitle("Remove Admins");
                     build.setMultiChoiceItems(a, null,
-                                                new DialogInterface.OnMultiChoiceClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface,
-                                                                        int i, boolean b) {
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface,
+                                                    int i, boolean b) {
 
-                                                        removeList[i] = b;
+                                    removeList[i] = b;
 
 
-                                                    }
-                                                });
+                                }
+                            });
 
 
                     build.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
@@ -803,7 +1150,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                     removeEntities.add(mGroup.mAdmins.get(i));
                             }
 
-                            for (Iterator<Entity> iterator = mGroup.mAdmins.iterator(); iterator.hasNext();) {
+                            for (Iterator<Entity> iterator = mGroup.mAdmins.iterator(); iterator.hasNext(); ) {
                                 Entity e = iterator.next();
                                 if (removeEntities.contains(e)) {
                                     Calls.removeAdmin(e.mID, mGroup.mID, token, new JsonHttpResponseHandler() {
@@ -835,16 +1182,16 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     AlertDialog.Builder buildr = new AlertDialog.Builder(mActivity);
                     buildr.setTitle("Transfer Ownership");
                     buildr.setSingleChoiceItems(newOwners, 0,
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface,
-                                                                        int i) {
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface,
+                                                    int i) {
 
-                                                        owner.mID = mGroup.mAdmins.get(i).mID;
+                                    owner.mID = mGroup.mAdmins.get(i).mID;
 
 
-                                                    }
-                                                });
+                                }
+                            });
 
 
                     buildr.setPositiveButton("Transfer", new DialogInterface.OnClickListener() {
@@ -906,16 +1253,16 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     AlertDialog.Builder buildr1 = new AlertDialog.Builder(mActivity);
                     buildr1.setTitle("Remove Member");
                     buildr1.setSingleChoiceItems(removers, 0,
-                                                new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface,
-                                                                        int i) {
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface,
+                                                    int i) {
 
-                                                        remove.mID = mGroup.mAdmins.get(i).mID;
+                                    remove.mID = mGroup.mAdmins.get(i).mID;
 
 
-                                                    }
-                                                });
+                                }
+                            });
 
 
                     buildr1.setPositiveButton("Remove", new DialogInterface.OnClickListener() {

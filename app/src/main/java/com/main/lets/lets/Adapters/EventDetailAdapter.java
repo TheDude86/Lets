@@ -249,6 +249,9 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                 h.mAction2.setText("Invite\nFriends");
                 h.mImage2.setImageResource(R.drawable.ic_mail_outline_black_24dp);
 
+                if (!mEvent.hasLocation())
+                    h.mButton3.setVisibility(View.GONE);
+
                 h.mAction3.setText("Get\nDirections");
                 h.mImage3.setImageResource(R.drawable.ic_place_black_24dp1);
 
@@ -263,6 +266,9 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
                 h.mAction2.setText("Invite\nFriends");
                 h.mImage2.setImageResource(R.drawable.ic_mail_outline_black_24dp);
+
+                if (!mEvent.hasLocation())
+                    h.mButton3.setVisibility(View.GONE);
 
                 h.mAction3.setText("Get\nDirections");
                 h.mImage3.setImageResource(R.drawable.ic_place_black_24dp1);
