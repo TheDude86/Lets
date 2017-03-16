@@ -275,15 +275,6 @@
                 android:layout_marginRight="8dp"/>
         </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Discussion"
-            android:id="@+id/textView42"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"/>
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"

@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -29,9 +30,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.ChatActivity;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.InviteActivity;
@@ -66,6 +71,8 @@ import cz.msebera.android.httpclient.Header;
  */
 public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     AppCompatActivity mActivity;
+    NetworkListener mListener;
+    long mMessageCount;
     MainHolder mHolder;
     Group mGroup;
 
@@ -74,6 +81,28 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mActivity = a;
         mGroup = g;
 
+        String s = String.format("groups/%d/chat/messages", mGroup.mID);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mMessageCount = dataSnapshot.getChildrenCount();
+
+                if (mListener != null)
+                    mListener.onFirebaseMessageUpdate();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private interface NetworkListener {
+        void onFirebaseMessageUpdate();
     }
 
     @Override
@@ -83,8 +112,11 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             return new MainHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_group_detail, parent, false));
 
-
         if (viewType == 1)
+            return new DiscussionHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_discussion, parent, false));
+
+        if (viewType == 2)
             return new CommentHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_entity_with_picture, parent, false));
 
@@ -99,15 +131,18 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (position == 0)
             return 0;
 
-        String c = mGroup.mComments.get(position - 1).mDetail;
+        if (position == 1)
+            return 1;
+
+        String c = mGroup.mComments.get(position - 2).mDetail;
 
         if (c.startsWith("{") && c.endsWith("}")) {
             try {
                 new JSONObject(c);
 
-                return 2;
+                return 3;
             } catch (JSONException e) {
-                return 1;
+                return 2;
             }
         }
 
@@ -132,6 +167,18 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             });
 
+        } else if (position == 1) {
+            final DiscussionHolder d = (DiscussionHolder) holder;
+            d.mMessages.setText(String.format("There are %d messages", mMessageCount));
+
+            mListener = new NetworkListener() {
+                @Override
+                public void onFirebaseMessageUpdate() {
+                    d.mMessages.setText(String.format("There are %d messages", mMessageCount));
+
+                }
+            };
+
         } else {
 
             if (holder instanceof CommentHolder) {
@@ -144,13 +191,10 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 h.loadUser(c.mAuthorID);
 
 
-
             } else if (holder instanceof EventHolder) {
                 final EventHolder h = (EventHolder) holder;
 
-                final Comment c = mGroup.mComments.get(position - 1);
-                L.println(Comment.class, c.mAuthorID + " ID");
-
+                final Comment c = mGroup.mComments.get(position - 2);
 
                 h.loadUser(c.mAuthorID);
                 h.mHost.setText(c.mText);
@@ -254,7 +298,41 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public int getItemCount() {
-        return 1 + mGroup.mComments.size();
+        return 2 + mGroup.mComments.size();
+    }
+
+    class DiscussionHolder extends RecyclerView.ViewHolder {
+        public CardView mContainer;
+        public TextView mMessages;
+        public TextView mJoin;
+
+        public DiscussionHolder(View itemView) {
+            super(itemView);
+
+            mContainer = (CardView) itemView.findViewById(R.id.container);
+            mMessages = (TextView) itemView.findViewById(R.id.messages);
+            mJoin = (TextView) itemView.findViewById(R.id.join);
+
+
+            mContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    int id = new UserData(mActivity).ID;
+                    String path = String.format("groups/%d/chat/messages", mGroup.mID);
+                    String s = String.format("users/%d/chats/group%d", id, mGroup.mID);
+                    DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
+
+                    db.setValue(path);
+
+                    Intent i = new Intent(mActivity, ChatActivity.class);
+                    i.putExtra("Path", path);
+                    mActivity.startActivity(i);
+                }
+            });
+
+
+        }
     }
 
     class EventHolder extends RecyclerView.ViewHolder {
@@ -805,7 +883,6 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     });
 
                 }
-
 
 
             } else if (view.equals(mAction4)) {

@@ -245,7 +245,8 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:background="#e2e2e2"
-            android:id="@+id/attendance">
+            android:id="@+id/attendance"
+            android:layout_marginBottom="10dp">
 
             <ImageView
                 android:layout_width="40dp"
@@ -276,16 +277,6 @@
                 android:id="@+id/person5"
                 android:layout_marginLeft="5dp" />
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Discussion"
-            android:id="@+id/textView37"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp" />
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

@@ -1,6 +1,7 @@
 package com.main.lets.lets.LetsAPI;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -262,7 +263,7 @@ public class User extends Entity {
         }
     }
 
-    public void load(final AppCompatActivity a, final OnLoadListener load) {
+    public void load(Context a, final OnLoadListener load) {
 
         final UserData u = new UserData(a);
 

@@ -1,12 +1,12 @@
 package com.main.lets.lets.Activities;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,17 +15,13 @@ import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -35,23 +31,15 @@ import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.Login;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
-import com.main.lets.lets.Services.RegistrationIntentService;
+import com.main.lets.lets.Services.ReminderService;
 import com.main.lets.lets.Visualizers.GlobalFeed;
 import com.main.lets.lets.Visualizers.NotificationFeed;
 import com.main.lets.lets.Visualizers.ProfileFeed;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -98,6 +86,17 @@ public class MainActivity extends AppCompatActivity {
         isVisible = false;
     }
 
+    public boolean isRemindersRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (ReminderService.class.getName().equals(service.service.getClassName())) {
+                return true;
+
+            }
+        }
+
+        return false;
+    }
 
 
     @SuppressWarnings("ConstantConditions")
@@ -106,10 +105,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        if (!isRemindersRunning()) {
+            Intent intent = new Intent(MainActivity.this, ReminderService.class);
+            startService(intent);
+
+        } else {
+            L.println(MainActivity.class, "RUNNING");
+        }
+
         mainActivity = this;
 
         gcm = GoogleCloudMessaging.getInstance(this);
-
 
         mRecyclerView = (UltimateRecyclerView) findViewById(R.id.list);
 
@@ -159,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
 
                         SharedPreferences.Editor editor = preferences.edit();
 
+                        String s = "{\"Event ID\": 200, \"Event Name\": \"Test\", \"Event Start\": \"03/05/2017 12:00:00\"}";
+
+                        JSONObject j = new JSONObject(s);
+
+                        editor.putString("Reminders", j.toString());
                         editor.putInt("UserID", response.getInt("user_id"));
                         editor.putString("Token", "Bearer " + response.getString("accessToken"));
                         editor.apply();

@@ -50,29 +50,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         loadEvent();
 
-        final EditText comment = (EditText)findViewById(R.id.txt_comment);
-        findViewById(R.id.btn_comment).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (!comment.getText().toString().equals("")) {
-
-                    Calls.addComment(mEvent.mID, new UserData(EventDetailActivity.this), comment.getText().toString(), new JsonHttpResponseHandler() {
-
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers,
-                                              JSONObject response) {
-                            comment.clearFocus();
-                            comment.setText("");
-                            loadEvent();
-                        }
-                    });
-                }
-
-
-            }
-        });
-
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -19,7 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.main.lets.lets.Activities.ChatActivity;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Dialogs.EventActions;
@@ -46,6 +53,8 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
     public OnActionsClicked mActionsClicked;
     public OnJoinClicked mOnJoinedClicked;
     public Event.MemberStatus mStatus;
+    public NetworkListener mListener;
+    public long mMessageCount;
     public int mID;
 
     public MainHolder mMainHolder;
@@ -67,6 +76,24 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         mActivity = a;
         mEvent = e;
 
+        String s = String.format("events/%d/chat/messages", mEvent.mID);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mMessageCount = dataSnapshot.getChildrenCount();
+
+                if (mListener != null)
+                    mListener.onFirebaseMessageUpdate();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -78,21 +105,28 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
             return mMainHolder;
         }
-        PictureViewHolder v = new PictureViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_entity_with_picture, parent, false));
 
-        return v;
+        return new DiscussionHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_discussion, parent, false));
 
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         if (position == 0) {
             mMainHolder = ((MainHolder) holder);
             loadMainViewHolder();
 
         } else {
-            super.onBindViewHolder(holder, position);
+
+            mListener = new NetworkListener() {
+                @Override
+                public void onFirebaseMessageUpdate() {
+                    ((DiscussionHolder) holder).mMessages.setText(String.format("There are %d messages ", mMessageCount));
+
+                }
+            };
+
 
         }
 
@@ -105,7 +139,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
     @Override
     public int getItemCount() {
-        return mList.size() + mEvent.mComments.size();
+        return 2;
     }
 
     @Override
@@ -436,6 +470,39 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
     }
 
+    class DiscussionHolder extends RecyclerView.ViewHolder {
+        public CardView mContainer;
+        public TextView mMessages;
+        public TextView mJoin;
+
+        public DiscussionHolder(View itemView) {
+            super(itemView);
+
+            mContainer = (CardView) itemView.findViewById(R.id.container);
+            mMessages = (TextView) itemView.findViewById(R.id.messages);
+            mJoin = (TextView) itemView.findViewById(R.id.join);
+
+
+            mContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    String path = String.format("events/%d/chat/messages", mEvent.mID);
+                    String s = String.format("users/%d/chats/event%d", new UserData(mActivity).ID, mEvent.mID);
+                    DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
+
+                    db.setValue(path);
+
+                    Intent i = new Intent(mActivity, ChatActivity.class);
+                    i.putExtra("Path", path);
+                    mActivity.startActivity(i);
+                }
+            });
+
+
+        }
+    }
+
     public MainHolder getmMainHolder() {
         return mMainHolder;
     }
@@ -455,5 +522,9 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
 
     public interface OnJoinClicked {
         void onClicked(int eventID);
+    }
+
+    private interface NetworkListener {
+        void onFirebaseMessageUpdate();
     }
 }

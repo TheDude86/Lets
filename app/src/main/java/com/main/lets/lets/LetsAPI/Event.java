@@ -188,7 +188,7 @@ public class Event extends Entity implements Comparable<Event> {
                     e.EventLoaded(event);
 
                     DatabaseReference db = FirebaseDatabase.getInstance()
-                            .getReference().child("events/" + event.getmEventID());
+                            .getReference().child("events/" + event.getmEventID() + "/hashtags");
 
                     db.addChildEventListener(new ChildEventListener() {
                         @Override

@@ -9,6 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.main.lets.lets.Adapters.CollageAdapter;
@@ -42,6 +43,19 @@ public class CollageActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                finish();
+                break;
+        }
+        return true;
     }
 
 }

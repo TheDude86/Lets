@@ -63,45 +63,6 @@ public class GroupDetailActivity extends AppCompatActivity {
                 mAdapter = new NewGroupDetailAdapter(GroupDetailActivity.this, mGroup);
                 mRecyclerView.setAdapter(mAdapter);
 
-                Button b = (Button) findViewById(R.id.btn_comment);
-
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        final EditText comment = (EditText) findViewById(R.id.txt_comment);
-                        UserData data = new UserData(GroupDetailActivity.this);
-
-                        final ProgressDialog dialog = ProgressDialog.show(GroupDetailActivity.this, "",
-                                "Adding comment. Please wait...", true);
-
-
-                        Calls.addGroupComment(mGroup.mID, comment.getText().toString(), data, new JsonHttpResponseHandler() {
-
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-                                mGroup.loadGroup(GroupDetailActivity.this, new Group.OnLoadListener() {
-                                    @Override
-                                    public void OnUpdate() {
-
-                                        comment.setText("");
-                                        GridLayoutManager manager = new GridLayoutManager(GroupDetailActivity.this, 1);
-                                        mRecyclerView.setLayoutManager(manager);
-                                        mAdapter = new NewGroupDetailAdapter(GroupDetailActivity.this, mGroup);
-                                        mRecyclerView.setAdapter(mAdapter);
-                                        dialog.hide();
-                                        manager.scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 100);
-
-                                    }
-                                });
-
-                            }
-                        });
-
-                    }
-                });
-
             }
         });
 

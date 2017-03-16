@@ -9,6 +9,7 @@ import java.util.Date;
  * Created by novosejr on 12/21/2016.
  */
 public class EventEntity extends Entity {
+    public Date mStart;
     public Date mEnd;
 
     public EventEntity(JSONObject j) throws JSONException {
@@ -16,6 +17,9 @@ public class EventEntity extends Entity {
 
         mEnd = new Date((Long.parseLong(j.getString("end_time")
                 .substring(6, j.getString("end_time").length() - 2))));
+
+        mStart = new Date(Long.parseLong(j.getString("start_time")
+                .substring(6, j.getString("start_time").length() - 2)));
 
     }
 }
