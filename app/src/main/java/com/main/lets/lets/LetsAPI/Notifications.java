@@ -35,8 +35,6 @@ public class Notifications extends Search{
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 
-                L.println(NotificationFeed.class, response.toString());
-
                 try {
                     JSONArray friends = response.getJSONArray("friends");
                     JSONArray events = response.getJSONArray("events");
@@ -48,8 +46,6 @@ public class Notifications extends Search{
 
                         if (!e.mStatus && mUserData.ID != e.mSender) {
 
-                            L.println(Notifications.class, e.mText + " " + e.mID);
-                            L.println(Notifications.class, mUserData.ID + " " + e.mID);
                             mUsers.add(e);
                         }
                     }

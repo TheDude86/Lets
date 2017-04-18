@@ -21,14 +21,11 @@ public class ExampleService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        L.println(ExampleService.class, "START");
-
 
         new Thread(new Runnable() {
             public void run() {
                 while (true) {
                     try {
-                        L.println(ExampleService.class, "TEST");
 
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {

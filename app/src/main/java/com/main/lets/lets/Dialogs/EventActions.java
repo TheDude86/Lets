@@ -6,20 +6,15 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.CollageActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
-import com.main.lets.lets.Adapters.FeedAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
@@ -27,12 +22,8 @@ import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
-import com.rey.material.widget.EditText;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Calendar;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -129,19 +120,19 @@ public class EventActions extends DialogFragment {
                 break;
             case "Add Co-hosts":
                 Intent inviteIntent = new Intent(mActivity, InviteActivity.class);
-                inviteIntent.putExtra("invite_id", event.getmEventID());
+                inviteIntent.putExtra("invite_id", event.getID());
                 inviteIntent.putExtra("token", mUserData.ShallonCreamerIsATwat);
                 inviteIntent.putExtra("entities", "Friends");
                 inviteIntent.putExtra("mode", "U2CFE");
-                inviteIntent.putExtra("id", mEvent.getmEventID());
+                inviteIntent.putExtra("id", mEvent.getID());
                 mActivity.startActivity(inviteIntent);
 
                 break;
             case "Remove Co-hosts":
-                final int length = mEvent.getmCohosts().size();
+                final int length = mEvent.getCohosts().size();
                 CharSequence[] list = new CharSequence[length];
                 for (int i = 0; i < length; i++) {
-                    list[i] = mEvent.getmCohosts().get(i).mText;
+                    list[i] = mEvent.getCohosts().get(i).mText;
 
                 }
 
@@ -153,11 +144,11 @@ public class EventActions extends DialogFragment {
 
                         for (int i = 0; i < values.length; i++) {
                             for (int j = 0; j < length; j++) {
-                                Entity user = mEvent.getmCohosts().get(j);
+                                Entity user = mEvent.getCohosts().get(j);
                                 if (values[i].equals(user.mText)) {
 
 
-                                    Calls.removeCohost(user.mID, event.getmEventID(), mUserData.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                    Calls.removeCohost(user.mID, event.getID(), mUserData.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
 
                                         @Override
@@ -205,7 +196,7 @@ public class EventActions extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Calls.leaveEvent(mEvent.getmEventID(), mUserData.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                        Calls.leaveEvent(mEvent.getID(), mUserData.ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -335,8 +326,6 @@ public class EventActions extends DialogFragment {
 
                                 loading.hide();
 
-                                L.println(EventActions.class, response.toString());
-
                                 AlertDialog.Builder suc = new AlertDialog.Builder(mActivity);
                                 suc.setTitle("Event Terminated");
                                 suc.setMessage("Your event has been wiped from existence.  " +
@@ -368,7 +357,7 @@ public class EventActions extends DialogFragment {
             case  "View Pictures":
 
                 Intent i = new Intent(mActivity, CollageActivity.class);
-                i.putExtra("Event", mEvent.getmEventID());
+                i.putExtra("Event", mEvent.getID());
                 mActivity.startActivity(i);
 
 

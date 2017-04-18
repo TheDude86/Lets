@@ -38,7 +38,7 @@ public class PictureViewHolder extends RecyclerView.ViewHolder {
         mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                L.println(PictureViewHolder.class, "ID:" + u.mID);
+
             }
         });
 
@@ -47,7 +47,6 @@ public class PictureViewHolder extends RecyclerView.ViewHolder {
             public void update() {
 
                 u.loadImage(mActivity, mImage);
-                L.println(PictureViewHolder.class, "ID:" + u.mID);
 
             }
         });

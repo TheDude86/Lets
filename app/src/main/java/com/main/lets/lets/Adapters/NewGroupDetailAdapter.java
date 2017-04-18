@@ -20,7 +20,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.telecom.Call;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.ChatActivity;
 import com.main.lets.lets.Activities.EventDetailActivity;
-import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Comment;
@@ -50,17 +48,14 @@ import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.User;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
-import com.rey.material.app.SimpleDialog;
 import com.rey.material.app.TimePickerDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -81,7 +76,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mActivity = a;
         mGroup = g;
 
-        String s = String.format("groups/%d/chat/messages", mGroup.mID);
+        String s = String.format("groups/%d/chat", mGroup.mID);
         DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -252,7 +247,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                     h.mTitlebar.setVisibility(View.GONE);
 
                                 } else
-                                    h.mTitle.setText(e.getmTitle());
+                                    h.mTitle.setText(e.getTitle());
 
 
                                 h.mDay.setText(e.getDay());
@@ -262,7 +257,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                 if (!e.hasLocation())
                                     h.mLocationContainer.setVisibility(View.GONE);
                                 else
-                                    h.mLocation.setText(e.getmLocationTitle());
+                                    h.mLocation.setText(e.getLocationTitle());
 
                                 h.mEventContainer.setVisibility(View.VISIBLE);
                                 h.mLoadingContainer.setVisibility(View.GONE);
@@ -271,7 +266,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                     @Override
                                     public void onClick(View view) {
                                         Intent i = new Intent(mActivity, EventDetailActivity.class);
-                                        i.putExtra("EventID", e.getmEventID());
+                                        i.putExtra("EventID", e.getID());
                                         mActivity.startActivity(i);
                                     }
                                 });
@@ -463,7 +458,6 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         mGroup.setPic_ref(s);
         mHolder.mGroupPic.setImageBitmap(null);
         mGroup.loadImage(mActivity, mHolder.mGroupPic);
-        L.println(getClass(), s);
 
     }
 
@@ -1053,7 +1047,7 @@ public class NewGroupDetailAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                                 e.printStackTrace();
                                             }
 
-                                            L.println(NewGroupDetailAdapter.class, response.toString());
+
                                         }
                                     });
 

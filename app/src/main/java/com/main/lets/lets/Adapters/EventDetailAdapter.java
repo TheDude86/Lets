@@ -10,11 +10,9 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,19 +25,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.ChatActivity;
-import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.InviteActivity;
 import com.main.lets.lets.Dialogs.EventActions;
-import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
-import com.main.lets.lets.LetsAPI.EventEntity;
-import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -71,7 +64,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(a.getBaseContext());
 
         mStatus = e.getUserStatus(preferences.getInt("UserID", -1));
-        mList.add(e.getmEventInfo());
+        mList.add(e.getInfo());
         mActive = Active.COMMENT;
         mActivity = a;
         mEvent = e;
@@ -150,7 +143,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
             case R.id.action1:
                 if (mStatus == Event.MemberStatus.GUEST) {
 
-                    Calls.inviteUserToEvent(mEvent.getmEventID(), preferences.getInt("UserID", -1),
+                    Calls.inviteUserToEvent(mEvent.getID(), preferences.getInt("UserID", -1),
                             new UserData(mActivity), new JsonHttpResponseHandler() {
 
                                 @Override
@@ -165,7 +158,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                 break;
             case R.id.action2:
                 if (mStatus == Event.MemberStatus.INVITE) {
-                    Calls.inviteUserToEvent(mEvent.getmEventID(), preferences.getInt("UserID", -1),
+                    Calls.inviteUserToEvent(mEvent.getID(), preferences.getInt("UserID", -1),
                             new UserData(mActivity), new JsonHttpResponseHandler() {
 
                                 @Override
@@ -180,7 +173,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                         mStatus == Event.MemberStatus.OWNER) {
 
                     Intent intent = new Intent(mActivity, InviteActivity.class);
-                    intent.putExtra("invite_id", mEvent.getmEventID());
+                    intent.putExtra("invite_id", mEvent.getID());
                     intent.putExtra("entities", "Friends:Groups");
                     intent.putExtra("mode", "UG2EFE");
                     mActivity.startActivity(intent);
@@ -190,7 +183,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                 break;
             case R.id.action3:
                 if (mStatus == Event.MemberStatus.INVITE) {
-                    Calls.leaveEvent(mEvent.getmEventID(), preferences.getString("Token", ""), new JsonHttpResponseHandler() {
+                    Calls.leaveEvent(mEvent.getID(), preferences.getString("Token", ""), new JsonHttpResponseHandler() {
 
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -207,7 +200,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                             mEvent.getmCords().get("latitude") + "," + mEvent.getmCords()
                             .get("longitude");
                     String query = mEvent.getmCords().get("latitude") + "," +
-                            mEvent.getmCords().get("longitude") + "(" + mEvent.getmTitle() + ")";
+                            mEvent.getmCords().get("longitude") + "(" + mEvent.getTitle() + ")";
                     String encodedQuery = Uri.encode(query);
                     String uriString = uriBegin + "?q=" + encodedQuery + "&z=16";
                     Uri uri = Uri.parse(uriString);
@@ -250,8 +243,8 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         h.resetToolbar();
 
         h.mTime.setText(mEvent.getTimeSpanString());
-        h.mLocation.setText(mEvent.getmLocationTitle());
-        h.mDescription.setText(mEvent.getmDescription());
+        h.mLocation.setText(mEvent.getLocationTitle());
+        h.mDescription.setText(mEvent.getDescription());
         h.mMonth.setText(mEvent.getMonth());
         h.mDay.setText(mEvent.getDay());
 
@@ -319,11 +312,11 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
         h.mButton3.setOnClickListener(this);
         h.mButton4.setOnClickListener(this);
 
-        int length = (mEvent.mMembers.size() > 5) ? 5 : mEvent.mMembers.size();
+        int length = (mEvent.getMembers().size() > 5) ? 5 : mEvent.getMembers().size();
         ImageView[] members = {h.mPerson1, h.mPerson2, h.mPerson3, h.mPerson4, h.mPerson5};
 
         for (int i = 0; i < length; i++) {
-            mEvent.mMembers.get(i).loadImage(mActivity, members[i]);
+            mEvent.getMembers().get(i).loadImage(mActivity, members[i]);
         }
 
         h.mAttendanceList.setOnClickListener(new View.OnClickListener() {
@@ -340,7 +333,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
     public void showAttendance() {
 
 
-        final ArrayList<Entity> entityFeed = mEvent.mMembers;
+        final ArrayList<Entity> entityFeed = mEvent.getMembers();
 
         SearchEntityAdapter adapter = new SearchEntityAdapter(entityFeed, mActivity);
 
@@ -487,7 +480,7 @@ public class EventDetailAdapter extends FeedAdapter implements View.OnClickListe
                 @Override
                 public void onClick(View view) {
 
-                    String path = String.format("events/%d/chat/messages", mEvent.mID);
+                    String path = String.format("events/%d/chat", mEvent.mID);
                     String s = String.format("users/%d/chats/event%d", new UserData(mActivity).ID, mEvent.mID);
                     DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(s);
 

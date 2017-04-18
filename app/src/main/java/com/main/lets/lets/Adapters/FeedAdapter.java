@@ -9,19 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.EventDetailActivity;
 import com.main.lets.lets.Activities.GroupDetailActivity;
 import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Holders.PictureViewHolder;
 import com.main.lets.lets.LetsAPI.BitmapLoader;
-import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Comment;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
-import com.main.lets.lets.LetsAPI.L;
-import com.main.lets.lets.LetsAPI.User;
-import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.squareup.picasso.Picasso;
 
@@ -29,8 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Joe on 8/23/2016.
@@ -58,7 +51,7 @@ public abstract class FeedAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
 
         if (mActive == Active.COMMENT) {
-            Comment c = mEvent.mComments.get(position - 1);
+            Comment c = mEvent.getComments().get(position - 1);
 
             ((PictureViewHolder) holder).mText.setText(c.mText);
             ((PictureViewHolder) holder).mDetail.setText(c.mDetail);

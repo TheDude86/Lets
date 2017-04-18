@@ -57,6 +57,10 @@ public class Entity extends Client {
 
     }
 
+    public Entity() {
+
+    }
+
     public Entity(JSONObject j) {
         try {
             if (j.has("Sender")) {

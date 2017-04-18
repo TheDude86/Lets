@@ -18,16 +18,12 @@ public class AutoStart extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        L.println(AutoStart.class, "Test");
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            L.println(AutoStart.class, "BOOT");
 
             if (!isRemindersRunning(context)) {
                 Intent i = new Intent(context, ReminderService.class);
                 context.startService(i);
 
-            } else {
-                L.println(MainActivity.class, "RUNNING");
             }
 
         }

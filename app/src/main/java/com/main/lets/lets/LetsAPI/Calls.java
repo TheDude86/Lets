@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageButton;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -26,7 +30,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -151,6 +155,13 @@ public class Calls {
         return NOTIFY_URL + relativeUrl;
     }
 
+    private static void searchByLocation(double latitude, double longitude, JsonHttpResponseHandler handler) {
+
+        //TODO: add searching other db by location
+        handler.onSuccess(0, null, new JSONArray());
+
+    }
+
     /**
      * Gets all events within a certian range from the given coordinate points.
      *
@@ -160,14 +171,79 @@ public class Calls {
      * @param jsonHttpResponseHandler code to be executed
      */
     public static void getCloseEvents(double latitude, double longitude, int range,
-                                      JsonHttpResponseHandler jsonHttpResponseHandler) {
+                                      final JsonHttpResponseHandler jsonHttpResponseHandler) {
 
-        client.removeAllHeaders();
-        RequestParams params = new RequestParams();
-        params.put("latitude", latitude);
-        params.put("longitude", longitude);
-        params.put("range", range);
-        post(GetCloseEvents, params, jsonHttpResponseHandler);
+        searchByLocation(latitude, longitude, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                //TODO: convert JSON event array
+                final ArrayList<Integer> events = new ArrayList<>();
+                final JSONArray eventList = new JSONArray();
+                events.add(224);
+                events.add(227);
+
+
+                Query ref = FirebaseDatabase.getInstance().getReference().child("events")
+                        .orderByChild("ID");
+
+
+                for (int i = 0; i < events.size(); i++) {
+                    int id = events.get(i);
+
+                    Query eventQuery = ref.equalTo(id);
+
+                    eventQuery.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Event e = dataSnapshot.getValue(Event.class);
+                            eventList.put(e.toJSON());
+                            L.println(Calls.class, e.getID() + " TEst");
+
+                            if (eventList.length() == events.size()) {
+                                jsonHttpResponseHandler.onSuccess(200, null, eventList);
+                            }
+
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                }
+
+
+            }
+        });
+
+    }
+
+    public abstract class LetsResponseListener {
+
+        public void onChildAdded() {}
+        public void onChildChanged() {}
+        public void onChildRemoved() {}
+        public void onChildMoved() {}
+        public void onChildCancelled() {}
 
     }
 
@@ -177,12 +253,39 @@ public class Calls {
      * @param id                      event ID
      * @param jsonHttpResponseHandler code to be executed
      */
-    public static void getEvent(int id, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    public static void getEvent(int id, final JsonHttpResponseHandler jsonHttpResponseHandler) {
 
-        client.removeAllHeaders();
-        RequestParams params = new RequestParams();
-        params.put("event_id", id);
-        post(GetEventById, params, jsonHttpResponseHandler);
+        Query ref = FirebaseDatabase.getInstance().getReference().child("events")
+                .orderByChild("ID").equalTo(id);
+
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Event e = dataSnapshot.getValue(Event.class);
+                jsonHttpResponseHandler.onSuccess(200, null, e.toJSON());
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
     }

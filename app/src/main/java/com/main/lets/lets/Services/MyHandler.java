@@ -27,9 +27,7 @@ public class MyHandler extends NotificationsHandler {
     public void onReceive(Context context, Bundle bundle) {
         ctx = context;
         String nhMessage = bundle.getString("message");
-        if (MainActivity.isVisible) {
-            L.println(MyHandler.class, nhMessage + "Hi");
-        }
+
     }
 
     private void sendNotification(String msg) {

@@ -86,7 +86,7 @@ public class RegistrationIntentService extends IntentService {
 
         // Notify UI that registration has completed.
         if (MainActivity.isVisible) {
-            L.println(RegistrationIntentService.class, resultString);
+
         }
     }
 }

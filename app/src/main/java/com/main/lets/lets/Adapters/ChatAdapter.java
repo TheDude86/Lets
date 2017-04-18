@@ -39,7 +39,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatHolder> {
         mActivity = a;
         mUser = new UserData(mActivity);
 
-        FirebaseDatabase.getInstance().getReference().child(d).orderByChild("timestamp").limitToLast(50).addChildEventListener(new ChildEventListener() {
+        FirebaseDatabase.getInstance().getReference().child(d + "/messages").orderByChild("timestamp").limitToLast(50).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Chat c = dataSnapshot.getValue(Chat.class);

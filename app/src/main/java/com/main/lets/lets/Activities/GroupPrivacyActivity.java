@@ -61,7 +61,6 @@ public class GroupPrivacyActivity extends AppCompatActivity {
 
                         try {
                             final int id = response.getJSONObject(0).getInt("group_id");
-                            L.println(GroupPrivacyActivity.class, response.toString());
 
                             final Group g = new Group(id);
                             g.loadGroup(GroupPrivacyActivity.this, new Group.OnLoadListener() {

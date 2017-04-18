@@ -23,7 +23,6 @@ public class JokesAdapter extends RecyclerView.Adapter <RecyclerView.ViewHolder>
         String[] jokeArray = a.getResources().getStringArray(R.array.jokes_array);
 
         for (String s: jokeArray) {
-            L.println(getClass(), s);
             mJokes.add(new JSONObject(s));
         }
 

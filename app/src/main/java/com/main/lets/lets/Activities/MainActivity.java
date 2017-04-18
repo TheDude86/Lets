@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     public GlobalFeed mGlobalFeed;
     public String mActive = "";
     int mAction = 0;
+    boolean DeveloperMode = false;
 
     public static MainActivity mainActivity;
     public static Boolean isVisible = false;
@@ -105,14 +107,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (DeveloperMode) {
+            Toast.makeText(this, "DEVELOPER MODE ACTIVATED", Toast.LENGTH_LONG).show();
+
+
+            Intent i = new Intent(this, ChatActivity.class);
+            i.putExtra("Path", "events/227/chat");
+            startActivity(i);
+        }
 
 
         if (!isRemindersRunning()) {
             Intent intent = new Intent(MainActivity.this, ReminderService.class);
             startService(intent);
 
-        } else {
-            L.println(MainActivity.class, "RUNNING");
         }
 
         mainActivity = this;
@@ -136,74 +144,74 @@ public class MainActivity extends AppCompatActivity {
         //Login object used for auto login for returning users
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-       if (!new UserData(this).isLoggedIn() && !fromWelcome) {
+        if (!new UserData(this).isLoggedIn() && !fromWelcome) {
             Intent i = new Intent(this, WelcomeActivity.class);
             startActivityForResult(i, WELCOME);
 
         }
 
         Calls.login(preferences.getString("email", ""), preferences.getString("password", ""),
-                    new JsonHttpResponseHandler() {
+                new JsonHttpResponseHandler() {
 
-            /**
-             * The login object will attempt to login automatically if there are saved credentials
-             * on the device already, if it succeeds, it will update the ProfileFeed object and if
-             * it fails, it will clear the saved credentials
-             *
-             * @param statusCode (Unused)
-             * @param headers (Unused)
-             * @param response contains the access token for the user if successfully logged in and
-             *                 returns an error message of login failed
-             */
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
+                    /**
+                     * The login object will attempt to login automatically if there are saved credentials
+                     * on the device already, if it succeeds, it will update the ProfileFeed object and if
+                     * it fails, it will clear the saved credentials
+                     *
+                     * @param statusCode (Unused)
+                     * @param headers (Unused)
+                     * @param response contains the access token for the user if successfully logged in and
+                     *                 returns an error message of login failed
+                     */
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
 
-                try {
-                    if (response.has("accessToken")) {
-                        new Calls.Notify(MainActivity.this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
+                        try {
+                            if (response.has("accessToken")) {
+                                new Calls.Notify(MainActivity.this, (ImageButton) findViewById(R.id.btn_notifications)).execute();
 
-                        SharedPreferences preferences = PreferenceManager
-                                .getDefaultSharedPreferences(getBaseContext());
+                                SharedPreferences preferences = PreferenceManager
+                                        .getDefaultSharedPreferences(getBaseContext());
 
-                        SharedPreferences.Editor editor = preferences.edit();
+                                SharedPreferences.Editor editor = preferences.edit();
 
-                        String s = "{\"Event ID\": 200, \"Event Name\": \"Test\", \"Event Start\": \"03/05/2017 12:00:00\"}";
+                                String s = "{\"Event ID\": 200, \"Event Name\": \"Test\", \"Event Start\": \"03/05/2017 12:00:00\"}";
 
-                        JSONObject j = new JSONObject(s);
+                                JSONObject j = new JSONObject(s);
 
-                        editor.putString("Reminders", j.toString());
-                        editor.putInt("UserID", response.getInt("user_id"));
-                        editor.putString("Token", "Bearer " + response.getString("accessToken"));
-                        editor.apply();
+                                editor.putString("Reminders", j.toString());
+                                editor.putInt("UserID", response.getInt("user_id"));
+                                editor.putString("Token", "Bearer " + response.getString("accessToken"));
+                                editor.apply();
 
-                        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-                        Log.println(Log.ASSERT, TAG, "Refreshed token: " + refreshedToken);
-                        Calls.registerToken(refreshedToken, new UserData(MainActivity.this), new JsonHttpResponseHandler() {
+                                String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+                                Log.println(Log.ASSERT, TAG, "Refreshed token: " + refreshedToken);
+                                Calls.registerToken(refreshedToken, new UserData(MainActivity.this), new JsonHttpResponseHandler() {
 
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                L.println(MainActivity.class, response.toString());
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                                    }
+                                });
+
+                                mGlobalFeed.update(response.getInt("user_id"),
+                                        "Bearer " + response.getString("accessToken"));
+
+                                mProfileFeed = new ProfileFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
+
+
+                            } else {
+                                Login.clearInfo(getBaseContext());
+
                             }
-                        });
 
-                        mGlobalFeed.update(response.getInt("user_id"),
-                                           "Bearer " + response.getString("accessToken"));
-
-                        mProfileFeed = new ProfileFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
-
-
-                    } else {
-                        Login.clearInfo(getBaseContext());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                     }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        });
+                });
 
 
         //Checks to see if the user has granted the app permission to get the device's location
@@ -223,10 +231,10 @@ public class MainActivity extends AppCompatActivity {
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putFloat("latitude",
-                            (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
+                    (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
 
             editor.putFloat("longitude",
-                            (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+                    (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
             editor.apply();
 
             //Draw the local event feed
@@ -372,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
                     mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 1));
                     mRecyclerView.setAdapter(new ProfilePreviewAdapter(MainActivity.this, (new UserData(MainActivity.this)).ID));
 
-                }else {
+                } else {
                     mNotificationFeed = new NotificationFeed(MainActivity.this, (UltimateRecyclerView) findViewById(R.id.list));
                     mActive = mNotificationFeed.getClass().toString();
                     mNotificationFeed.draw(null);
@@ -422,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
         String ShallonCreamerIsATwat = preferences.getString("Token", "");
 
         if (!ShallonCreamerIsATwat.equals("") && !mActive.equals(NotificationFeed.class.toString()))
-            new Calls.Notify(this, (ImageButton)findViewById(R.id.btn_notifications)).execute();
+            new Calls.Notify(this, (ImageButton) findViewById(R.id.btn_notifications)).execute();
 
 
         if (mActive.equals(mGlobalFeed.getClass().toString())) {
@@ -461,10 +469,10 @@ public class MainActivity extends AppCompatActivity {
 
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putFloat("latitude",
-                                (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
+                        (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLatitude());
 
                 editor.putFloat("longitude",
-                                (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
+                        (float) mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER).getLongitude());
                 editor.apply();
 
                 //Draw the GlobalFeed just as if the user perviously accepted the permissions
@@ -528,12 +536,10 @@ public class MainActivity extends AppCompatActivity {
             if (mAction == 1) {
                 mActive = "PROFILE";
 
-            }else if (mAction == 2){
+            } else if (mAction == 2) {
                 Intent i = new Intent(this, RegisterActivity.class);
                 startActivity(i);
             }
-
-
 
 
         }

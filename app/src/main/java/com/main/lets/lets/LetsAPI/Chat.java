@@ -2,10 +2,6 @@ package com.main.lets.lets.LetsAPI;
 
 import com.google.firebase.database.Exclude;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created by novosejr on 3/9/2017.
  */

@@ -113,7 +113,7 @@ public class Search {
             if (entity instanceof Event) {
                 Event event = (Event) entity;
 
-                if (event.getmEventID() == e.getmEventID())
+                if (event.getID() == e.getID())
                     return true;
 
             }
@@ -193,8 +193,6 @@ public class Search {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-
-                    L.println(Search.class, "Load more");
 
                     switch (f) {
                         case EVENT:

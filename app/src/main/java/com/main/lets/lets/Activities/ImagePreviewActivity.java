@@ -175,7 +175,7 @@ public class ImagePreviewActivity extends AppCompatActivity implements View.OnCl
                         mURL = "group" + mGroup.mID + "-" + millis;
 
                     } else if (imageType.equalsIgnoreCase("user")) {
-                        mURL = "user" + mEvent.mID + "-" + millis;
+                        mURL = "user" + mUser.mID + "-" + millis;
 
 
                     } else if (imageType.equalsIgnoreCase("event")) {

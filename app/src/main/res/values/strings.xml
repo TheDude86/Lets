@@ -217,4 +217,5 @@
     </string-array>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_collage">CollageActivity</string>
+    <string name="title_activity_admin_settings">AdminSettingsActivity</string>
 </resources>

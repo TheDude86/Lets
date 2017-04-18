@@ -4,16 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,52 +36,56 @@ import cz.msebera.android.httpclient.Header;
  * Created by Joe on 5/12/2016.
  */
 public class Event extends Entity implements Comparable<Event> {
-    private HashMap<String, Double> mCords;
 
-    private int mMaxAttendance = 200;
-    private boolean mUserAttending;
-    DatabaseReference mDatabaseRef;
-    private String mLocationTitle;
-    StorageReference mStorageRef;
-    private String mDescription;
-    private int mMinAttendance;
-    private int mRestrictions;
-    private boolean mIsInvite;
-    private boolean mIsActive;
-    private String mOwnerName;
-    private String mEventInfo;
-    private JSONObject mJSON;
-    private boolean mIsOwner;
-    private double mDistance;
-    private int mAttendance;
-    private LatLng mCoords;
-    private Date mCreated;
-    private String mTitle;
-    private int mEventID;
-    private int mOwnerID;
-    private Date mStart;
-    private Date mEnd;
-    private int mPicCount = 0;
+    private DatabaseReference mDatabaseRef;
+    private String locationTitle;
+    private String description;
+    private int maxAttendance;
+    private int minAttendance;
+    private boolean isInvite;
+    private long timeCreated;
+    private double longitude;
+    private double latitude;
+    private long timeStart;
+    private int category;
+    private String title;
+    private String owner;
+    private long timeEnd;
+    private String info;
+    private String key;
+    private int ownID;
+    private int ID;
 
-    public ArrayList<Entity> mMembers = new ArrayList<>();
-    public ArrayList<Entity> mInvites = new ArrayList<>();
-    public ArrayList<Entity> mCohosts = new ArrayList<>();
-    public ArrayList<Comment> mComments = new ArrayList<>();
+    private boolean userAttending;
+    private int restrictions;
+    private double distance;
+    private int attendance;
+
+
+    private ArrayList<Entity> members = new ArrayList<>();
+    private ArrayList<Entity> invites = new ArrayList<>();
+    private ArrayList<Entity> cohosts = new ArrayList<>();
+    private ArrayList<Comment> comments = new ArrayList<>();
+
 
 
 
     public enum MemberStatus {OWNER, HOST, MEMBER, INVITE, GUEST, UNKNOWN;}
     public Event(org.json.JSONObject j) throws JSONException {
         super(j.getInt("Event_ID"), j.getString("Event_Name"), EntityType.EVENT);
-        mEventInfo = j.toString();
+        info = j.toString();
         loadData(j);
 
     }
 
+    public Event() {
+        super();
+
+    }
 
     public Event(int eventID) {
         super(eventID, "Blank", EntityType.EVENT);
-        mEventID = eventID;
+        ID = eventID;
     }
 
     public Event(JSONArray eventInfo, JSONArray attendance, JSONArray cohosts, JSONArray comments) throws JSONException {
@@ -89,7 +93,7 @@ public class Event extends Entity implements Comparable<Event> {
                 eventInfo.getJSONObject(0).getString("Event_Name"),
                 EntityType.EVENT);
 
-        mEventInfo = eventInfo.getJSONObject(0).toString();
+        info = eventInfo.getJSONObject(0).toString();
 
         loadData(eventInfo.getJSONObject(0));
 
@@ -97,75 +101,102 @@ public class Event extends Entity implements Comparable<Event> {
             Entity e = new Entity(attendance.getJSONObject(i));
 
             if (e.mStatus)
-               mMembers.add(new Entity(attendance.getJSONObject(i)));
+               members.add(new Entity(attendance.getJSONObject(i)));
             else
-               mInvites.add(new Entity(attendance.getJSONObject(i)));
+               invites.add(new Entity(attendance.getJSONObject(i)));
 
         }
 
         for (int i = 0; i < cohosts.length(); i++) {
-            mCohosts.add(new Entity(cohosts.getJSONObject(i)));
+            this.cohosts.add(new Entity(cohosts.getJSONObject(i)));
         }
 
         for (int i = 0; i < comments.length(); i++) {
-            mComments.add(new Comment(comments.getJSONObject(i)));
+            this.comments.add(new Comment(comments.getJSONObject(i)));
         }
 
-        Collections.sort(mComments);
+        Collections.sort(this.comments);
 
 
     }
 
     public void loadData(JSONObject j) throws JSONException {
-        mCords = new HashMap<>();
 
-        mCoords = new LatLng(j.getDouble("Latitude"), j.getDouble("Longitude"));
 
-        mCords.put("longitude", j.getDouble("Longitude"));
-        mCords.put("latitude", j.getDouble("Latitude"));
-        mLocationTitle = j.getString("Location_Title");
-//        mMaxAttendance = j.getInt("Max_Attendance");
-//        mMinAttendance = j.getInt("Min_Attendance");
-        mDescription = j.getString("Description");
-        mOwnerName = j.getString("Creator_Name");
-        mTitle = j.getString("Event_Name");
-        mOwnerID = j.getInt("Creator_ID");
+        longitude = j.getDouble("Longitude");
+        latitude = j.getDouble("Latitude");
+        locationTitle = j.getString("Location_Title");
+//        maxAttendance = j.getInt("Max_Attendance");
+//        minAttendance = j.getInt("Min_Attendance");
+        description = j.getString("Description");
+        owner = j.getString("Creator_Name");
+        title = j.getString("Event_Name");
+        ownID = j.getInt("Creator_ID");
         mCategory = j.getInt("Category");
-        mEventID = j.getInt("Event_ID");
-        mJSON = j;
+        ID = j.getInt("Event_ID");
 
         if (j.has("Distance"))
-            mDistance = j.getDouble("Distance");
+            distance = j.getDouble("Distance");
 
-        mStart = new Date((Long.parseLong(j.getString("Start_Time")
-                .substring(6, j.getString("Start_Time").length() - 2))));
+        timeCreated = j.getLong("Time_Created");
+    }
 
-        mEnd = new Date((Long.parseLong(j.getString("End_Time")
-                .substring(6, j.getString("End_Time").length() - 2))));
+    public JSONObject toJSON() {
+        JSONObject data = new JSONObject();
 
-//        mCreated = new Date((Long.parseLong(j.getString("Time_Created")
-//                .substring(6, j.getString("Time_Created").length() - 2))));
+        try {
+            data.put("Longitude", longitude);
+            data.put("Latitude", latitude);
+            data.put("Location_Title", locationTitle);
+            data.put("Description", description);
+            data.put("Creator_Name", owner);
+            data.put("Event_Name", title);
+            data.put("Creator_ID", ownID);
+            data.put("Category", category);
+            data.put("Event_ID", ID);
+            data.put("Time_Created", timeCreated);
+
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return data;
     }
 
     public void getEventByID(final onEventLoaded e) {
 
-        Calls.getEvent(mEventID, new JsonHttpResponseHandler() {
+        Query ref = FirebaseDatabase.getInstance().getReference().child("events")
+                .orderByChild("ID").equalTo(ID);
+
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Event event = dataSnapshot.getValue(Event.class);
+                e.EventLoaded(event);
+
+            }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                try {
-                    Event event = new Event(response.getJSONArray("Event_info"),
-                            response.getJSONArray("Attending_users"),
-                            response.getJSONArray("Cohosts"),
-                            response.getJSONArray("Comments"));
+            }
 
-                    e.EventLoaded(event);
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                } catch (JSONException e1) {
-                    e.EventLoaded(null);
-                }
+            }
 
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -174,7 +205,7 @@ public class Event extends Entity implements Comparable<Event> {
 
     public void getEventByID(final onFullEventLoaded e) {
 
-        Calls.getEvent(mEventID, new JsonHttpResponseHandler() {
+        Calls.getEvent(ID, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -188,7 +219,7 @@ public class Event extends Entity implements Comparable<Event> {
                     e.EventLoaded(event);
 
                     DatabaseReference db = FirebaseDatabase.getInstance()
-                            .getReference().child("events/" + event.getmEventID() + "/hashtags");
+                            .getReference().child("events/" + event.getID() + "/hashtags");
 
                     db.addChildEventListener(new ChildEventListener() {
                         @Override
@@ -240,8 +271,6 @@ public class Event extends Entity implements Comparable<Event> {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 EventImage e = dataSnapshot.getValue(EventImage.class);
 
-                L.println(Event.class, e.getURL());
-
                 StorageReference storage = FirebaseStorage.getInstance()
                         .getReferenceFromUrl("gs://lets-push-notifications-829d7.appspot.com")
                         .child(e.getURL());
@@ -287,14 +316,15 @@ public class Event extends Entity implements Comparable<Event> {
 
     public void uploadImage(int id, Bitmap b, String url, final OnPictureUploaded l) {
 
-        String s = "events/event" + getmEventID() + "/" + url + ".jpg";
-        mStorageRef = FirebaseStorage.getInstance()
+        String s = "events/event" + getID() + "/" + url + ".jpg";
+
+        StorageReference mStorageRef = FirebaseStorage.getInstance()
                 .getReferenceFromUrl("gs://lets-push-notifications-829d7.appspot.com")
                 .child(s);
 
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("pictures");
 
-        EventImage e = new EventImage(s, getmEventID(), id);
+        EventImage e = new EventImage(s, getID(), id);
 
         mDatabaseRef.push().setValue(e);
 
@@ -325,91 +355,112 @@ public class Event extends Entity implements Comparable<Event> {
     public MemberStatus getUserStatus(int ID) {
         MemberStatus s = MemberStatus.GUEST;
 
-        for (int i = 0; i < mMembers.size(); i++) {
-            L.println(Event.class, mID + " ID");
+        for (int i = 0; i < members.size(); i++) {
 
-            if (mMembers.get(i).mID == ID) {
-                if (mMembers.get(i).mStatus)
+            if (members.get(i).mID == ID) {
+                if (members.get(i).mStatus)
                     s = MemberStatus.MEMBER;
 
             }
 
         }
 
-        for (int i = 0; i < mInvites.size(); i++) {
-            if (mInvites.get(i).mID == ID)
+        for (int i = 0; i < invites.size(); i++) {
+            if (invites.get(i).mID == ID)
                 s = MemberStatus.INVITE;
 
         }
 
-        for (int i = 0; i < mCohosts.size(); i++) {
-            if (mCohosts.get(i).mID == ID)
+        for (int i = 0; i < cohosts.size(); i++) {
+            if (cohosts.get(i).mID == ID)
                 s = MemberStatus.HOST;
 
         }
 
-        if (ID == mOwnerID)
+        if (ID == ownID)
             s = MemberStatus.OWNER;
 
         return s;
     }
 
-    public LatLng getmCoords() {
-        return mCoords;
+    public ArrayList<Comment> getComments () {
+        return comments;
     }
 
-    public void setmCoords(LatLng mCoords) {
-        this.mCoords = mCoords;
+    public void setComments(ArrayList<Comment> m) {
+        comments = m;
     }
 
-    public ArrayList<Entity> getmCohosts() {return mCohosts;}
-
-    public String getmEventInfo() {
-        return mEventInfo;
+    public ArrayList<Entity> getMembers() {
+        return  members;
     }
 
-    public void setmEventInfo(String mEventInfo) {
-        this.mEventInfo = mEventInfo;
+    public void setMembers(ArrayList<Entity> m) {
+        members = m;
     }
 
-    public int getmEventID() {
-        return this.mEventID;
+    public ArrayList<Entity> getInvites() {
+        return  members;
     }
 
-    public void setmEventID(int mEventID) {
-        this.mEventID = mEventID;
+    public void setInvites(ArrayList<Entity> m) {
+        invites = m;
     }
 
-    public int getmOwnerID() {
-        return this.mOwnerID;
+    public ArrayList<Entity> getCohosts() {
+        return cohosts;
     }
 
-    public void setmOwnerID(int mOwnerID) {
-        this.mOwnerID = mOwnerID;
+    public void setCohosts(ArrayList<Entity> m) {
+        cohosts = m;
     }
 
-    public int getmAttendance() {
-        return this.mAttendance;
+    public String getInfo() {
+        return info;
     }
 
-    public void setmAttendance(int mAttendance) {
-        this.mAttendance = mAttendance;
+    public void setInfo(String info) {
+        this.info = info;
     }
 
-    public int getmMinAttendance() {
-        return this.mMinAttendance;
+    public int getID() {
+        return this.ID;
     }
 
-    public void setmMinAttendance(int mMinAttendance) {
-        this.mMinAttendance = mMinAttendance;
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public int getOwnID() {
+        return this.ownID;
+    }
+
+    public void setOwnID(int ownerID) {
+        this.ownID = ownerID;
+    }
+
+    public int getAttendance() {
+        return this.attendance;
+    }
+
+    public void setAttendance(int attendance) {
+        this.attendance = attendance;
+    }
+
+    public int getMinAttendance() {
+        return this.minAttendance;
+    }
+
+    public void setMinAttendance(int minAttendance) {
+        this.minAttendance = minAttendance;
     }
 
     public int getMax() {
-        return this.mMaxAttendance;
+        return this.maxAttendance;
     }
 
     public void setMax(int max) {
-        this.mMaxAttendance = max;
+        this.maxAttendance = max;
     }
 
     public int getCategory() {
@@ -420,110 +471,105 @@ public class Event extends Entity implements Comparable<Event> {
         this.mCategory = category;
     }
 
-    public int getmRestrictions() {
-        return this.mRestrictions;
+    public int getRestrictions() {
+        return this.restrictions;
     }
 
-    public void setmRestrictions(int mRestrictions) {
-        this.mRestrictions = mRestrictions;
+    public void setRestrictions(int restrictions) {
+        this.restrictions = restrictions;
     }
 
-    public String getmTitle() {
-        return this.mTitle.equals("{null}") ? String.format("%s's Event", getmOwnerName()) : this.mTitle;
+    public String getTitle() {
+        return this.title.equals("{null}") ? String.format("%s's Event", getOwner()) : this.title;
     }
 
     public boolean hasTitle() {
-        return !this.mTitle.equals("{null}");
+        return !this.title.equals("{null}");
     }
 
-    public void setmTitle(String mTitle) {
-        this.mTitle = mTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getmLocationTitle() {
-        return this.mLocationTitle.equals("{null}") ? "No location set" : this.mLocationTitle;
+    public String getLocationTitle() {
+        return this.locationTitle.equals("{null}") ? "No location set" : this.locationTitle;
     }
 
     public boolean hasLocation() {
-        return !this.mLocationTitle.equals("{null}");
+        return !this.locationTitle.equals("{null}");
     }
 
-    public void setmLocationTitle(String mLocationTitle) {
-        this.mLocationTitle = mLocationTitle;
+    public void setLocationTitle(String locationTitle) {
+        this.locationTitle = locationTitle;
     }
 
-    public String getmDescription() {
-        return this.mDescription;
+    public String getDescription() {
+        return this.description;
     }
 
-    public void setmDescription(String mDescription) {
-        this.mDescription = mDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public HashMap<String, Double> getmCords() {
-        return this.mCords;
+        HashMap<String, Double> mCords = new HashMap<>();
+        mCords.put("latitude", latitude);
+        mCords.put("longitude", longitude);
+
+        return mCords;
     }
 
-    public void setmCords(HashMap mCords) {
-        this.mCords = mCords;
+    public void setmCords(HashMap<String, Double> mCords) {
+        this.latitude = mCords.get("latitude");
+        this.longitude = mCords.get("longitude");
     }
 
-    public boolean ismUserAttending() {
-        return this.mUserAttending;
+    public boolean isUserAttending() {
+        return this.userAttending;
     }
 
-    public void setmUserAttending(boolean mUserAttending) {
-        this.mUserAttending = mUserAttending;
+    public void setUserAttending(boolean userAttending) {
+        this.userAttending = userAttending;
     }
 
 
     public String getTimeSpanString() {
-        String s = new SimpleDateFormat("h:mm a").format(mStart.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime());
+        Date start = new Date(timeStart);
+        Date end = new Date(timeEnd);
+
+        String s = new SimpleDateFormat("h:mm a").format(start.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(end.getTime());
 
         if (s.equalsIgnoreCase("12:00 AM - 12:00 AM")) {
 
             return "All Day";
         }
 
-        return (new SimpleDateFormat("h:mm a").format(mStart.getTime()) + " - " + (new SimpleDateFormat("h:mm a")).format(mEnd.getTime()));
+        return s;
     }
 
     public String getMonth() {
+        Date start = new Date(timeStart);
 
-        return (new SimpleDateFormat("MMM").format(mStart.getTime()));
+        return (new SimpleDateFormat("MMM").format(start.getTime()));
     }
 
     public String getDay() {
+        Date end = new Date(timeEnd);
 
-        return (new SimpleDateFormat("dd").format(mStart.getTime()));
+        return (new SimpleDateFormat("dd").format(end.getTime()));
     }
 
-    public boolean ismIsOwner() {
-        return this.mIsOwner;
+    public boolean isInvite() {
+        return this.isInvite;
     }
 
-    public void setmIsOwner(boolean isOwner) {
-        this.mIsOwner = isOwner;
+    public void setInvite(boolean isInvite) {
+        this.isInvite = isInvite;
     }
 
-    public boolean ismIsInvite() {
-        return this.mIsInvite;
-    }
-
-    public void setmIsInvite(boolean isInvite) {
-        this.mIsInvite = isInvite;
-    }
-
-    public boolean ismIsActive() {
-        return this.mIsActive;
-    }
-
-    public void setmIsActive(boolean isActive) {
-        this.mIsActive = isActive;
-    }
 
     public int priority() {
-        return !this.mIsActive ? 0 : (this.mIsInvite ? 4 : (this.mIsActive && this.mCategory > -1 ? 2 : (this.mCategory < 0 ? Math.abs(this.mCategory) : -1)));
+        return (this.isInvite ? 4 : (this.mCategory > -1 ? 2 : (this.mCategory < 0 ? Math.abs(this.mCategory) : -1)));
     }
 
     public int compareTo(Event arg0) {
@@ -533,24 +579,28 @@ public class Event extends Entity implements Comparable<Event> {
 
         }
 
+        Date start = new Date(timeStart);
+        Date end = new Date(timeEnd);
 
-        return this.priority() == arg0.priority() ? (mStart.before(arg0.mStart) ? -1 : (mStart.after(arg0.mStart) ? 1 : 0)) : (this.priority() > arg0.priority() ? -1 : 1);
+        return this.priority() == arg0.priority() ?
+                (start.before(new Date(arg0.timeStart)) ?
+                        -1 : (start.after(new Date(arg0.timeStart)) ? 1 : 0)) : (this.priority() > arg0.priority() ? -1 : 1);
     }
 
-    public Date getStart() {
-        return mStart;
+    public Date getTimeStart() {
+        return new Date(timeStart);
     }
 
-    public void setStart(Date mStart) {
-        this.mStart = mStart;
+    public void setTimeStart(long mStart) {
+        this.timeStart = mStart;
     }
 
-    public Date getEnd() {
-        return mEnd;
+    public Date getTimeEnd() {
+        return new Date(timeEnd);
     }
 
-    public void setEnd(Date mEnd) {
-        this.mEnd = mEnd;
+    public void setTimeEnd(long mEnd) {
+        this.timeEnd = mEnd;
     }
 
     public int getImageResourceId(Context context) {
@@ -558,44 +608,47 @@ public class Event extends Entity implements Comparable<Event> {
                 .replaceAll("\\s+", "").toLowerCase(), "drawable", context.getPackageName());
     }
 
-    public Date getmCreated() {
-        return mCreated;
+    public Date getTimeCreated() {
+        return new Date(timeStart);
     }
 
-    public void setmCreated(Date mCreated) {
-        this.mCreated = mCreated;
+    public void setTimeCreated(long timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
-    public double getmDistance() {
-        return mDistance;
+    public double getDistance() {
+        return distance;
     }
 
-    public void setmDistance(double mDistance) {
-        this.mDistance = mDistance;
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
-    public JSONObject getmJSON() {
-        return mJSON;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setmJSON(JSONObject mJSON) {
-        this.mJSON = mJSON;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public String getmOwnerName() {
-        return mOwnerName;
+    @Exclude
+    public String getKey() {
+        return key;
     }
 
-    public void setmOwnerName(String mOwnerName) {
-        this.mOwnerName = mOwnerName;
+    public void setKey(String key) {
+        this.key = key;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof  Event) {
             Event e = (Event) o;
 
-            if (e.getmEventID() == getmEventID())
+            if (e.getID() == getID())
                 return true;
 
         }

@@ -63,9 +63,6 @@ public class ReminderNotificationService extends NotificationListenerService {
         SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(getBaseContext());
 
-        L.println(ReminderService.class, preferences.getString("Reminder", "EMPTY"));
-
-        L.println(ReminderService.class, String.format("Name: %s, ID: %d, Start: %s", mUserData.reminder.mName, mUserData.reminder.mID, new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(mUserData.reminder.mStart)));
 
         if (mUserData.reminder.mID == 0) {
 
@@ -99,8 +96,6 @@ public class ReminderNotificationService extends NotificationListenerService {
                                 JSONObject j = new JSONObject(s);
                                 edit.putString("Reminder", j.toString());
                                 edit.apply();
-
-                                L.println(ReminderService.class, p.getString("Reminder", "EMPTY") + "\n");
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

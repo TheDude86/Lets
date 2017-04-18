@@ -1,6 +1,5 @@
 package com.main.lets.lets.Adapters;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -70,10 +69,10 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
             final org.json.JSONObject j = new org.json.JSONObject(data);
             e = new Event(j);
 
-            holder.mLocation.setText(e.getmLocationTitle());
+            holder.mLocation.setText(e.getLocationTitle());
             holder.mTime.setText(e.getTimeSpanString());
-            holder.mHost.setText(e.getmOwnerName());
-            holder.mTitle.setText(e.getmTitle());
+            holder.mHost.setText(e.getOwner());
+            holder.mTitle.setText(e.getTitle());
             holder.mMonth.setText(e.getMonth());
             holder.mDay.setText(e.getDay());
 
@@ -102,7 +101,7 @@ public class EventAdapter extends easyRegularAdapter<String, EventAdapter.ViewHo
                 }
             });
 
-            final User u = new User(e.getmOwnerID());
+            final User u = new User(e.getOwnID());
             u.load(mActivity, new User.OnLoadListener() {
                 @Override
                 public void update() {

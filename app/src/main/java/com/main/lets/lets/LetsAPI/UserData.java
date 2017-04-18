@@ -82,7 +82,6 @@ public class UserData {
         reminderLength = preferences.getLong("Reminder Length", 1000 * 60 * 30);
 
         try {
-            L.println(UserData.class, preferences.getString("Reminder", "{s : 0}"));
             JSONObject j = new JSONObject(preferences.getString("Reminder", "{s: 0}"));
             reminder = new Reminder(j);
         } catch (JSONException e) {
@@ -91,7 +90,6 @@ public class UserData {
     }
 
     public boolean isLoggedIn() {
-        L.println(getClass(), "ID: " + ID);
         return !(ID == -1);
     }
 

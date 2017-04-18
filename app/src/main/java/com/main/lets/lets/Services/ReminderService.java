@@ -75,8 +75,6 @@ public class ReminderService extends Service {
                         if (e.mStart.before(entity.mStart) && e.mStart.after(current)) {
                             entity = e;
 
-                            L.println(ReminderService.class, e.mText);
-
                         }
 
                     }
@@ -95,7 +93,6 @@ public class ReminderService extends Service {
                             edit.putString("Reminder", j.toString());
                             edit.apply();
 
-                            L.println(ReminderService.class, p.getString("Reminder", "EMPTY") + "\n");
 
                         } catch (JSONException e) {
                             e.printStackTrace();

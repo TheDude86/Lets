@@ -14,18 +14,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.main.lets.lets.Activities.InviteActivity;
-import com.main.lets.lets.Activities.UserDetailActivity;
 import com.main.lets.lets.Adapters.EventDetailAdapter;
 import com.main.lets.lets.Adapters.FeedAdapter;
 import com.main.lets.lets.LetsAPI.Calls;
 import com.main.lets.lets.LetsAPI.Entity;
 import com.main.lets.lets.LetsAPI.Event;
-import com.main.lets.lets.LetsAPI.L;
 import com.main.lets.lets.LetsAPI.UserData;
 import com.main.lets.lets.R;
 import com.rey.material.app.SimpleDialog;
@@ -76,7 +73,7 @@ public class EventDetailFeed extends Client {
             mRecyclerView.setLayoutManager(
                     new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
             mEventAdapter = new EventDetailAdapter(mActivity, j.toString(),
-                    (new Event(j).getmOwnerID() == mID) ?
+                    (new Event(j).getOwnID() == mID) ?
                             Event.MemberStatus.HOST :
                             Event.MemberStatus.UNKNOWN);
 
@@ -95,7 +92,7 @@ public class EventDetailFeed extends Client {
 
 
                                     } else {
-                                        Calls.inviteUserToEvent(new Event(j).getmEventID(), mID, new UserData(mActivity), new JsonHttpResponseHandler() {
+                                        Calls.inviteUserToEvent(new Event(j).getID(), mID, new UserData(mActivity), new JsonHttpResponseHandler() {
                                             @Override
                                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                                 mEventAdapter.mStatus = Event.MemberStatus.MEMBER;
@@ -267,9 +264,9 @@ public class EventDetailFeed extends Client {
             switch (s) {
                 case "Invite":
                     Intent intent = new Intent(mActivity, InviteActivity.class);
-                    intent.putExtra("invite_id", event.getmEventID());
+                    intent.putExtra("invite_id", event.getID());
                     intent.putExtra("entities", "Friends:Groups");
-                    intent.putExtra("id", mEvent.getmEventID());
+                    intent.putExtra("id", mEvent.getID());
                     intent.putExtra("mode", "UG2EFE");
                     mActivity.startActivity(intent);
 
@@ -292,7 +289,7 @@ public class EventDetailFeed extends Client {
                                     "Loading. Please " +
                                             "wait...",
                                     true);
-                            Calls.addComment(event.getmEventID(), new UserData(mActivity),
+                            Calls.addComment(event.getID(), new UserData(mActivity),
                                     e.getText().toString(),
                                     new JsonHttpResponseHandler() {
                                         @Override
@@ -312,7 +309,7 @@ public class EventDetailFeed extends Client {
 
                                                 JSONObject j = new JSONObject();
                                                 j.put("user_id", mID);
-                                                j.put("event_id", event.getmEventID());
+                                                j.put("event_id", event.getID());
                                                 j.put("text", e.getText().toString());
                                                 j.put("timestamp",
                                                         "/Date(" + Calendar.getInstance()
@@ -361,7 +358,7 @@ public class EventDetailFeed extends Client {
                             event.getmCords().get("latitude") + "," + event.getmCords()
                             .get("longitude");
                     String query = event.getmCords().get("latitude") + "," +
-                            event.getmCords().get("longitude") + "(" + event.getmTitle() + ")";
+                            event.getmCords().get("longitude") + "(" + event.getTitle() + ")";
                     String encodedQuery = Uri.encode(query);
                     String uriString = uriBegin + "?q=" + encodedQuery + "&z=16";
                     Uri uri = Uri.parse(uriString);
@@ -371,7 +368,7 @@ public class EventDetailFeed extends Client {
                     break;
                 case "Add Co-hosts":
                     Intent inviteIntent = new Intent(mActivity, InviteActivity.class);
-                    inviteIntent.putExtra("invite_id", event.getmEventID());
+                    inviteIntent.putExtra("invite_id", event.getID());
                     inviteIntent.putExtra("token", ShallonCreamerIsATwat);
                     inviteIntent.putExtra("entities", "Friends");
                     inviteIntent.putExtra("mode", "U2CFE");
@@ -403,7 +400,7 @@ public class EventDetailFeed extends Client {
                                         if (values[i].equals(user.mText)) {
 
 
-                                            Calls.removeCohost(user.mID, event.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                                            Calls.removeCohost(user.mID, event.getID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
 
                                                 @Override
@@ -453,7 +450,7 @@ public class EventDetailFeed extends Client {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
-                            Calls.leaveEvent(mEvent.getmEventID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
+                            Calls.leaveEvent(mEvent.getID(), ShallonCreamerIsATwat, new JsonHttpResponseHandler() {
 
                                 @Override
                                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

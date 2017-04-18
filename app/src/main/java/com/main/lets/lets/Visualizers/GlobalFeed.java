@@ -79,8 +79,6 @@ public class GlobalFeed extends Client {
                     public void onSuccess(int statusCode, Header[] headers,
                                           org.json.JSONArray response) {
 
-                        L.println(GlobalFeed.class, "lat: ");
-
                         ArrayList<Event> events = new ArrayList<>();
 
                         for (int i = 0; i < response.length(); i++) {
@@ -94,7 +92,8 @@ public class GlobalFeed extends Client {
                         Collections.sort(events);
 
                         for (Event e : events) {
-                            mEventAdapter.insertLast(e.getmJSON().toString());
+                              //TODO FIX THIS SHIT
+                            mEventAdapter.insertLast(e.getInfo());
                         }
 
 

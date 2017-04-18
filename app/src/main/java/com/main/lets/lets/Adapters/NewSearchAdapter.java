@@ -117,8 +117,6 @@ public class NewSearchAdapter extends RecyclerView.Adapter<NewSearchAdapter.Sear
             if (s.equalsIgnoreCase(mFeeds[0])) {
                 mFeed = mSearch.mEvents;
 
-                L.println(NewSearchAdapter.class, mFeed.size() + " Events");
-                L.println(NewSearchAdapter.class, "TEST");
                 if (!mSearch.mLoadMore[0])
                     mLoadMore.setVisibility(View.GONE);
 

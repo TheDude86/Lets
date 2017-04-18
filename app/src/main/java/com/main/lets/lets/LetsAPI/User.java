@@ -80,7 +80,6 @@ public class User extends Entity {
         this.setScore(j.getInt("Score"));
         mGroupList = new LinkedList<>();
 
-        L.println(getClass(), j.toString());
 
     }
 
@@ -255,7 +254,7 @@ public class User extends Entity {
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    L.println(User.class, response.toString());
+
                     load.update();
                 }
             });
